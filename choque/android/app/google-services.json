@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1013852381026",
+    "project_id": "cho-que-c9752",
+    "storage_bucket": "cho-que-c9752.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1013852381026:android:adb0db28f54de4aa3a163b",
+        "android_client_info": {
+          "package_name": "com.example.choque"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwwNFkWyfvPieShurYMuIJz4U3DC63g_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

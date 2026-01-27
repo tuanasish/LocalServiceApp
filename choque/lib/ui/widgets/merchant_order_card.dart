@@ -13,6 +13,7 @@ class MerchantOrderCard extends StatelessWidget {
   final bool isUrgent;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
+  final VoidCallback? onMarkReady;
 
   const MerchantOrderCard({
     super.key,
@@ -25,6 +26,7 @@ class MerchantOrderCard extends StatelessWidget {
     this.isUrgent = false,
     this.onAccept,
     this.onReject,
+    this.onMarkReady,
   });
 
   Color get _statusColor {
@@ -33,6 +35,8 @@ class MerchantOrderCard extends StatelessWidget {
         return AppColors.primary;
       case 'Đang chuẩn bị':
         return const Color(0xFFF59E0B);
+      case 'Sẵn sàng':
+        return AppColors.success;
       default:
         return AppColors.textSecondary;
     }
@@ -181,6 +185,25 @@ class MerchantOrderCard extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              if (status == 'Đang chuẩn bị')
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.success,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                    ),
+                  ),
+                  onPressed: onMarkReady,
+                  child: Text(
+                    'Sẵn sàng',
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                 ),
             ],
           ),

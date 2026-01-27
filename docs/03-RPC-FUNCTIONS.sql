@@ -496,6 +496,46 @@ begin
 end;
 $$;
 
+-- Thống kê đơn hàng của driver
+create or replace function public.get_driver_stats(
+  p_driver_id uuid,
+  p_date_from timestamptz default null,
+  p_date_to timestamptz default null
+)
+returns jsonb
+language plpgsql
+security definer
+as $$
+declare
+  v_stats jsonb;
+begin
+  -- Check driver owns this or is admin
+  if p_driver_id != auth.uid() and not has_role('super_admin') then
+    raise exception 'NOT_ALLOWED';
+  end if;
+  
+  select jsonb_build_object(
+    'total_orders', count(*) filter (where status = 'COMPLETED'),
+    'today_orders', count(*) filter (
+      where status = 'COMPLETED' 
+      and completed_at::date = current_date
+    ),
+    'active_orders', count(*) filter (where status in ('ASSIGNED', 'PICKED_UP')),
+    'total_earnings', coalesce(sum(delivery_fee) filter (where status = 'COMPLETED'), 0),
+    'today_earnings', coalesce(sum(delivery_fee) filter (
+      where status = 'COMPLETED' 
+      and completed_at::date = current_date
+    ), 0)
+  ) into v_stats
+  from public.orders
+  where driver_id = p_driver_id
+    and (p_date_from is null or created_at >= p_date_from)
+    and (p_date_to is null or created_at <= p_date_to);
+  
+  return v_stats;
+end;
+$$;
+
 -- ============================================
 -- MERCHANT FUNCTIONS
 -- ============================================
@@ -531,6 +571,124 @@ begin
 end;
 $$;
 
+-- Lấy shop của merchant hiện tại
+create or replace function public.get_my_shop()
+returns public.shops
+language plpgsql
+security definer
+as $$
+declare
+  v_shop public.shops;
+begin
+  select * into v_shop
+  from public.shops
+  where owner_user_id = auth.uid()
+    and status = 'active'
+  limit 1;
+  
+  if v_shop is null then
+    raise exception 'NO_SHOP_FOUND';
+  end if;
+  
+  return v_shop;
+end;
+$$;
+
+-- Lấy đơn hàng của shop (merchant)
+create or replace function public.get_shop_orders(
+  p_shop_id uuid,
+  p_status text default null,
+  p_limit int default 50
+)
+returns table (
+  id uuid,
+  order_number int,
+  customer_id uuid,
+  customer_name text,
+  customer_phone text,
+  status text,
+  items_total int,
+  delivery_fee int,
+  total_amount int,
+  discount_amount int,
+  created_at timestamptz,
+  confirmed_at timestamptz,
+  pickup jsonb,
+  dropoff jsonb,
+  note text
+)
+language plpgsql
+security definer
+as $$
+begin
+  -- Check merchant owns this shop
+  if not is_shop_owner(p_shop_id) and not has_role('super_admin') then
+    raise exception 'NOT_ALLOWED';
+  end if;
+  
+  return query
+  select 
+    o.id,
+    o.order_number,
+    o.customer_id,
+    o.customer_name,
+    o.customer_phone,
+    o.status,
+    o.items_total,
+    o.delivery_fee,
+    o.total_amount,
+    o.discount_amount,
+    o.created_at,
+    o.confirmed_at,
+    o.pickup,
+    o.dropoff,
+    o.note
+  from public.orders o
+  where o.shop_id = p_shop_id
+    and (p_status is null or o.status = p_status)
+    and o.status != 'CANCELED'
+  order by o.created_at desc
+  limit p_limit;
+end;
+$$;
+
+-- Thống kê đơn hàng của shop
+create or replace function public.get_shop_stats(
+  p_shop_id uuid,
+  p_date_from timestamptz default null,
+  p_date_to timestamptz default null
+)
+returns jsonb
+language plpgsql
+security definer
+as $$
+declare
+  v_stats jsonb;
+begin
+  if not is_shop_owner(p_shop_id) and not has_role('super_admin') then
+    raise exception 'NOT_ALLOWED';
+  end if;
+  
+  select jsonb_build_object(
+    'total_orders', count(*),
+    'pending_orders', count(*) filter (where status = 'PENDING_CONFIRMATION'),
+    'preparing_orders', count(*) filter (where status = 'CONFIRMED'),
+    'completed_orders', count(*) filter (where status = 'COMPLETED'),
+    'total_revenue', coalesce(sum(total_amount) filter (where status = 'COMPLETED'), 0),
+    'today_revenue', coalesce(sum(total_amount) filter (
+      where status = 'COMPLETED' 
+      and completed_at::date = current_date
+    ), 0)
+  ) into v_stats
+  from public.orders
+  where shop_id = p_shop_id
+    and (p_date_from is null or created_at >= p_date_from)
+    and (p_date_to is null or created_at <= p_date_to);
+  
+  return v_stats;
+end;
+$$;
+
 -- ============================================
 -- UTILITY FUNCTIONS
 -- ============================================
@@ -562,3 +720,52 @@ as $$
     and zone_name = p_zone_name
   limit 1;
 $$;
+
+-- ============================================
+-- NOTIFICATION FUNCTIONS
+-- ============================================
+
+-- Function để tạo notification (sẽ được gọi từ backend/service)
+create or replace function public.create_notification(
+  p_user_id uuid,
+  p_title text,
+  p_body text,
+  p_type text,
+  p_data jsonb default null
+) returns uuid as $$
+declare
+  v_notification_id uuid;
+begin
+  insert into public.notifications (
+    user_id, title, body, type, data
+  ) values (
+    p_user_id, p_title, p_body, p_type, p_data
+  ) returning id into v_notification_id;
+
+  -- TODO: Trigger FCM push notification từ backend
+  -- (Cần implement trong backend service, không phải SQL)
+
+  return v_notification_id;
+end;
+$$ language plpgsql security definer;
+
+-- Function để tạo notification cho nhiều users (broadcast)
+create or replace function public.create_broadcast_notification(
+  p_user_ids uuid[],
+  p_title text,
+  p_body text,
+  p_type text,
+  p_data jsonb default null
+) returns int as $$
+declare
+  v_count int;
+begin
+  insert into public.notifications (
+    user_id, title, body, type, data
+  )
+  select unnest(p_user_ids), p_title, p_body, p_type, p_data;
+
+  get diagnostics v_count = row_count;
+  return v_count;
+end;
+$$ language plpgsql security definer;

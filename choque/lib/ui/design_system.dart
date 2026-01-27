@@ -48,12 +48,14 @@ class AppTextStyles {
         fontSize: 20,
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
+        letterSpacing: -0.5,
       );
 
   static TextStyle get heading18 => GoogleFonts.inter(
         fontSize: 18,
         fontWeight: FontWeight.w700,
         color: AppColors.textPrimary,
+        letterSpacing: -0.5,
       );
 
   static TextStyle get label14 => GoogleFonts.inter(
@@ -66,6 +68,32 @@ class AppTextStyles {
         fontSize: 13,
         color: AppColors.textSecondary,
       );
+
+  static TextStyle get body15Secondary => GoogleFonts.inter(
+        fontSize: 15,
+        color: AppColors.textSecondary,
+      );
+
+  static TextStyle get body13 => GoogleFonts.inter(
+        fontSize: 13,
+        color: AppColors.textPrimary,
+      );
+
+  static TextStyle get body12 => GoogleFonts.inter(
+        fontSize: 12,
+        color: AppColors.textSecondary,
+      );
+
+  static TextStyle get body11 => GoogleFonts.inter(
+        fontSize: 11,
+        color: AppColors.textSecondary,
+      );
+
+  static TextStyle get label16 => GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        color: AppColors.textPrimary,
+      );
 }
 
 /// Header đơn giản với nút back + title, dùng lại cho nhiều màn.
@@ -73,9 +101,11 @@ class AppSimpleHeader extends StatelessWidget {
   const AppSimpleHeader({
     super.key,
     required this.title,
+    this.actions,
   });
 
   final String title;
+  final List<Widget>? actions;
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +140,19 @@ class AppSimpleHeader extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
-          Text(
-            title,
-            style: GoogleFonts.inter(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+          Expanded(
+            child: Text(
+              title,
+              style: GoogleFonts.inter(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+                letterSpacing: -0.5,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
+          if (actions != null) ...actions!,
         ],
       ),
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../ui/design_system.dart';
 
 /// Welcome Onboarding Screen
@@ -22,13 +23,11 @@ class WelcomeOnboardingScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: () {
-                    // TODO: điều hướng vào home / login
-                  },
+                  onPressed: () => context.go('/'),
                   child: Text(
                     'Bỏ qua',
                     style: GoogleFonts.inter(
-                      fontSize: 13,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: AppColors.textSecondary,
                     ),
@@ -40,27 +39,21 @@ class WelcomeOnboardingScreen extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: size.width * 0.7,
-                      height: size.width * 0.7,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.06),
-                        borderRadius: BorderRadius.circular(AppRadius.large),
-                      ),
-                      child: Icon(
-                        Icons.local_grocery_store_outlined,
-                        size: size.width * 0.25,
-                        color: AppColors.primary,
-                      ),
+                    Image.asset(
+                      'assets/images/logo.png',
+                      width: size.width * 0.5,
+                      height: size.width * 0.5,
+                      fit: BoxFit.contain,
                     ),
                     const SizedBox(height: 32),
                     Text(
                       'Chợ Quê trong tầm tay bạn',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w700,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
                         color: AppColors.textPrimary,
+                        letterSpacing: -0.5,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -68,8 +61,8 @@ class WelcomeOnboardingScreen extends StatelessWidget {
                       'Đặt món ngon nhà làm, đặc sản vùng miền\nvà thực phẩm tươi mỗi ngày, giao tận nơi.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.inter(
-                        fontSize: 14,
-                        height: 1.5,
+                        fontSize: 15,
+                        height: 1.6,
                         color: AppColors.textSecondary,
                       ),
                     ),
@@ -91,18 +84,17 @@ class WelcomeOnboardingScreen extends StatelessWidget {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 0,
                   ),
-                  onPressed: () {
-                    // TODO: điều hướng vào màn Login / Home
-                  },
+                  onPressed: () => context.push('/register'),
                   child: Text(
                     'Bắt đầu khám phá',
                     style: GoogleFonts.inter(
-                      fontSize: 15,
+                      fontSize: 16,
                       fontWeight: FontWeight.w700,
                       color: Colors.white,
                     ),
@@ -111,15 +103,13 @@ class WelcomeOnboardingScreen extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               TextButton(
-                onPressed: () {
-                  // TODO: điều hướng tới Login Selection
-                },
+                onPressed: () => context.push('/login'),
                 child: Text(
                   'Tôi đã có tài khoản',
                   style: GoogleFonts.inter(
-                    fontSize: 13,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
+                    color: AppColors.primary,
                   ),
                 ),
               ),

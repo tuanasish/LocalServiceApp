@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../ui/design_system.dart';
+import '../../data/models/location_model.dart';
+import 'map_address_picker_screen.dart';
 
 /// Manual Address Selection Screen
 /// Thiết lập / chọn địa chỉ giao hàng thủ công.
@@ -25,7 +28,7 @@ class ManualAddressSelectionScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       _buildCurrentAddressCard(),
                       const SizedBox(height: 20),
-                      _buildManualFormCard(),
+                      _buildManualFormCard(context),
                       const SizedBox(height: 24),
                       _buildConfirmHint(),
                       const SizedBox(height: 100),
@@ -98,7 +101,7 @@ class ManualAddressSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildManualFormCard() {
+  Widget _buildManualFormCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -124,6 +127,43 @@ class ManualAddressSelectionScreen extends StatelessWidget {
             label: 'Số điện thoại',
             hint: '0901234567',
             keyboardType: TextInputType.phone,
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 12),
+              side: const BorderSide(color: AppColors.primary),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.medium),
+              ),
+            ),
+            onPressed: () async {
+              final result = await context.push<LocationModel>(
+                '/address/map-picker',
+              );
+              if (result != null) {
+                // TODO: Cập nhật form với result
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Đã chọn: ${result.address ?? result.label}'),
+                    backgroundColor: AppColors.success,
+                  ),
+                );
+              }
+            },
+            icon: const Icon(
+              Icons.map_outlined,
+              size: 18,
+              color: AppColors.primary,
+            ),
+            label: Text(
+              'Chọn trên bản đồ',
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
           _buildTextField(

@@ -9,6 +9,7 @@ class OrderTimelineItem extends StatelessWidget {
   final String title;
   final String subtitle;
   final bool isCompleted;
+  final bool isActive;
   final bool isLast;
 
   const OrderTimelineItem({
@@ -18,6 +19,7 @@ class OrderTimelineItem extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.isCompleted,
+    this.isActive = false,
     this.isLast = false,
   });
 
@@ -32,13 +34,20 @@ class OrderTimelineItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isCompleted ? iconColor : AppColors.textMuted.withValues(alpha: 0.1),
+                color: isActive 
+                    ? iconColor.withValues(alpha: 0.2)
+                    : (isCompleted ? iconColor : AppColors.textMuted.withValues(alpha: 0.1)),
                 shape: BoxShape.circle,
+                border: isActive 
+                    ? Border.all(color: iconColor, width: 2)
+                    : null,
               ),
               child: Icon(
                 icon,
                 size: 20,
-                color: isCompleted ? Colors.white : AppColors.textMuted,
+                color: isActive || isCompleted 
+                    ? iconColor 
+                    : AppColors.textMuted,
               ),
             ),
             if (!isLast)
@@ -60,8 +69,10 @@ class OrderTimelineItem extends StatelessWidget {
                   title,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: isCompleted ? AppColors.textPrimary : AppColors.textMuted,
+                    fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+                    color: isActive || isCompleted 
+                        ? AppColors.textPrimary 
+                        : AppColors.textMuted,
                   ),
                 ),
                 const SizedBox(height: 4),

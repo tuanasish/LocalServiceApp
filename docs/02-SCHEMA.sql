@@ -37,6 +37,10 @@ create table public.shops (
   address text,
   phone text,
   owner_user_id uuid references public.profiles(user_id),
+  rating double precision,
+  opening_hours text,
+  lat double precision,
+  lng double precision,
   status text not null default 'active',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -103,6 +107,28 @@ create table public.fixed_pricing (
 );
 
 create index fixed_pricing_lookup_idx on public.fixed_pricing(market_id, service_type);
+
+-- User Addresses (for user address management)
+create table if not exists public.addresses (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(user_id) on delete cascade,
+  label text not null,
+  details text not null,
+  lat double precision,
+  lng double precision,
+  is_default boolean not null default false,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index addresses_user_idx on public.addresses(user_id);
+create index addresses_default_idx on public.addresses(user_id, is_default) where is_default = true;
+
+-- Tạo index để tìm kiếm địa chỉ gần (nếu có PostGIS extension)
+-- create index if not exists addresses_location_idx 
+--   on public.addresses using gist (
+--     point(lng, lat)
+--   ) where lat is not null and lng is not null;
 
 -- ============================================
 -- 3. ORDERS
@@ -586,6 +612,7 @@ alter table public.driver_locations enable row level security;
 alter table public.app_configs enable row level security;
 alter table public.promotions enable row level security;
 alter table public.user_promotions enable row level security;
+alter table public.addresses enable row level security;
 
 -- Profiles
 create policy "Users read own profile" on public.profiles for select using (user_id = auth.uid());
@@ -666,6 +693,20 @@ create policy "Admin read all user promotions" on public.user_promotions
 create policy "Service role full access user promotions" on public.user_promotions 
   for all using (auth.role() = 'service_role');
 
+-- Addresses
+create policy "Users read own addresses" on public.addresses 
+  for select using (user_id = auth.uid());
+create policy "Users insert own addresses" on public.addresses 
+  for insert with check (user_id = auth.uid());
+create policy "Users update own addresses" on public.addresses 
+  for update using (user_id = auth.uid());
+create policy "Users delete own addresses" on public.addresses 
+  for delete using (user_id = auth.uid());
+create policy "Admin read all addresses" on public.addresses 
+  for select using (has_role('super_admin'));
+create policy "Service role full access addresses" on public.addresses 
+  for all using (auth.role() = 'service_role');
+
 -- ============================================
 -- 9. TRIGGERS
 -- ============================================
@@ -686,6 +727,9 @@ create trigger orders_updated_at before update on public.orders for each row exe
 create trigger app_configs_updated_at before update on public.app_configs for each row execute function update_updated_at();
 create trigger promotions_updated_at 
   before update on public.promotions 
+  for each row execute function update_updated_at();
+create trigger addresses_updated_at 
+  before update on public.addresses 
   for each row execute function update_updated_at();
 
 -- Auto-create profile on signup
@@ -909,3 +953,34 @@ analyze public.order_events;
 analyze public.driver_locations;
 analyze public.preset_locations;
 analyze public.fixed_pricing;
+
+-- ============================================
+-- NOTIFICATIONS TABLE
+-- ============================================
+
+create table public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.profiles(user_id) on delete cascade,
+  title text not null,
+  body text not null,
+  type text not null, -- 'order', 'promo', 'system'
+  is_read boolean not null default false,
+  data jsonb, -- Additional data: {order_id, promotion_id, etc.}
+  created_at timestamptz not null default now(),
+  read_at timestamptz
+);
+
+create index notifications_user_idx on public.notifications(user_id, created_at desc);
+create index notifications_unread_idx on public.notifications(user_id, is_read) where is_read = false;
+
+-- RLS Policies
+alter table public.notifications enable row level security;
+
+create policy "Users read own notifications" on public.notifications 
+  for select using (user_id = auth.uid());
+
+create policy "Users update own notifications" on public.notifications 
+  for update using (user_id = auth.uid());
+
+create policy "Service role full access" on public.notifications 
+  for all using (auth.role() = 'service_role');
