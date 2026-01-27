@@ -10,6 +10,7 @@ import '../../providers/app_providers.dart';
 import '../../data/models/order_model.dart';
 import '../../data/models/order_item_model.dart';
 import '../../data/repositories/merchant_repository.dart';
+import 'merchant_profile_screen.dart';
 
 /// Merchant Order Dashboard Screen
 /// Dashboard cho chủ cửa hàng: thống kê đơn hàng, danh sách đơn mới/chờ xử lý.
@@ -137,7 +138,11 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
                   children: [
                     const SizedBox(height: 16),
                     _buildStatsCards(shopId),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
+                    _buildSectionHeader('Thao tác nhanh'),
+                    const SizedBox(height: 12),
+                    _buildQuickActions(context),
+                    const SizedBox(height: 30),
                     _buildTabs(shopId),
                     const SizedBox(height: 16),
                     _buildOrderList(shopId),
@@ -400,6 +405,89 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
                 ),
               ),
             ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title) {
+    return Text(
+      title,
+      style: GoogleFonts.inter(
+        fontSize: 16,
+        fontWeight: FontWeight.w700,
+        color: AppColors.textPrimary,
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildActionButton(
+            label: 'Quản lý\nProfile Shop',
+            icon: Icons.store_outlined,
+            color: AppColors.primary,
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const MerchantProfileScreen()),
+              );
+            },
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildActionButton(
+            label: 'Quản lý\nMenu & Giá',
+            icon: Icons.menu_book_outlined,
+            color: Colors.blue,
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Chức năng đang phát triển')),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildActionButton({
+    required String label,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppRadius.medium),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(5),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: color, size: 28),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
           ],
         ),
       ),

@@ -5,6 +5,9 @@ import '../../ui/design_system.dart';
 import '../../providers/app_providers.dart';
 import '../../data/repositories/merchant_repository.dart';
 import 'price_edit_modal.dart';
+import 'product_picker_screen.dart';
+import '../../data/models/order_model.dart'; // For OrderStatus if needed, but ShopMenuItem is here
+import '../../data/models/merchant_model.dart';
 
 /// Merchant Price Management Screen
 /// Màn quản lý giá bán: danh sách món ăn, chỉnh sửa giá, cập nhật hàng loạt.
@@ -183,12 +186,29 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Quản lý giá bán',
+              'Quản lý thực đơn',
               style: GoogleFonts.inter(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
                 color: AppColors.textPrimary,
               ),
+            ),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => ProductPickerScreen(shopId: ref.read(myShopProvider).value!.id),
+                ),
+              );
+            },
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Thêm món'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
             ),
           ),
         ],
@@ -437,6 +457,10 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                 },
                 activeThumbColor: AppColors.primary,
               ),
+              IconButton(
+                icon: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20),
+                onPressed: () => _confirmRemove(context, item, shopId),
+              ),
             ],
           ),
           const SizedBox(height: 16),
@@ -633,6 +657,48 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
         ],
       ),
     );
+  }
+
+    );
+  }
+
+  Future<void> _confirmRemove(BuildContext context, ShopMenuItem item, String shopId) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Xóa khỏi thực đơn?'),
+        content: Text('Bạn có chắc muốn xóa "${item.name}" khỏi thực đơn của quán?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            child: const Text('Xóa'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      try {
+        await ref.read(merchantRepositoryProvider).removeProductFromShop(
+          shopId: shopId,
+          productId: item.productId,
+        );
+        ref.invalidate(shopMenuProvider(shopId));
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Đã xóa món khỏi thực đơn')),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger),
+          );
+        }
+      }
+    }
   }
 
   String _formatPrice(int price) {

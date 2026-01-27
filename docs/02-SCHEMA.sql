@@ -625,6 +625,7 @@ create policy "Service role full access" on public.profiles for all using (auth.
 create policy "Anyone read active shops" on public.shops for select using (status = 'active');
 create policy "Admin manage shops" on public.shops for all using (has_role('super_admin'));
 create policy "Owner read own shop" on public.shops for select using (owner_user_id = auth.uid());
+create policy "Merchant update own shop" on public.shops for update using (owner_user_id = auth.uid());
 
 -- Products
 create policy "Anyone read active products" on public.products for select using (status = 'active');
@@ -633,6 +634,7 @@ create policy "Admin manage products" on public.products for all using (has_role
 -- Shop Products
 create policy "Anyone read shop products" on public.shop_products for select using (true);
 create policy "Admin manage shop products" on public.shop_products for all using (has_role('super_admin'));
+create policy "Merchant manage own shop products" on public.shop_products for all using (is_shop_owner(shop_id));
 
 -- Shop Product Overrides
 create policy "Anyone read overrides" on public.shop_product_overrides for select using (true);

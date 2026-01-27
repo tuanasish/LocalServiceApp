@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/merchant_model.dart';
 import '../models/order_model.dart';
+import '../models/product_model.dart';
 import '../../config/constants.dart';
 
 /// Shop Menu Item Model (từ View v_shop_menu)
@@ -261,5 +262,71 @@ class MerchantRepository {
     ).timeout(AppConstants.apiTimeout);
 
     return OrderModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  /// Cập nhật profile cửa hàng (Merchant)
+  Future<MerchantModel> updateShopProfile({
+    required String shopId,
+    required String name,
+    required String phone,
+    required String address,
+    required String openingHours,
+  }) async {
+    final response = await _client.rpc(
+      'update_shop_profile',
+      params: {
+        'p_shop_id': shopId,
+        'p_name': name,
+        'p_phone': phone,
+        'p_address': address,
+        'p_opening_hours': openingHours,
+      },
+    ).timeout(AppConstants.apiTimeout);
+
+    return MerchantModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  /// Tìm kiếm sản phẩm trong Master Catalog
+  Future<List<ProductModel>> searchMasterCatalog({
+    required String query,
+    int limit = 50,
+  }) async {
+    final response = await _client
+        .from('products')
+        .select()
+        .eq('status', 'active')
+        .ilike('name', '%$query%')
+        .limit(limit)
+        .timeout(AppConstants.apiTimeout);
+
+    return (response as List).map((json) => ProductModel.fromJson(json)).toList();
+  }
+
+  /// Thêm sản phẩm vào shop menu
+  Future<void> addProductToShop({
+    required String shopId,
+    required String productId,
+  }) async {
+    await _client.rpc(
+      'add_product_to_shop',
+      params: {
+        'p_shop_id': shopId,
+        'p_product_id': productId,
+      },
+    ).timeout(AppConstants.apiTimeout);
+  }
+
+  /// Xóa sản phẩm khỏi shop menu
+  Future<void> removeProductFromShop({
+    required String shopId,
+    required String productId,
+  }) async {
+    await _client.rpc(
+      'remove_product_from_shop',
+      params: {
+        'p_shop_id': shopId,
+        'p_product_id': productId,
+      },
+    ).timeout(AppConstants.apiTimeout);
   }
 }

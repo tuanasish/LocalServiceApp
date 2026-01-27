@@ -571,6 +571,59 @@ begin
 end;
 $$;
 
+-- Thêm sản phẩm vào shop menu (từ catalog)
+create or replace function public.add_product_to_shop(
+  p_shop_id uuid,
+  p_product_id uuid
+)
+returns public.shop_products
+language plpgsql
+security definer
+as $$
+declare
+  v_shop_product public.shop_products;
+begin
+  if not is_shop_owner(p_shop_id) and not has_role('super_admin') then
+    raise exception 'NOT_ALLOWED';
+  end if;
+
+  insert into public.shop_products (shop_id, product_id, is_listed)
+  values (p_shop_id, p_product_id, true)
+  on conflict (shop_id, product_id)
+  do update set is_listed = true
+  returning * into v_shop_product;
+
+  return v_shop_product;
+end;
+$$;
+
+-- Xóa/Ẩn sản phẩm khỏi shop menu
+create or replace function public.remove_product_from_shop(
+  p_shop_id uuid,
+  p_product_id uuid
+)
+returns boolean
+language plpgsql
+security definer
+as $$
+begin
+  if not is_shop_owner(p_shop_id) and not has_role('super_admin') then
+    raise exception 'NOT_ALLOWED';
+  end if;
+
+  -- Thực tế ta sẽ set is_listed = false để giữ history, hoặc xóa hẳn. 
+  -- MVP này chọn xóa hẳn junction record cho sạch.
+  delete from public.shop_products
+  where shop_id = p_shop_id and product_id = p_product_id;
+  
+  -- Xóa luôn override nếu có
+  delete from public.shop_product_overrides
+  where shop_id = p_shop_id and product_id = p_product_id;
+
+  return true;
+end;
+$$;
+
 -- Lấy shop của merchant hiện tại
 create or replace function public.get_my_shop()
 returns public.shops
@@ -686,6 +739,38 @@ begin
     and (p_date_to is null or created_at <= p_date_to);
   
   return v_stats;
+end;
+$$;
+
+-- Cập nhật profile shop (merchant)
+create or replace function public.update_shop_profile(
+  p_shop_id uuid,
+  p_name text,
+  p_phone text,
+  p_address text,
+  p_opening_hours text
+)
+returns public.shops
+language plpgsql
+security definer
+as $$
+declare
+  v_shop public.shops;
+begin
+  if not is_shop_owner(p_shop_id) and not has_role('super_admin') then
+    raise exception 'NOT_ALLOWED';
+  end if;
+
+  update public.shops
+  set name = p_name,
+      phone = p_phone,
+      address = p_address,
+      opening_hours = p_opening_hours,
+      updated_at = now()
+  where id = p_shop_id
+  returning * into v_shop;
+
+  return v_shop;
 end;
 $$;
 
