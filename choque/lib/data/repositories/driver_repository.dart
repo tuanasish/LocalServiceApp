@@ -1,42 +1,8 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/profile_model.dart';
+import '../models/order_model.dart';
+import '../models/driver_location_model.dart';
 import '../../config/constants.dart';
-
-/// Driver Location Model
-class DriverLocationModel {
-  final String driverId;
-  final String? orderId;
-  final double lat;
-  final double lng;
-  final double? heading;
-  final double? speed;
-  final double? accuracy;
-  final DateTime updatedAt;
-
-  const DriverLocationModel({
-    required this.driverId,
-    this.orderId,
-    required this.lat,
-    required this.lng,
-    this.heading,
-    this.speed,
-    this.accuracy,
-    required this.updatedAt,
-  });
-
-  factory DriverLocationModel.fromJson(Map<String, dynamic> json) {
-    return DriverLocationModel(
-      driverId: json['driver_id'] as String,
-      orderId: json['order_id'] as String?,
-      lat: (json['lat'] as num).toDouble(),
-      lng: (json['lng'] as num).toDouble(),
-      heading: (json['heading'] as num?)?.toDouble(),
-      speed: (json['speed'] as num?)?.toDouble(),
-      accuracy: (json['accuracy'] as num?)?.toDouble(),
-      updatedAt: DateTime.parse(json['updated_at'] as String),
-    );
-  }
-}
 
 /// Driver Repository
 /// 
@@ -119,5 +85,34 @@ class DriverRepository {
     ).timeout(AppConstants.apiTimeout);
     
     return response as Map<String, dynamic>;
+  }
+
+  /// Lấy danh sách đơn hàng có sẵn cho tài xế
+  Future<List<OrderModel>> getAvailableOrders(String marketId) async {
+    final response = await _client.rpc(
+      'get_available_orders',
+      params: {'p_market_id': marketId},
+    ).timeout(AppConstants.apiTimeout);
+
+    return (response as List).map((json) => OrderModel.fromJson(json as Map<String, dynamic>)).toList();
+  }
+
+  /// Tài xế nhận đơn
+  Future<void> acceptOrder(String orderId) async {
+    await _client.rpc(
+      'driver_accept_order',
+      params: {'p_order_id': orderId},
+    ).timeout(AppConstants.apiTimeout);
+  }
+
+  /// Tài xế từ chối / hủy đơn (khi đang ở trạng thái ASSIGNED)
+  Future<void> rejectOrder(String orderId, {String? reason}) async {
+    await _client.rpc(
+      'driver_reject_order',
+      params: {
+        'p_order_id': orderId,
+        'p_reason': reason,
+      },
+    ).timeout(AppConstants.apiTimeout);
   }
 }

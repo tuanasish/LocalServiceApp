@@ -287,7 +287,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
           _selectedRating = selected ? rating : null;
         });
       },
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      selectedColor: AppColors.primary.withValues(alpha: 0.2),
       checkmarkColor: AppColors.primary,
     );
   }
@@ -309,7 +309,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
           _selectedDistance = selected ? distance : null;
         });
       },
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      selectedColor: AppColors.primary.withValues(alpha: 0.2),
       checkmarkColor: AppColors.primary,
     );
   }
@@ -328,7 +328,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
           }
         });
       },
-      selectedColor: AppColors.primary.withOpacity(0.2),
+      selectedColor: AppColors.primary.withValues(alpha: 0.2),
       checkmarkColor: AppColors.primary,
     );
   }

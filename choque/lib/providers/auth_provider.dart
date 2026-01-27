@@ -405,7 +405,7 @@ final availableRolesProvider = Provider<List<UserRole>>((ref) {
   return profile.when(
     data: (p) => p?.roles.map((r) => UserRole.fromString(r)).toList() ?? [UserRole.customer],
     loading: () => [UserRole.customer],
-    error: (_, ___) => [UserRole.customer],
+    error: (e, st) => [UserRole.customer],
   );
 });
 

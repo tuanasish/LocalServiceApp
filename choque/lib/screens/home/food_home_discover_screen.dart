@@ -20,7 +20,7 @@ class FoodHomeDiscoverScreen extends ConsumerStatefulWidget {
 }
 
 class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen> {
-  String _searchQuery = '';
+  final String _searchQuery = '';
   String? _selectedCategory;
 
   @override
@@ -142,7 +142,7 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
                       ),
                     ],
                   ),
-                  error: (_, __) => Column(
+                  error: (e, st) => Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -201,15 +201,15 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.primary.withOpacity(0.1),
-              AppColors.primary.withOpacity(0.05),
+              AppColors.primary.withValues(alpha: 0.1),
+              AppColors.primary.withValues(alpha: 0.05),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-            color: AppColors.primary.withOpacity(0.2),
+            color: AppColors.primary.withValues(alpha: 0.2),
             width: 1,
           ),
         ),
@@ -241,7 +241,7 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
         ),
       ),
       loading: () => const SizedBox(height: 80, child: Center(child: CircularProgressIndicator())),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (e, st) => const SizedBox.shrink(),
     );
   }
 
@@ -255,10 +255,7 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
     final categoryColor = _getCategoryColor(label);
     final iconColor = isSelected 
         ? AppColors.primary 
-        : categoryColor.withOpacity(0.7);
-    final bgColor = isSelected 
-        ? AppColors.primary.withOpacity(0.15)
-        : categoryColor.withOpacity(0.1);
+        : categoryColor.withValues(alpha: 0.7);
     
     return GestureDetector(
       onTap: onTap,
@@ -271,19 +268,19 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
               height: 56,
               decoration: BoxDecoration(
                 color: isSelected 
-                    ? AppColors.primary.withOpacity(0.1) 
-                    : categoryColor.withOpacity(0.08),
+                    ? AppColors.primary.withValues(alpha: 0.1) 
+                    : categoryColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isSelected 
                       ? AppColors.primary 
-                      : categoryColor.withOpacity(0.2),
+                      : categoryColor.withValues(alpha: 0.2),
                   width: isSelected ? 2 : 1,
                 ),
                 boxShadow: isSelected
                     ? [
                         BoxShadow(
-                          color: AppColors.primary.withOpacity(0.15),
+                          color: AppColors.primary.withValues(alpha: 0.15),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -437,18 +434,18 @@ class _FilterChip extends StatelessWidget {
       decoration: BoxDecoration(
         color: isActive 
             ? AppColors.primary
-            : filterColor.withOpacity(0.08),
+            : filterColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isActive 
               ? AppColors.primary 
-              : filterColor.withOpacity(0.3),
+              : filterColor.withValues(alpha: 0.3),
           width: isActive ? 2 : 1,
         ),
         boxShadow: isActive
             ? [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.2),
+                  color: AppColors.primary.withValues(alpha: 0.2),
                   blurRadius: 4,
                   offset: const Offset(0, 2),
                 ),
@@ -462,7 +459,7 @@ class _FilterChip extends StatelessWidget {
             size: 16, 
             color: isActive 
                 ? Colors.white 
-                : filterColor.withOpacity(0.8),
+                : filterColor.withValues(alpha: 0.8),
           ),
           const SizedBox(width: 6),
           Text(
@@ -472,7 +469,7 @@ class _FilterChip extends StatelessWidget {
               fontWeight: FontWeight.w600,
               color: isActive 
                   ? Colors.white 
-                  : filterColor.withOpacity(0.9),
+                  : filterColor.withValues(alpha: 0.9),
             ),
           ),
         ],

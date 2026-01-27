@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 import '../../config/constants.dart';
 import '../../data/models/order_model.dart';
+import '../../data/models/driver_location_model.dart';
 import '../../providers/app_providers.dart';
 
 /// Order Tracking Map Widget
@@ -33,7 +34,7 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
       await _controller!.addSymbol(SymbolOptions(
         geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
         textField: 'Cửa hàng',
-        textColor: '#0000FF',
+        textColor: Colors.blue,
         textOffset: const Offset(0, 2),
       ));
 
@@ -41,7 +42,7 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
       await _controller!.addSymbol(SymbolOptions(
         geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
         textField: 'Bạn',
-        textColor: '#008000',
+        textColor: Colors.green,
         textOffset: const Offset(0, 2),
       ));
       
@@ -68,7 +69,7 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
       await _controller!.addSymbol(SymbolOptions(
         geometry: LatLng(driverLocation.lat, driverLocation.lng),
         textField: 'Tài xế',
-        textColor: '#FFA500',
+        textColor: Colors.orange,
       ));
     }
   }
@@ -128,7 +129,7 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.9),
+                  color: Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(

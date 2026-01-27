@@ -79,7 +79,6 @@ class LocationTrackingService {
       },
       onError: (error) {
         // Log error nhưng không dừng tracking
-        print('Location tracking error: $error');
       },
     );
   }
@@ -105,7 +104,6 @@ class LocationTrackingService {
       );
     } catch (e) {
       // Log error nhưng không throw để không làm gián đoạn tracking
-      print('Failed to upload location: $e');
     }
   }
 

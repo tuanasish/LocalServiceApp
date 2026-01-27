@@ -42,7 +42,7 @@ class RoleSwitcherScreen extends ConsumerWidget {
     final name = profileAsync.when(
       data: (p) => p?.displayName ?? 'Bạn',
       loading: () => '…',
-      error: (_, __) => 'Bạn',
+      error: (e, st) => 'Bạn',
     );
 
     return Column(
@@ -85,7 +85,7 @@ class RoleSwitcherScreen extends ConsumerWidget {
   Widget _buildRoleCards(BuildContext context, WidgetRef ref, List<UserRole> roles) {
     return ListView.separated(
       itemCount: roles.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 16),
+      separatorBuilder: (context, index) => const SizedBox(height: 16),
       itemBuilder: (context, index) {
         final role = roles[index];
         return _RoleCard(

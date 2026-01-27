@@ -160,7 +160,11 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
                     const SizedBox(height: 20),
                     _buildStatusToggle(driverStatus),
                     const SizedBox(height: 20),
-                    _buildSectionTitle('Đơn hàng của tôi'),
+                    _buildSectionTitle(
+                      'Đơn hàng đang nhận',
+                      actionLabel: 'Nhận đơn mới',
+                      onActionPressed: () => context.push('/driver/requests'),
+                    ),
                     const SizedBox(height: 12),
                     _buildOrderList(),
                     const SizedBox(height: 100),
@@ -303,7 +307,7 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
           Expanded(child: _buildStatCardSkeleton()),
         ],
       ),
-      error: (_, __) => const SizedBox(),
+      error: (e, st) => const SizedBox(),
     );
   }
 
@@ -423,10 +427,27 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
     );
   }
 
-  Widget _buildSectionTitle(String title) {
-    return Text(
-      title,
-      style: AppTextStyles.heading18,
+  Widget _buildSectionTitle(String title, {String? actionLabel, VoidCallback? onActionPressed}) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          title,
+          style: AppTextStyles.heading18,
+        ),
+        if (actionLabel != null && onActionPressed != null)
+          TextButton(
+            onPressed: onActionPressed,
+            child: Text(
+              actionLabel,
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
+          ),
+      ],
     );
   }
 
@@ -491,7 +512,7 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
         final storeName = merchantAsync?.when(
           data: (merchant) => merchant.name,
           loading: () => 'Đang tải...',
-          error: (_, __) => 'Cửa hàng',
+          error: (e, st) => 'Cửa hàng',
         ) ?? 'Cửa hàng';
 
         final statusText = _getOrderStatusText(order.status);
@@ -519,7 +540,7 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
         );
       },
       loading: () => _buildOrderCardSkeleton(),
-      error: (_, __) => DriverOrderCard(
+      error: (e, st) => DriverOrderCard(
         orderId: '#${order.orderNumber}',
         storeName: 'Cửa hàng',
         address: order.pickup.address ?? order.pickup.label,
@@ -612,6 +633,8 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
 
   String _getOrderStatusText(OrderStatus status) {
     switch (status) {
+      case OrderStatus.readyForPickup:
+      case OrderStatus.confirmed:
       case OrderStatus.assigned:
         return 'Chờ nhận';
       case OrderStatus.pickedUp:
@@ -628,7 +651,7 @@ class _DriverHomeDashboardScreenState extends ConsumerState<DriverHomeDashboardS
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 
   String _formatEarnings(int earnings) {

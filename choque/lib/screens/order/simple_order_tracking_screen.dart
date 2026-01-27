@@ -111,7 +111,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                 ),
                 child: Text(
@@ -240,7 +240,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.danger.withOpacity(0.1),
+                color: AppColors.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -613,6 +613,8 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
       case OrderStatus.completed: return AppColors.success;
       case OrderStatus.canceled: return AppColors.danger;
       case OrderStatus.pickedUp: 
+      case OrderStatus.readyForPickup:
+      case OrderStatus.confirmed:
       case OrderStatus.assigned: return const Color(0xFFF59E0B);
       default: return AppColors.primary;
     }

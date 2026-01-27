@@ -11,8 +11,6 @@ import '../../providers/cart_provider.dart';
 import '../../providers/address_provider.dart';
 import '../../data/repositories/merchant_repository.dart';
 import '../../data/models/merchant_model.dart';
-import '../../data/models/shop_review_model.dart';
-import '../../data/repositories/favorite_repository.dart';
 import '../../utils/distance_utils.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -833,7 +831,7 @@ class _ReviewsTabContent extends ConsumerWidget {
                   children: [
                     CircleAvatar(
                       radius: 18,
-                      backgroundColor: AppColors.primary.withOpacity(0.1),
+                      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                       backgroundImage: review.userAvatar != null ? NetworkImage(review.userAvatar!) : null,
                       child: review.userAvatar == null 
                         ? Text(
@@ -871,7 +869,7 @@ class _ReviewsTabContent extends ConsumerWidget {
                   const SizedBox(height: 8),
                   Text(
                     review.comment!,
-                    style: AppTextStyles.body14,
+                    style: AppTextStyles.body13,
                   ),
                 ],
               ],

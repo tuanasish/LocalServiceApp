@@ -386,7 +386,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                           controller: scrollController,
                           padding: EdgeInsets.zero,
                           itemCount: _suggestions.isEmpty ? 1 : _suggestions.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1, indent: 56),
+                          separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
                           itemBuilder: (context, index) {
                             if (_suggestions.isEmpty) {
                               return _buildCurrentSelectionTile();
@@ -425,7 +425,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     itemCount: _searchResults.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1, indent: 56),
+                    separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
                     itemBuilder: (context, index) {
                       return _buildSearchResultTile(_searchResults[index]);
                     },

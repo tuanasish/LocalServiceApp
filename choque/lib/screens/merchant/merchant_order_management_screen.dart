@@ -12,10 +12,7 @@ import '../../data/models/order_item_model.dart';
 class MerchantOrderManagementScreen extends ConsumerWidget {
   final String orderId;
 
-  const MerchantOrderManagementScreen({
-    super.key,
-    required this.orderId,
-  });
+  const MerchantOrderManagementScreen({super.key, required this.orderId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -76,7 +73,11 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.error_outline, size: 64, color: AppColors.danger),
+                        Icon(
+                          Icons.error_outline,
+                          size: 64,
+                          color: AppColors.danger,
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Lỗi tải đơn hàng',
@@ -137,7 +138,10 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: _getStatusColor(order.status).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -253,10 +257,7 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Thông tin khách hàng',
-                style: AppTextStyles.label14,
-              ),
+              Text('Thông tin khách hàng', style: AppTextStyles.label14),
             ],
           ),
           const SizedBox(height: 12),
@@ -348,7 +349,10 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
               return const SizedBox.shrink();
             }
 
-            final subtotal = items.fold<int>(0, (sum, item) => sum + item.subtotal);
+            final subtotal = items.fold<int>(
+              0,
+              (sum, item) => sum + item.subtotal,
+            );
 
             return Container(
               padding: const EdgeInsets.all(16),
@@ -360,15 +364,14 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    'Chi tiết đơn hàng',
-                    style: AppTextStyles.heading18,
-                  ),
+                  Text('Chi tiết đơn hàng', style: AppTextStyles.heading18),
                   const SizedBox(height: 16),
-                  ...items.map((item) => Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: _buildOrderItemRow(item),
-                      )),
+                  ...items.map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _buildOrderItemRow(item),
+                    ),
+                  ),
                   const SizedBox(height: 12),
                   const Divider(height: 1),
                   const SizedBox(height: 12),
@@ -478,10 +481,7 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Thông tin trạng thái',
-            style: AppTextStyles.heading18,
-          ),
+          Text('Thông tin trạng thái', style: AppTextStyles.heading18),
           const SizedBox(height: 16),
           _buildStatusInfoRow(
             icon: Icons.info_outline,
@@ -494,7 +494,9 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
             _buildStatusInfoRow(
               icon: Icons.check_circle_outline,
               label: 'Đã xác nhận lúc',
-              value: DateFormat('HH:mm • dd/MM/yyyy').format(order.confirmedAt!),
+              value: DateFormat(
+                'HH:mm • dd/MM/yyyy',
+              ).format(order.confirmedAt!),
             ),
           ],
           if (order.assignedAt != null) ...[
@@ -518,7 +520,9 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
             _buildStatusInfoRow(
               icon: Icons.check_circle,
               label: 'Hoàn thành lúc',
-              value: DateFormat('HH:mm • dd/MM/yyyy').format(order.completedAt!),
+              value: DateFormat(
+                'HH:mm • dd/MM/yyyy',
+              ).format(order.completedAt!),
             ),
           ],
           const SizedBox(height: 16),
@@ -528,8 +532,13 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context, WidgetRef ref, OrderModel order) {
-    if (order.status == OrderStatus.completed || order.status == OrderStatus.canceled) {
+  Widget _buildActionButtons(
+    BuildContext context,
+    WidgetRef ref,
+    OrderModel order,
+  ) {
+    if (order.status == OrderStatus.completed ||
+        order.status == OrderStatus.canceled) {
       return const SizedBox.shrink();
     }
 
@@ -538,10 +547,23 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
         if (order.status == OrderStatus.pendingConfirmation) ...[
           SizedBox(
             width: double.infinity,
-            child: AppButton(
-              text: 'Xác nhận đơn hàng',
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+              ),
               onPressed: () => _handleConfirm(context, ref, order),
-              backgroundColor: AppColors.primary,
+              child: Text(
+                'Xác nhận đơn hàng',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -570,10 +592,23 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
         if (order.status == OrderStatus.confirmed) ...[
           SizedBox(
             width: double.infinity,
-            child: AppButton(
-              text: 'Báo sẵn sàng (Giao cho tài xế)',
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.success,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                ),
+              ),
               onPressed: () => _handleMarkReady(context, ref, order),
-              backgroundColor: AppColors.success,
+              child: Text(
+                'Báo sẵn sàng (Giao cho tài xế)',
+                style: GoogleFonts.inter(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],
@@ -606,13 +641,17 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleConfirm(BuildContext context, WidgetRef ref, OrderModel order) async {
+  Future<void> _handleConfirm(
+    BuildContext context,
+    WidgetRef ref,
+    OrderModel order,
+  ) async {
     try {
       await ref.read(merchantRepositoryProvider).confirmOrder(order.id);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã xác nhận đơn hàng')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã xác nhận đơn hàng')));
         ref.invalidate(orderDetailProvider(order.id));
       }
     } catch (e) {
@@ -624,18 +663,20 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
     }
   }
 
-  Future<void> _handleReject(BuildContext context, WidgetRef ref, OrderModel order) async {
+  Future<void> _handleReject(
+    BuildContext context,
+    WidgetRef ref,
+    OrderModel order,
+  ) async {
     final reasonController = TextEditingController();
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Từ chối đơn hàng'),
         content: TextField(
           controller: reasonController,
-          decoration: const InputDecoration(
-            hintText: 'Nhập lý do từ chối...',
-          ),
+          decoration: const InputDecoration(hintText: 'Nhập lý do từ chối...'),
         ),
         actions: [
           TextButton(
@@ -644,7 +685,10 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xác nhận', style: TextStyle(color: AppColors.danger)),
+            child: const Text(
+              'Xác nhận',
+              style: TextStyle(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -652,33 +696,44 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
 
     if (result == true && context.mounted) {
       try {
-        await ref.read(merchantRepositoryProvider).rejectOrder(
-          order.id, 
-          reasonController.text.isEmpty ? 'Merchant từ chối' : reasonController.text
-        );
+        await ref
+            .read(merchantRepositoryProvider)
+            .rejectOrder(
+              order.id,
+              reasonController.text.isEmpty
+                  ? 'Merchant từ chối'
+                  : reasonController.text,
+            );
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã từ chối đơn hàng')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Đã từ chối đơn hàng')));
           ref.invalidate(orderDetailProvider(order.id));
         }
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger),
+            SnackBar(
+              content: Text('Lỗi: $e'),
+              backgroundColor: AppColors.danger,
+            ),
           );
         }
       }
     }
   }
 
-  Future<void> _handleMarkReady(BuildContext context, WidgetRef ref, OrderModel order) async {
+  Future<void> _handleMarkReady(
+    BuildContext context,
+    WidgetRef ref,
+    OrderModel order,
+  ) async {
     try {
       await ref.read(merchantRepositoryProvider).markOrderReady(order.id);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã báo sẵn sàng')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã báo sẵn sàng')));
         ref.invalidate(orderDetailProvider(order.id));
       }
     } catch (e) {
@@ -770,7 +825,7 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 
   Future<void> _makePhoneCall(BuildContext context, String phoneNumber) async {

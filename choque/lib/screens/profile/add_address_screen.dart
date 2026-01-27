@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -328,7 +327,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         ),
                         value: _isDefault,
                         onChanged: (v) => setState(() => _isDefault = v),
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                       ),
                     ]),
                     

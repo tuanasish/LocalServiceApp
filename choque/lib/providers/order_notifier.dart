@@ -2,11 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/order_model.dart';
 import '../data/models/location_model.dart';
 import '../models/user_address.dart';
-import '../models/cart_item.dart';
 import '../providers/cart_provider.dart';
-import '../providers/address_provider.dart';
 import '../providers/app_providers.dart';
-import '../providers/auth_provider.dart';
 import '../config/constants.dart';
 import '../data/models/promotion_model.dart';
 

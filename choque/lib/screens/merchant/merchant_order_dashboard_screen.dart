@@ -8,9 +8,6 @@ import '../../ui/widgets/stat_card.dart';
 import '../../ui/widgets/merchant_order_card.dart';
 import '../../providers/app_providers.dart';
 import '../../data/models/order_model.dart';
-import '../../data/models/order_item_model.dart';
-import '../../data/repositories/merchant_repository.dart';
-import 'merchant_profile_screen.dart';
 
 /// Merchant Order Dashboard Screen
 /// Dashboard cho chủ cửa hàng: thống kê đơn hàng, danh sách đơn mới/chờ xử lý.
@@ -18,11 +15,14 @@ class MerchantOrderDashboardScreen extends ConsumerStatefulWidget {
   const MerchantOrderDashboardScreen({super.key});
 
   @override
-  ConsumerState<MerchantOrderDashboardScreen> createState() => _MerchantOrderDashboardScreenState();
+  ConsumerState<MerchantOrderDashboardScreen> createState() =>
+      _MerchantOrderDashboardScreenState();
 }
 
-class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDashboardScreen> {
-  String? _selectedStatus; // null = Tất cả, 'PENDING_CONFIRMATION' = Mới, 'CONFIRMED' = Đang xử lý
+class _MerchantOrderDashboardScreenState
+    extends ConsumerState<MerchantOrderDashboardScreen> {
+  String?
+  _selectedStatus; // null = Tất cả, 'PENDING_CONFIRMATION' = Mới, 'CONFIRMED' = Đang xử lý
 
   @override
   Widget build(BuildContext context) {
@@ -52,7 +52,11 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.store_outlined, size: 64, color: AppColors.textSecondary),
+            Icon(
+              Icons.store_outlined,
+              size: 64,
+              color: AppColors.textSecondary,
+            ),
             const SizedBox(height: 16),
             Text(
               'Chưa có cửa hàng',
@@ -124,9 +128,15 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
               ref.invalidate(myShopProvider);
               ref.invalidate(shopStatsProvider(shopId));
               if (_selectedStatus != null) {
-                ref.invalidate(shopOrdersProvider(ShopOrdersParams(shopId: shopId, status: _selectedStatus)));
+                ref.invalidate(
+                  shopOrdersProvider(
+                    ShopOrdersParams(shopId: shopId, status: _selectedStatus),
+                  ),
+                );
               } else {
-                ref.invalidate(shopOrdersProvider(ShopOrdersParams(shopId: shopId)));
+                ref.invalidate(
+                  shopOrdersProvider(ShopOrdersParams(shopId: shopId)),
+                );
               }
             },
             child: SingleChildScrollView(
@@ -205,7 +215,9 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
                     shop.status == 'active' ? 'Đang mở cửa' : 'Đã đóng cửa',
                     style: GoogleFonts.inter(
                       fontSize: 12,
-                      color: shop.status == 'active' ? AppColors.success : AppColors.textSecondary,
+                      color: shop.status == 'active'
+                          ? AppColors.success
+                          : AppColors.textSecondary,
                     ),
                   ),
                 ],
@@ -220,7 +232,10 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
             ),
           ],
         ),
-        loading: () => const SizedBox(height: 56, child: Center(child: CircularProgressIndicator())),
+        loading: () => const SizedBox(
+          height: 56,
+          child: Center(child: CircularProgressIndicator()),
+        ),
         error: (_, __) => const SizedBox(height: 56),
       ),
     );
@@ -323,7 +338,8 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
 
   Widget _buildTabs(String shopId) {
     final statsAsync = ref.watch(shopStatsProvider(shopId));
-    final pendingCount = statsAsync.asData?.value?['pending_orders'] as int? ?? 0;
+    final pendingCount =
+        statsAsync.asData?.value['pending_orders'] as int? ?? 0;
 
     return Container(
       padding: const EdgeInsets.all(4),
@@ -346,7 +362,8 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
               'Mới',
               isActive: _selectedStatus == 'PENDING_CONFIRMATION',
               badge: pendingCount > 0 ? pendingCount.toString() : null,
-              onTap: () => setState(() => _selectedStatus = 'PENDING_CONFIRMATION'),
+              onTap: () =>
+                  setState(() => _selectedStatus = 'PENDING_CONFIRMATION'),
             ),
           ),
           Expanded(
@@ -430,11 +447,7 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
             label: 'Quản lý\nProfile Shop',
             icon: Icons.store_outlined,
             color: AppColors.primary,
-            onTap: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const MerchantProfileScreen()),
-              );
-            },
+            onTap: () => context.push('/merchant/profile'),
           ),
         ),
         const SizedBox(width: 12),
@@ -443,11 +456,7 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
             label: 'Quản lý\nMenu & Giá',
             icon: Icons.menu_book_outlined,
             color: Colors.blue,
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Chức năng đang phát triển')),
-              );
-            },
+            onTap: () => context.push('/merchant/menu'),
           ),
         ),
       ],
@@ -500,17 +509,21 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
       status: _selectedStatus,
       limit: 50,
     );
-    
+
     // Use stream for real-time updates
     final ordersStreamAsync = ref.watch(shopOrdersStreamProvider(shopId));
-    
+
     return ordersStreamAsync.when(
       data: (allOrders) {
         // Filter by selected status
         final orders = _selectedStatus == null
             ? allOrders
-            : allOrders.where((order) => order.status.toDbString() == _selectedStatus).toList();
-            
+            : allOrders
+                  .where(
+                    (order) => order.status.toDbString() == _selectedStatus,
+                  )
+                  .toList();
+
         if (orders.isEmpty) {
           return _buildEmptyState();
         }
@@ -524,10 +537,13 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
         );
       },
       loading: () => Column(
-        children: List.generate(3, (index) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: _buildOrderCardSkeleton(),
-        )),
+        children: List.generate(
+          3,
+          (index) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildOrderCardSkeleton(),
+          ),
+        ),
       ),
       error: (error, stack) => Center(
         child: Padding(
@@ -561,7 +577,9 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
 
     return itemsAsync.when(
       data: (items) {
-        final itemsText = items.map((item) => '${item.productName} x${item.quantity}').join(', ');
+        final itemsText = items
+            .map((item) => '${item.productName} x${item.quantity}')
+            .join(', ');
         final statusText = _getStatusText(order.status);
         final timeText = DateFormat('HH:mm').format(order.createdAt);
 
@@ -626,10 +644,10 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
     try {
       await ref.read(merchantRepositoryProvider).confirmOrder(order.id);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã xác nhận đơn hàng')),
-        );
-        ref.invalidate(shopStatsProvider(order.shopId));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã xác nhận đơn hàng')));
+        ref.invalidate(shopStatsProvider(order.shopId!));
       }
     } catch (e) {
       if (mounted) {
@@ -642,16 +660,14 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
 
   Future<void> _handleReject(OrderModel order) async {
     final reasonController = TextEditingController();
-    
+
     final result = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Từ chối đơn hàng'),
         content: TextField(
           controller: reasonController,
-          decoration: const InputDecoration(
-            hintText: 'Nhập lý do từ chối...',
-          ),
+          decoration: const InputDecoration(hintText: 'Nhập lý do từ chối...'),
         ),
         actions: [
           TextButton(
@@ -660,7 +676,10 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Xác nhận', style: TextStyle(color: AppColors.danger)),
+            child: const Text(
+              'Xác nhận',
+              style: TextStyle(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -668,20 +687,27 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
 
     if (result == true && mounted) {
       try {
-        await ref.read(merchantRepositoryProvider).rejectOrder(
-          order.id, 
-          reasonController.text.isEmpty ? 'Merchant từ chối' : reasonController.text
-        );
+        await ref
+            .read(merchantRepositoryProvider)
+            .rejectOrder(
+              order.id,
+              reasonController.text.isEmpty
+                  ? 'Merchant từ chối'
+                  : reasonController.text,
+            );
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã từ chối đơn hàng')),
-          );
-          ref.invalidate(shopStatsProvider(order.shopId));
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Đã từ chối đơn hàng')));
+          ref.invalidate(shopStatsProvider(order.shopId!));
         }
       } catch (e) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger),
+            SnackBar(
+              content: Text('Lỗi: $e'),
+              backgroundColor: AppColors.danger,
+            ),
           );
         }
       }
@@ -692,10 +718,10 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
     try {
       await ref.read(merchantRepositoryProvider).markOrderReady(order.id);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Đã báo sẵn sàng')),
-        );
-        ref.invalidate(shopStatsProvider(order.shopId));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã báo sẵn sàng')));
+        ref.invalidate(shopStatsProvider(order.shopId!));
       }
     } catch (e) {
       if (mounted) {
@@ -711,7 +737,11 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
       padding: const EdgeInsets.all(32.0),
       child: Column(
         children: [
-          Icon(Icons.receipt_long_outlined, size: 64, color: AppColors.textSecondary),
+          Icon(
+            Icons.receipt_long_outlined,
+            size: 64,
+            color: AppColors.textSecondary,
+          ),
           const SizedBox(height: 16),
           Text(
             'Chưa có đơn hàng',
@@ -761,6 +791,6 @@ class _MerchantOrderDashboardScreenState extends ConsumerState<MerchantOrderDash
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 }

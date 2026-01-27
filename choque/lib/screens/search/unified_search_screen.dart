@@ -297,7 +297,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
       label: Text(label, style: AppTextStyles.body13),
       deleteIcon: const Icon(Icons.close, size: 16),
       onDeleted: onRemove,
-      backgroundColor: AppColors.primary.withOpacity(0.1),
+      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
       deleteIconColor: AppColors.primary,
     );
   }
@@ -744,7 +744,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withOpacity(0.1),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
           child: const Icon(Icons.store, color: AppColors.primary),
         ),
         title: Text(shop.name, style: AppTextStyles.label14),
@@ -760,7 +760,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
                 children: [
                   const Icon(Icons.star, color: Color(0xFFFBBF24), size: 16),
                   const SizedBox(width: 4),
-                  Text('${shop.rating!.toStringAsFixed(1)}', style: AppTextStyles.body13),
+                  Text(shop.rating!.toStringAsFixed(1), style: AppTextStyles.body13),
                 ],
               )
             : null,
@@ -774,7 +774,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: AppColors.primary.withOpacity(0.1),
+          backgroundColor: AppColors.primary.withValues(alpha: 0.1),
           child: const Icon(Icons.restaurant, color: AppColors.primary),
         ),
         title: Text(product.name, style: AppTextStyles.label14),

@@ -536,6 +536,174 @@ begin
 end;
 $$;
 
+-- 4.1 Lấy danh sách đơn hàng chờ nhận (READY_FOR_PICKUP) cho Driver
+create or replace function public.get_available_orders(
+  p_market_id uuid
+)
+returns table (
+  id uuid,
+  order_number integer,
+  market_id uuid,
+  service_type text,
+  customer_id uuid,
+  shop_id uuid,
+  shop_name text,
+  status text,
+  pickup jsonb,
+  dropoff jsonb,
+  delivery_fee integer,
+  items_total integer,
+  total_amount integer,
+  created_at timestamptz,
+  updated_at timestamptz
+)
+language plpgsql
+security definer
+as $$
+begin
+  -- Check if driver is online
+  if not exists (
+    select 1 from public.profiles 
+    where user_id = auth.uid() 
+      and 'driver' = any(roles)
+      and driver_status = 'online'
+  ) then
+    raise exception 'DRIVER_NOT_ONLINE';
+  end if;
+
+  return query
+  select 
+    o.id,
+    o.order_number,
+    o.market_id,
+    o.service_type,
+    o.customer_id,
+    o.shop_id,
+    s.name as shop_name,
+    o.status,
+    o.pickup,
+    o.dropoff,
+    o.delivery_fee,
+    o.items_total,
+    o.total_amount,
+    o.created_at,
+    o.updated_at
+  from public.orders o
+  join public.shops s on o.shop_id = s.id
+  where o.market_id = p_market_id
+    and o.status = 'READY_FOR_PICKUP'
+    and o.driver_id is null
+  order by o.created_at desc;
+end;
+$$;
+
+-- 4.2 Driver nhận đơn hàng (READY_FOR_PICKUP -> ASSIGNED)
+create or replace function public.driver_accept_order(
+  p_order_id uuid
+)
+returns public.orders
+language plpgsql
+security definer
+as $$
+declare
+  v_order public.orders;
+begin
+  -- 1. Check if driver is online
+  if not exists (
+    select 1 from public.profiles 
+    where user_id = auth.uid() 
+      and 'driver' = any(roles)
+      and driver_status = 'online'
+  ) then
+    raise exception 'DRIVER_NOT_ONLINE';
+  end if;
+
+  -- 2. Lock and check order status
+  select * into v_order from public.orders 
+  where id = p_order_id 
+    and status = 'READY_FOR_PICKUP' 
+    and driver_id is null
+  for update;
+
+  if v_order is null then
+    raise exception 'ORDER_ATTACHED_OR_NOT_READY';
+  end if;
+
+  -- 3. Update order
+  update public.orders
+  set driver_id = auth.uid(),
+      status = 'ASSIGNED',
+      assigned_at = now()
+  where id = p_order_id
+  returning * into v_order;
+
+  -- 4. Update driver status
+  update public.profiles
+  set driver_status = 'busy'
+  where user_id = auth.uid();
+
+  -- 5. Log event
+  insert into public.order_events (order_id, actor_id, event_type, from_status, to_status)
+  values (p_order_id, auth.uid(), 'ORDER_ACCEPTED_BY_DRIVER', 'READY_FOR_PICKUP', 'ASSIGNED');
+
+  return v_order;
+end;
+$$;
+
+-- 4.3 Driver từ chối/trả lại đơn hàng đã nhận
+create or replace function public.driver_reject_order(
+  p_order_id uuid,
+  p_reason text default null
+)
+returns public.orders
+language plpgsql
+security definer
+as $$
+declare
+  v_order public.orders;
+begin
+  -- 1. Check ownership
+  select * into v_order from public.orders 
+  where id = p_order_id 
+    and driver_id = auth.uid()
+  for update;
+
+  if v_order is null then
+    raise exception 'NOT_OWNED_OR_NOT_FOUND';
+  end if;
+
+  -- 2. Transition logic (only if assigned but not picked up yet)
+  if v_order.status != 'ASSIGNED' then
+    raise exception 'INVALID_STATUS_FOR_REJECTION';
+  end if;
+
+  -- 3. Update order back to READY_FOR_PICKUP
+  update public.orders
+  set driver_id = null,
+      status = 'READY_FOR_PICKUP',
+      assigned_at = null
+  where id = p_order_id
+  returning * into v_order;
+
+  -- 4. Re-calculate driver busy status
+  if not exists (
+    select 1 from public.orders 
+    where driver_id = auth.uid() 
+      and status in ('ASSIGNED', 'PICKED_UP')
+  ) then
+    update public.profiles
+    set driver_status = 'online'
+    where user_id = auth.uid();
+  end if;
+
+  -- 5. Log event
+  insert into public.order_events (order_id, actor_id, event_type, from_status, to_status, notes)
+  values (p_order_id, auth.uid(), 'ORDER_REJECTED_BY_DRIVER', 'ASSIGNED', 'READY_FOR_PICKUP', p_reason);
+
+  return v_order;
+end;
+$$;
+
 -- ============================================
 -- MERCHANT FUNCTIONS
 -- ============================================

@@ -10,9 +10,7 @@ import '../providers/auth_provider.dart';
 import '../models/user_address.dart';
 import '../config/constants.dart';
 import '../data/models/location_model.dart';
-import '../data/models/order_model.dart';
 import '../data/models/promotion_model.dart';
-import '../services/vietmap_api_service.dart';
 import '../providers/order_notifier.dart';
 
 /// Phí giao hàng cố định (VND)
@@ -136,7 +134,7 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
       ),
       child: addressesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => _buildNoAddressUI(),
+        error: (e, st) => _buildNoAddressUI(),
         data: (addresses) {
           if (addresses.isEmpty) {
             return _buildNoAddressUI();
@@ -726,6 +724,8 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
         ? (_temporaryAddress != null)
         : (_selectedAddress != null);
 
+    final isPlacingOrder = ref.watch(orderNotifierProvider).isPlacing;
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(

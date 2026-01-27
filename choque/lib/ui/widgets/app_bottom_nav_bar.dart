@@ -129,8 +129,8 @@ class AppBottomNavBar extends StatelessWidget {
                           ? BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  const Color(0xFF1E7F43).withOpacity(0.15),
-                                  const Color(0xFF1E7F43).withOpacity(0.05),
+                                  const Color(0xFF1E7F43).withValues(alpha: 0.15),
+                                  const Color(0xFF1E7F43).withValues(alpha: 0.05),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -228,8 +228,8 @@ class _NotificationNavItem extends ConsumerWidget {
                     ? BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            const Color(0xFF1E7F43).withOpacity(0.15),
-                            const Color(0xFF1E7F43).withOpacity(0.05),
+                            const Color(0xFF1E7F43).withValues(alpha: 0.15),
+                            const Color(0xFF1E7F43).withValues(alpha: 0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,

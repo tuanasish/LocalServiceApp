@@ -247,7 +247,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                         ),
                       ],
                     ),
-                    error: (_, __) => Column(
+                    error: (e, st) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(
@@ -427,7 +427,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
             gradient: LinearGradient(
               colors: [
                 Colors.white,
-                AppColors.primary.withOpacity(0.02),
+                AppColors.primary.withValues(alpha: 0.02),
               ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
@@ -472,7 +472,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
         ),
         child: const Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const SizedBox.shrink(), // Ẩn nếu lỗi
+      error: (e, st) => const SizedBox.shrink(), // Ẩn nếu lỗi
     );
   }
 
@@ -657,7 +657,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 itemCount: merchants.length,
-                separatorBuilder: (_, __) => const SizedBox(width: 20),
+                separatorBuilder: (context, index) => const SizedBox(width: 20),
                 itemBuilder: (context, index) {
                   final merchant = merchants[index];
                   // Tách MerchantCardItem thành ConsumerWidget riêng
@@ -789,7 +789,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
           ],
         ),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (e, st) => const SizedBox.shrink(),
     );
   }
 
@@ -836,8 +836,8 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                     ? BoxDecoration(
                         gradient: LinearGradient(
                           colors: [
-                            AppColors.primary.withOpacity(0.15),
-                            AppColors.primary.withOpacity(0.05),
+                            AppColors.primary.withValues(alpha: 0.15),
+                            AppColors.primary.withValues(alpha: 0.05),
                           ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
@@ -870,7 +870,7 @@ class _UserHomeScreenState extends ConsumerState<UserHomeScreen> {
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.red.withOpacity(0.5),
+                          color: Colors.red.withValues(alpha: 0.5),
                           blurRadius: 4,
                           offset: const Offset(0, 2),
                         ),
@@ -1001,7 +1001,7 @@ class _PopularMerchantItem extends ConsumerWidget {
                       width: 96,
                       height: 96,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => placeholder,
+                      errorBuilder: (context, error, stackTrace) => placeholder,
                     )
                   : placeholder,
             ),

@@ -89,6 +89,7 @@ class OrderModel {
   final String? customerPhone;
   final String? note;
   final String? cancelReason;
+  final String? shopName;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? confirmedAt;
@@ -118,6 +119,7 @@ class OrderModel {
     this.customerPhone,
     this.note,
     this.cancelReason,
+    this.shopName,
     required this.createdAt,
     required this.updatedAt,
     this.confirmedAt,
@@ -149,6 +151,7 @@ class OrderModel {
       customerPhone: json['customer_phone'] as String?,
       note: json['note'] as String?,
       cancelReason: json['cancel_reason'] as String?,
+      shopName: json['shop_name'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
       confirmedAt: json['confirmed_at'] != null ? DateTime.parse(json['confirmed_at'] as String) : null,
@@ -191,4 +194,7 @@ class OrderModel {
   
   /// Kiểm tra xem đơn đã bị hủy chưa
   bool get isCanceled => status == OrderStatus.canceled;
+
+  /// Display alias for delivery fee
+  int get shippingFee => deliveryFee;
 }

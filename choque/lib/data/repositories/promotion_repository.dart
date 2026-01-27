@@ -95,7 +95,7 @@ class PromotionRepository {
           .single()
           .timeout(AppConstants.apiTimeout);
 
-      final promo = PromotionModel.fromJson(response as Map<String, dynamic>);
+      final promo = PromotionModel.fromJson(response);
 
       // Kiểm tra validity
       if (!promo.isValid) return null;
@@ -161,7 +161,7 @@ class PromotionRepository {
           .single()
           .timeout(AppConstants.apiTimeout);
 
-      final promo = PromotionModel.fromJson(response as Map<String, dynamic>);
+      final promo = PromotionModel.fromJson(response);
 
       switch (promo.discountType) {
         case 'freeship':

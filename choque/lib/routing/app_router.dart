@@ -16,10 +16,14 @@ import '../screens/auth/profile_setup_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/reset_password_screen.dart';
 import '../screens/admin/admin_system_overview_screen.dart';
+import '../screens/driver/driver_dashboard_request_screen.dart';
 import '../screens/driver/driver_home_dashboard_screen.dart';
 import '../screens/driver/driver_order_fulfillment_screen.dart';
 import '../screens/merchant/merchant_order_dashboard_screen.dart';
 import '../screens/merchant/merchant_order_management_screen.dart';
+import '../screens/merchant/merchant_price_management_screen.dart';
+import '../screens/merchant/product_picker_screen.dart';
+import '../screens/merchant/merchant_profile_screen.dart';
 import '../screens/order/order_history_screen.dart';
 import '../screens/order/simple_order_tracking_screen.dart';
 import '../screens/profile/user_profile_screen.dart';
@@ -335,6 +339,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return MerchantOrderManagementScreen(orderId: orderId);
             },
           ),
+          GoRoute(
+            path: 'menu',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const MerchantPriceManagementScreen(),
+            routes: [
+              GoRoute(
+                path: 'add',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) {
+                  final extra = state.extra as Map<String, dynamic>?;
+                  final shopId = extra?['shopId'] as String? ?? '';
+                  return ProductPickerScreen(shopId: shopId);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'profile',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const MerchantProfileScreen(),
+          ),
         ],
       ),
       GoRoute(
@@ -342,6 +367,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const DriverHomeDashboardScreen(),
         routes: [
+          GoRoute(
+            path: 'requests',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const DriverDashboardRequestScreen(),
+          ),
           GoRoute(
             path: 'order/:id',
             parentNavigatorKey: _rootNavigatorKey,

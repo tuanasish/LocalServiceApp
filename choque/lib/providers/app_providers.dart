@@ -19,6 +19,8 @@ import '../data/models/notification_model.dart';
 import '../data/models/promotion_model.dart';
 import '../data/models/search_history_model.dart';
 import '../data/models/shop_review_model.dart';
+import '../data/models/driver_location_model.dart';
+import '../services/distance_calculator_service.dart';
 import '../config/constants.dart';
 
 /// Parameters cho shopOrdersProvider
@@ -348,6 +350,23 @@ final driverOrdersStreamProvider = StreamProvider<List<OrderModel>>((ref) {
       });
 });
 
+/// Đơn hàng có sẵn trong khu vực Market (để tài xế nhận)
+final availableOrdersProvider = FutureProvider.family<List<OrderModel>, String>((ref, marketId) async {
+  return ref.watch(driverRepositoryProvider).getAvailableOrders(marketId);
+});
+
+/// Stream realtime đơn hàng có sẵn
+final availableOrdersStreamProvider = StreamProvider.family<List<OrderModel>, String>((ref, marketId) {
+  return ref.watch(supabaseClientProvider)
+      .from('orders')
+      .stream(primaryKey: ['id'])
+      .eq('market_id', marketId)
+      .map((data) => (data as List)
+          .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
+          .where((order) => order.status == OrderStatus.readyForPickup)
+          .toList());
+});
+
 /// Stream driver location for a specific driver (used by customer/admin to track)
 final specificDriverLocationProvider = StreamProvider.family<DriverLocationModel?, String>((ref, driverId) {
   return ref.watch(supabaseClientProvider)
@@ -365,7 +384,14 @@ final driverLocationProvider = StreamProvider<DriverLocationModel?>((ref) {
   final userId = ref.watch(currentUserProvider).value?.id;
   if (userId == null) return Stream.value(null);
   
-  return ref.watch(specificDriverLocationProvider(userId).stream);
+  return ref.watch(supabaseClientProvider)
+      .from('driver_locations')
+      .stream(primaryKey: ['driver_id'])
+      .eq('driver_id', userId)
+      .map((data) {
+        if (data.isEmpty) return null;
+        return DriverLocationModel.fromJson(data.first);
+      });
 });
 
 // ============================================
@@ -432,4 +458,12 @@ final availablePromotionsProvider = FutureProvider.family<List<PromotionModel>, 
     marketId: marketId,
     orderValue: orderValue,
   );
+});
+
+// ============================================
+// DISTANCE CALCULATOR PROVIDER
+// ============================================
+
+final distanceCalculatorProvider = Provider<DistanceCalculatorService>((ref) {
+  return DistanceCalculatorService();
 });

@@ -9,6 +9,7 @@ import '../../data/models/order_model.dart';
 import '../../data/models/order_item_model.dart';
 import '../../services/location_tracking_service.dart';
 import '../../services/navigation_service.dart';
+import '../../ui/widgets/order_tracking_map.dart';
 
 /// Driver Order Fulfillment Screen
 /// Màn chi tiết đơn hàng đang giao: thông tin đơn, địa chỉ, timeline, nút hành động.
@@ -80,6 +81,8 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
                           const SizedBox(height: 20),
                           _buildOrderInfoCard(order),
                           const SizedBox(height: 20),
+                          _buildRealtimeMap(order),
+                          const SizedBox(height: 20),
                           _buildTimeline(order),
                           const SizedBox(height: 20),
                           _buildStoreInfo(order),
@@ -150,7 +153,7 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
       bottomNavigationBar: orderAsync.when(
         data: (order) => _buildBottomBar(order),
         loading: () => null,
-        error: (_, __) => null,
+        error: (e, st) => null,
       ),
     );
   }
@@ -213,6 +216,50 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
               ),
             ],
           ),
+        ],
+      ),
+    );
+  }
+
+  /// Build realtime tracking map with distance/ETA info
+  Widget _buildRealtimeMap(OrderModel order) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Bản đồ giao hàng',
+                style: AppTextStyles.heading18,
+              ),
+              const Spacer(),
+              // Navigate to external map
+              IconButton(
+                onPressed: () => NavigationService.openNavigationApp(
+                  lat: order.status == OrderStatus.assigned
+                      ? order.pickup.lat
+                      : order.dropoff.lat,
+                  lng: order.status == OrderStatus.assigned
+                      ? order.pickup.lng
+                      : order.dropoff.lng,
+                  label: order.status == OrderStatus.assigned
+                      ? 'Cửa hàng'
+                      : 'Khách hàng',
+                ),
+                icon: const Icon(Icons.directions, color: AppColors.primary),
+                tooltip: 'Mở chỉ đường',
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          OrderTrackingMapWidget(order: order),
         ],
       ),
     );
@@ -485,7 +532,7 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
         ),
         child: const Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (e, st) => const SizedBox.shrink(),
     ) ?? const SizedBox.shrink();
   }
 
@@ -688,7 +735,7 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
             ),
             child: const Center(child: CircularProgressIndicator()),
           ),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (e, st) => const SizedBox.shrink(),
         );
       },
     );
@@ -751,7 +798,28 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
       ),
       child: Row(
         children: [
-          if (canPickUp)
+          if (canPickUp) ...[
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.danger,
+                  side: const BorderSide(color: AppColors.danger),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.pill),
+                  ),
+                ),
+                onPressed: _isUpdatingStatus ? null : () => _rejectOrder(order),
+                child: Text(
+                  'Hủy đơn',
+                  style: GoogleFonts.inter(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               flex: 2,
               child: ElevatedButton(
@@ -782,6 +850,7 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
                       ),
               ),
             ),
+          ],
           if (canComplete) ...[
             Expanded(
               flex: 2,
@@ -842,6 +911,54 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
     await _locationService?.stopTracking();
   }
 
+  Future<void> _rejectOrder(OrderModel order) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Hủy nhận đơn'),
+        content: const Text('Bạn có chắc chắn muốn hủy nhận đơn hàng này?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Bỏ qua'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+            child: const Text('Xác nhận'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    setState(() => _isUpdatingStatus = true);
+    try {
+      await ref.read(driverRepositoryProvider).rejectOrder(order.id);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã hủy nhận đơn hàng'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+        context.go('/driver');
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi: ${e.toString()}'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUpdatingStatus = false);
+    }
+  }
+
   Future<void> _updateStatus(OrderModel order, OrderStatus newStatus) async {
     setState(() => _isUpdatingStatus = true);
 
@@ -891,6 +1008,8 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
 
   String _getStatusText(OrderStatus status) {
     switch (status) {
+      case OrderStatus.readyForPickup:
+      case OrderStatus.confirmed:
       case OrderStatus.assigned:
         return 'Đã nhận đơn';
       case OrderStatus.pickedUp:
@@ -904,6 +1023,8 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
 
   Color _getStatusColor(OrderStatus status) {
     switch (status) {
+      case OrderStatus.readyForPickup:
+      case OrderStatus.confirmed:
       case OrderStatus.assigned:
         return AppColors.primary;
       case OrderStatus.pickedUp:
@@ -920,6 +1041,6 @@ class _DriverOrderFulfillmentScreenState extends ConsumerState<DriverOrderFulfil
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 }

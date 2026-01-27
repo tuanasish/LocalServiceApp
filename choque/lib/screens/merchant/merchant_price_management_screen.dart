@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../ui/design_system.dart';
 import '../../providers/app_providers.dart';
 import '../../data/repositories/merchant_repository.dart';
 import 'price_edit_modal.dart';
-import 'product_picker_screen.dart';
-import '../../data/models/order_model.dart'; // For OrderStatus if needed, but ShopMenuItem is here
-import '../../data/models/merchant_model.dart';
+// For OrderStatus if needed, but ShopMenuItem is here
 
 /// Merchant Price Management Screen
 /// Màn quản lý giá bán: danh sách món ăn, chỉnh sửa giá, cập nhật hàng loạt.
@@ -196,11 +195,10 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
           ),
           ElevatedButton.icon(
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => ProductPickerScreen(shopId: ref.read(myShopProvider).value!.id),
-                ),
-              );
+              final shop = ref.read(myShopProvider).value;
+              if (shop != null) {
+                context.push('/merchant/menu/add', extra: {'shopId': shop.id});
+              }
             },
             icon: const Icon(Icons.add, size: 18),
             label: const Text('Thêm món'),
@@ -659,9 +657,6 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
     );
   }
 
-    );
-  }
-
   Future<void> _confirmRemove(BuildContext context, ShopMenuItem item, String shopId) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -706,6 +701,6 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
-    return '${formatted}đ';
+    return '$formattedđ';
   }
 }

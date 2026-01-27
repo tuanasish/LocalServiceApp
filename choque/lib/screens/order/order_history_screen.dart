@@ -253,7 +253,7 @@ class _OrderCard extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.pill),
                   ),
                   child: Text(
@@ -361,6 +361,8 @@ class _OrderCard extends ConsumerWidget {
       case OrderStatus.canceled:
         return AppColors.danger;
       case OrderStatus.pickedUp:
+      case OrderStatus.readyForPickup:
+      case OrderStatus.confirmed:
       case OrderStatus.assigned:
         return const Color(0xFFF59E0B); // Amber
       default:
