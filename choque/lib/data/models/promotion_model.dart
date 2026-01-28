@@ -1,5 +1,5 @@
 /// Promotion Model
-/// 
+///
 /// Ánh xạ bảng `promotions` trong Supabase.
 /// Hỗ trợ freeship đơn đầu và voucher code.
 class PromotionModel {
@@ -61,8 +61,12 @@ class PromotionModel {
       maxTotalUses: json['max_total_uses'] as int?,
       maxUsesPerUser: json['max_uses_per_user'] as int? ?? 1,
       currentUses: json['current_uses'] as int? ?? 0,
-      validFrom: json['valid_from'] != null ? DateTime.parse(json['valid_from'] as String) : null,
-      validTo: json['valid_to'] != null ? DateTime.parse(json['valid_to'] as String) : null,
+      validFrom: json['valid_from'] != null
+          ? DateTime.parse(json['valid_from'] as String)
+          : null,
+      validTo: json['valid_to'] != null
+          ? DateTime.parse(json['valid_to'] as String)
+          : null,
       status: json['status'] as String? ?? 'active',
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),

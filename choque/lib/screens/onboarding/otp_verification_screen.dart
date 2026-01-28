@@ -54,10 +54,7 @@ class OtpVerificationScreen extends StatelessWidget {
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: List.generate(
-                  6,
-                  (index) => _buildOtpBox(),
-                ),
+                children: List.generate(6, (index) => _buildOtpBox()),
               ),
               const SizedBox(height: 16),
               Row(
@@ -155,4 +152,3 @@ class OtpVerificationScreen extends StatelessWidget {
     );
   }
 }
-

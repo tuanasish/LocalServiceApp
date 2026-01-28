@@ -10,7 +10,7 @@ import '../../data/models/location_model.dart';
 import '../../services/vietmap_api_service.dart';
 
 /// ShopeeFood-style Map Address Picker Screen
-/// 
+///
 /// Features:
 /// - Search bar at top
 /// - Map with custom marker
@@ -19,22 +19,25 @@ import '../../services/vietmap_api_service.dart';
 class MapAddressPickerScreen extends ConsumerStatefulWidget {
   final LocationModel? initialLocation;
 
-  const MapAddressPickerScreen({
-    super.key,
-    this.initialLocation,
-  });
+  const MapAddressPickerScreen({super.key, this.initialLocation});
 
   @override
-  ConsumerState<MapAddressPickerScreen> createState() => _MapAddressPickerScreenState();
+  ConsumerState<MapAddressPickerScreen> createState() =>
+      _MapAddressPickerScreenState();
 }
 
-class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen> {
+class _MapAddressPickerScreenState
+    extends ConsumerState<MapAddressPickerScreen> {
   VietmapController? _mapController;
   final TextEditingController _searchController = TextEditingController();
   final VietmapApiService _apiService = VietmapApiService();
-  final DraggableScrollableController _sheetController = DraggableScrollableController();
-  
-  LatLng _selectedLocation = const LatLng(20.00333, 105.97583); // Nga Sơn, Thanh Hóa
+  final DraggableScrollableController _sheetController =
+      DraggableScrollableController();
+
+  LatLng _selectedLocation = const LatLng(
+    20.00333,
+    105.97583,
+  ); // Nga Sơn, Thanh Hóa
   String _selectedAddress = '';
   bool _isLoadingSuggestions = false;
   List<Map<String, dynamic>> _searchResults = [];
@@ -51,7 +54,8 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
         widget.initialLocation!.lat,
         widget.initialLocation!.lng,
       );
-      _selectedAddress = widget.initialLocation!.address ?? widget.initialLocation!.label;
+      _selectedAddress =
+          widget.initialLocation!.address ?? widget.initialLocation!.label;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadSuggestionsForLocation(_selectedLocation);
@@ -79,14 +83,14 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
         location.latitude,
         location.longitude,
       );
-      
+
       // Get nearby suggestions
       final suggestions = await _apiService.searchAddress(
         '', // Empty query to get nearby places
         focusLat: location.latitude,
         focusLng: location.longitude,
       );
-      
+
       setState(() {
         _selectedAddress = address ?? 'Không tìm thấy địa chỉ';
         _suggestions = suggestions.take(5).toList();
@@ -133,19 +137,20 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
   void _onSearchResultTap(Map<String, dynamic> result) {
     final geometry = result['geometry'] as Map<String, dynamic>?;
     final properties = result['properties'] as Map<String, dynamic>?;
-    
+
     if (geometry != null) {
       final coordinates = geometry['coordinates'] as List<dynamic>?;
       if (coordinates != null && coordinates.length >= 2) {
         final lng = (coordinates[0] as num).toDouble();
         final lat = (coordinates[1] as num).toDouble();
         final location = LatLng(lat, lng);
-        
-        final addressFromResult = properties?['name'] as String? ?? 
-                                  properties?['label'] as String? ?? 
-                                  properties?['address'] as String? ?? 
-                                  properties?['full_address'] as String?;
-        
+
+        final addressFromResult =
+            properties?['name'] as String? ??
+            properties?['label'] as String? ??
+            properties?['address'] as String? ??
+            properties?['full_address'] as String?;
+
         setState(() {
           _selectedLocation = location;
           _searchResults = [];
@@ -159,10 +164,10 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
         _mapController?.animateCamera(
           CameraUpdate.newLatLngZoom(location, 16.0),
         );
-        
+
         // Reload suggestions for new location
         _loadSuggestionsForLocation(location);
-        
+
         // Collapse search results
         FocusScope.of(context).unfocus();
       }
@@ -179,11 +184,11 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
     String address = _selectedAddress;
     double lat = _selectedLocation.latitude;
     double lng = _selectedLocation.longitude;
-    
+
     if (result != null) {
       final geometry = result['geometry'] as Map<String, dynamic>?;
       final properties = result['properties'] as Map<String, dynamic>?;
-      
+
       if (geometry != null) {
         final coordinates = geometry['coordinates'] as List<dynamic>?;
         if (coordinates != null && coordinates.length >= 2) {
@@ -191,20 +196,21 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
           lat = (coordinates[1] as num).toDouble();
         }
       }
-      
-      address = properties?['name'] as String? ?? 
-                properties?['label'] as String? ?? 
-                properties?['address'] as String? ?? 
-                address;
+
+      address =
+          properties?['name'] as String? ??
+          properties?['label'] as String? ??
+          properties?['address'] as String? ??
+          address;
     }
-    
+
     final location = LocationModel(
       label: address,
       address: address,
       lat: lat,
       lng: lng,
     );
-    
+
     if (mounted) {
       context.pop(location);
     }
@@ -215,26 +221,24 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
       final permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         final requested = await Geolocator.requestPermission();
-        if (requested == LocationPermission.denied || 
+        if (requested == LocationPermission.denied ||
             requested == LocationPermission.deniedForever) {
           return;
         }
       }
-      
+
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      
+
       final location = LatLng(position.latitude, position.longitude);
-      
+
       setState(() {
         _selectedLocation = location;
       });
-      
-      _mapController?.animateCamera(
-        CameraUpdate.newLatLngZoom(location, 16.0),
-      );
-      
+
+      _mapController?.animateCamera(CameraUpdate.newLatLngZoom(location, 16.0));
+
       _loadSuggestionsForLocation(location);
     } catch (e) {
       if (mounted) {
@@ -260,7 +264,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
               children: [
                 // Header with search
                 _buildHeader(),
-                
+
                 // Map
                 Expanded(
                   child: Stack(
@@ -270,23 +274,24 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                         onMapCreated: (controller) {
                           _mapController = controller;
                           _mapController?.moveCamera(
-                            CameraUpdate.newLatLngZoom(
-                              _selectedLocation,
-                              15.0,
-                            ),
+                            CameraUpdate.newLatLngZoom(_selectedLocation, 15.0),
                           );
                         },
                         onCameraIdle: () {
                           // When map stops moving, update suggestions
                           _suggestionDebounce?.cancel();
-                          _suggestionDebounce = Timer(const Duration(milliseconds: 500), () {
-                            if (mounted && !_isSearchMode) {
-                              // Note: VietmapGL doesn't expose camera position directly
-                              // Using selected location which is updated on map creation
-                            }
-                          });
+                          _suggestionDebounce = Timer(
+                            const Duration(milliseconds: 500),
+                            () {
+                              if (mounted && !_isSearchMode) {
+                                // Note: VietmapGL doesn't expose camera position directly
+                                // Using selected location which is updated on map creation
+                              }
+                            },
+                          );
                         },
-                        styleString: 'https://maps.vietmap.vn/maps/styles/tm/style.json?apikey=${AppConstants.vietmapTilemapKey}',
+                        styleString:
+                            'https://maps.vietmap.vn/maps/styles/tm/style.json?apikey=${AppConstants.vietmapTilemapKey}',
                         initialCameraPosition: CameraPosition(
                           target: _selectedLocation,
                           zoom: 15.0,
@@ -294,7 +299,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                         myLocationEnabled: true,
                         myLocationTrackingMode: MyLocationTrackingMode.none,
                       ),
-                      
+
                       // Center marker (ShopeeFood style - avatar marker)
                       Center(
                         child: Padding(
@@ -302,7 +307,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                           child: _buildCustomMarker(),
                         ),
                       ),
-                      
+
                       // FAB for current location
                       Positioned(
                         bottom: 16,
@@ -321,7 +326,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                 ),
               ],
             ),
-            
+
             // Bottom Sheet with suggestions (ShopeeFood style)
             DraggableScrollableSheet(
               controller: _sheetController,
@@ -332,7 +337,9 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                 return Container(
                   decoration: const BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                    borderRadius: BorderRadius.vertical(
+                      top: Radius.circular(16),
+                    ),
                     boxShadow: [
                       BoxShadow(
                         color: Color(0x1A000000),
@@ -353,10 +360,13 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
-                      
+
                       // "Địa chỉ gợi ý" header
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         child: Row(
                           children: [
                             Text(
@@ -371,22 +381,27 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                               const SizedBox(
                                 width: 12,
                                 height: 12,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               ),
                             ],
                           ],
                         ),
                       ),
-                      
+
                       const Divider(height: 1),
-                      
+
                       // Suggestions list
                       Expanded(
                         child: ListView.separated(
                           controller: scrollController,
                           padding: EdgeInsets.zero,
-                          itemCount: _suggestions.isEmpty ? 1 : _suggestions.length,
-                          separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                          itemCount: _suggestions.isEmpty
+                              ? 1
+                              : _suggestions.length,
+                          separatorBuilder: (context, index) =>
+                              const Divider(height: 1, indent: 56),
                           itemBuilder: (context, index) {
                             if (_suggestions.isEmpty) {
                               return _buildCurrentSelectionTile();
@@ -400,7 +415,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                 );
               },
             ),
-            
+
             // Search results overlay
             if (_isSearchMode && _searchResults.isNotEmpty)
               Positioned(
@@ -425,7 +440,8 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                     shrinkWrap: true,
                     padding: EdgeInsets.zero,
                     itemCount: _searchResults.length,
-                    separatorBuilder: (context, index) => const Divider(height: 1, indent: 56),
+                    separatorBuilder: (context, index) =>
+                        const Divider(height: 1, indent: 56),
                     itemBuilder: (context, index) {
                       return _buildSearchResultTile(_searchResults[index]);
                     },
@@ -470,10 +486,18 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                 decoration: InputDecoration(
                   hintText: 'Tìm vị trí',
                   hintStyle: GoogleFonts.inter(color: Colors.grey[400]),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[400], size: 20),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: Colors.grey[400],
+                    size: 20,
+                  ),
                   suffixIcon: _searchController.text.isNotEmpty
                       ? IconButton(
-                          icon: Icon(Icons.clear, color: Colors.grey[400], size: 18),
+                          icon: Icon(
+                            Icons.clear,
+                            color: Colors.grey[400],
+                            size: 18,
+                          ),
                           onPressed: () {
                             _searchController.clear();
                             setState(() {
@@ -496,11 +520,14 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
                     return;
                   }
                   setState(() => _isSearchMode = true);
-                  _searchDebounce = Timer(const Duration(milliseconds: 400), () {
-                    if (mounted && value.isNotEmpty) {
-                      _onSearch(value);
-                    }
-                  });
+                  _searchDebounce = Timer(
+                    const Duration(milliseconds: 400),
+                    () {
+                      if (mounted && value.isNotEmpty) {
+                        _onSearch(value);
+                      }
+                    },
+                  );
                 },
               ),
             ),
@@ -531,11 +558,7 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
               ),
             ],
           ),
-          child: const Icon(
-            Icons.person,
-            color: Colors.white,
-            size: 20,
-          ),
+          child: const Icon(Icons.person, color: Colors.white, size: 20),
         ),
         CustomPaint(
           size: const Size(12, 8),
@@ -572,13 +595,15 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
 
   Widget _buildSuggestionTile(Map<String, dynamic> result) {
     final properties = result['properties'] as Map<String, dynamic>?;
-    final name = properties?['name'] as String? ?? 
-                 properties?['label'] as String? ?? 
-                 'Địa chỉ';
-    final address = properties?['label'] as String? ??
-                    properties?['address'] as String? ?? 
-                    '';
-    
+    final name =
+        properties?['name'] as String? ??
+        properties?['label'] as String? ??
+        'Địa chỉ';
+    final address =
+        properties?['label'] as String? ??
+        properties?['address'] as String? ??
+        '';
+
     return ListTile(
       leading: Container(
         width: 40,
@@ -609,13 +634,15 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
 
   Widget _buildSearchResultTile(Map<String, dynamic> result) {
     final properties = result['properties'] as Map<String, dynamic>?;
-    final name = properties?['name'] as String? ?? 
-                 properties?['label'] as String? ?? 
-                 'Địa chỉ';
-    final address = properties?['label'] as String? ??
-                    properties?['address'] as String? ?? 
-                    '';
-    
+    final name =
+        properties?['name'] as String? ??
+        properties?['label'] as String? ??
+        'Địa chỉ';
+    final address =
+        properties?['label'] as String? ??
+        properties?['address'] as String? ??
+        '';
+
     return ListTile(
       leading: Icon(Icons.location_on_outlined, color: Colors.grey[600]),
       title: Text(
@@ -640,24 +667,24 @@ class _MapAddressPickerScreenState extends ConsumerState<MapAddressPickerScreen>
 /// Triangle painter for marker pointer
 class _TrianglePainter extends CustomPainter {
   final Color color;
-  
+
   _TrianglePainter({required this.color});
-  
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = color
       ..style = PaintingStyle.fill;
-    
+
     final path = Path()
       ..moveTo(size.width / 2, size.height)
       ..lineTo(0, 0)
       ..lineTo(size.width, 0)
       ..close();
-    
+
     canvas.drawPath(path, paint);
   }
-  
+
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

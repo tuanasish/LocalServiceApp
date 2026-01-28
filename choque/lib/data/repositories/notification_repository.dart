@@ -1,105 +1,167 @@
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/notification_model.dart';
-import '../../config/constants.dart';
 
 /// Notification Repository
-/// 
-/// Xử lý các thao tác liên quan đến notifications.
+/// Handles all notification-related database operations
 class NotificationRepository {
-  final SupabaseClient _client;
+  final SupabaseClient _supabase;
 
-  NotificationRepository(this._client);
+  NotificationRepository(this._supabase);
 
-  factory NotificationRepository.instance() {
-    return NotificationRepository(Supabase.instance.client);
-  }
-
-  /// Lấy danh sách notifications của user
-  Future<List<NotificationModel>> getMyNotifications({
-    String? type,
-    int limit = 50,
+  /// Save FCM token to database
+  Future<void> saveFCMToken({
+    required String token,
+    String? deviceType,
+    String? deviceId,
   }) async {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) return [];
+    try {
+      await _supabase.rpc('save_fcm_token', params: {
+        'p_token': token,
+        'p_device_type': deviceType,
+        'p_device_id': deviceId,
+      });
 
-    var query = _client
-        .from('notifications')
-        .select()
-        .eq('user_id', userId);
-
-    if (type != null && type != 'Tất cả' && type.isNotEmpty) {
-      query = query.eq('type', type.toLowerCase());
+      if (kDebugMode) {
+        print('[NotificationRepository] FCM token saved: ${token.substring(0, 20)}...');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('[NotificationRepository] Error saving FCM token: $e');
+      }
+      rethrow;
     }
-
-    final response = await query
-        .order('created_at', ascending: false)
-        .limit(limit)
-        .timeout(AppConstants.apiTimeout);
-
-    return (response as List)
-        .map((json) => NotificationModel.fromJson(json as Map<String, dynamic>))
-        .toList();
   }
 
-  /// Đánh dấu notification là đã đọc
-  Future<void> markAsRead(String notificationId) async {
-    await _client
-        .from('notifications')
-        .update({
-          'is_read': true,
-          'read_at': DateTime.now().toIso8601String(),
-        })
-        .eq('id', notificationId)
-        .timeout(AppConstants.apiTimeout);
+  /// Get user notifications with pagination
+  Future<List<NotificationModel>> getNotifications({
+    int limit = 50,
+    int offset = 0,
+    bool unreadOnly = false,
+  }) async {
+    try {
+      final response = await _supabase.rpc('get_user_notifications', params: {
+        'p_limit': limit,
+        'p_offset': offset,
+        'p_unread_only': unreadOnly,
+      }) as List<dynamic>;
+
+      final notifications = response
+          .map((json) => NotificationModel.fromJson(json as Map<String, dynamic>))
+          .toList();
+
+      if (kDebugMode) {
+        print('[NotificationRepository] Fetched ${notifications.length} notifications');
+      }
+
+      return notifications;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[NotificationRepository] Error fetching notifications: $e');
+      }
+      rethrow;
+    }
   }
 
-  /// Đánh dấu tất cả notifications là đã đọc
-  Future<void> markAllAsRead() async {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) return;
+  /// Mark notification as read
+  Future<NotificationModel> markAsRead(String notificationId, {bool read = true}) async {
+    try {
+      final response = await _supabase.rpc('mark_notification_read', params: {
+        'p_notification_id': notificationId,
+        'p_read': read,
+      }) as Map<String, dynamic>;
 
-    await _client
-        .from('notifications')
-        .update({
-          'is_read': true,
-          'read_at': DateTime.now().toIso8601String(),
-        })
-        .eq('user_id', userId)
-        .eq('is_read', false)
-        .timeout(AppConstants.apiTimeout);
+      final notification = NotificationModel.fromJson(response);
+
+      if (kDebugMode) {
+        print('[NotificationRepository] Marked notification as ${read ? "read" : "unread"}: $notificationId');
+      }
+
+      return notification;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[NotificationRepository] Error marking notification: $e');
+      }
+      rethrow;
+    }
   }
 
-  /// Đếm số notifications chưa đọc
+  /// Mark all notifications as read
+  Future<int> markAllAsRead() async {
+    try {
+      final count = await _supabase.rpc('mark_all_notifications_read') as int;
+
+      if (kDebugMode) {
+        print('[NotificationRepository] Marked $count notifications as read');
+      }
+
+      return count;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[NotificationRepository] Error marking all as read: $e');
+      }
+      rethrow;
+    }
+  }
+
+  /// Delete notification
+  Future<void> deleteNotification(String notificationId) async {
+    try {
+      await _supabase.rpc('delete_notification', params: {
+        'p_notification_id': notificationId,
+      });
+
+      if (kDebugMode) {
+        print('[NotificationRepository] Deleted notification: $notificationId');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('[NotificationRepository] Error deleting notification: $e');
+      }
+      rethrow;
+    }
+  }
+
+  /// Get unread notifications count
   Future<int> getUnreadCount() async {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) return 0;
+    try {
+      final count = await _supabase.rpc('get_unread_notifications_count') as int;
 
-    final response = await _client
-        .from('notifications')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('is_read', false)
-        .timeout(AppConstants.apiTimeout);
+      if (kDebugMode) {
+        print('[NotificationRepository] Unread count: $count');
+      }
 
-    return (response as List).length;
+      return count;
+    } catch (e) {
+      if (kDebugMode) {
+        print('[NotificationRepository] Error getting unread count: $e');
+      }
+      return 0;
+    }
   }
 
-  /// Stream notifications real-time
-  Stream<List<NotificationModel>> streamNotifications() {
-    final userId = _client.auth.currentUser?.id;
-    if (userId == null) {
-      return Stream.value([]);
-    }
-
-    return _client
+  /// Stream of notifications (real-time updates)
+  Stream<List<NotificationModel>> watchNotifications() {
+    final userId = _supabase.auth.currentUser?.id ?? '';
+    return _supabase
         .from('notifications')
         .stream(primaryKey: ['id'])
         .eq('user_id', userId)
         .order('created_at', ascending: false)
-        .map((data) {
-          return (data as List)
-              .map((json) => NotificationModel.fromJson(json as Map<String, dynamic>))
-              .toList();
-        });
+        .limit(50)
+        .map((data) => data
+            .map((json) => NotificationModel.fromJson(json))
+            .toList());
+  }
+
+  /// Stream of unread count (real-time updates)
+  Stream<int> watchUnreadCount() {
+    final userId = _supabase.auth.currentUser?.id ?? '';
+    return _supabase
+        .from('notifications')
+        .stream(primaryKey: ['id'])
+        .eq('user_id', userId)
+        .eq('read', false)
+        .map((data) => data.length);
   }
 }

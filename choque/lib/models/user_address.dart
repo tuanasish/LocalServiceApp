@@ -38,7 +38,7 @@ class UserAddress {
   final double? lng;
   final bool isDefault;
   final DateTime createdAt;
-  
+
   // ShopeeFood-style new fields
   final AddressType addressType;
   final String? building; // Tòa nhà, Số tầng
@@ -131,7 +131,7 @@ class UserAddress {
       recipientPhone: recipientPhone ?? this.recipientPhone,
     );
   }
-  
+
   /// Get full display address including building and gate
   String get fullDisplayAddress {
     final parts = <String>[details];

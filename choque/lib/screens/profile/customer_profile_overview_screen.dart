@@ -196,7 +196,9 @@ class _ProfileCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                  ),
                 ),
                 child: const Icon(Icons.person, color: AppColors.primary),
               ),
@@ -239,7 +241,11 @@ class _ProfileCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.check_circle, size: 14, color: AppColors.textPrimary),
+                  const Icon(
+                    Icons.check_circle,
+                    size: 14,
+                    color: AppColors.textPrimary,
+                  ),
                   const SizedBox(width: 6),
                   Text(
                     'Đã xác thực',
@@ -260,10 +266,7 @@ class _ProfileCard extends StatelessWidget {
 }
 
 class _SectionCard extends StatelessWidget {
-  const _SectionCard({
-    required this.title,
-    required this.children,
-  });
+  const _SectionCard({required this.title, required this.children});
 
   final String title;
   final List<Widget> children;
@@ -385,19 +388,13 @@ class _ProfileListTile extends StatelessWidget {
 
     return Material(
       color: Colors.transparent,
-      child: InkWell(
-        onTap: () {},
-        child: tile,
-      ),
+      child: InkWell(onTap: () {}, child: tile),
     );
   }
 }
 
 class _LogoutCard extends StatelessWidget {
-  const _LogoutCard({
-    required this.versionText,
-    required this.onLogout,
-  });
+  const _LogoutCard({required this.versionText, required this.onLogout});
 
   final String versionText;
   final VoidCallback onLogout;
@@ -545,4 +542,3 @@ class _BottomNavItem extends StatelessWidget {
     );
   }
 }
-

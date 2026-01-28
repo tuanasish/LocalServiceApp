@@ -64,14 +64,16 @@ class CheckoutGpsFeeScreen extends StatelessWidget {
       children: [
         Text('Đơn hàng của bạn', style: AppTextStyles.heading18),
         const SizedBox(height: 12),
-        const CheckoutOrderItem(title: 'Phở Bò Tái Lăn', quantity: 1, price: '65.000đ'),
+        const CheckoutOrderItem(
+          title: 'Phở Bò Tái Lăn',
+          quantity: 1,
+          price: '65.000đ',
+        ),
         const SizedBox(height: 10),
         const CheckoutOrderItem(title: 'Trà Đá', quantity: 1, price: '5.000đ'),
       ],
     );
   }
-
-
 
   Widget _buildDeliveryFeeInfo() {
     return Container(
@@ -93,10 +95,7 @@ class CheckoutGpsFeeScreen extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Expanded(
-                child: Text(
-                  'Phí giao hàng',
-                  style: AppTextStyles.label14,
-                ),
+                child: Text('Phí giao hàng', style: AppTextStyles.label14),
               ),
               Text(
                 '22.000đ',
@@ -144,10 +143,7 @@ class CheckoutGpsFeeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Ghi chú cho cửa hàng',
-            style: AppTextStyles.label14,
-          ),
+          Text('Ghi chú cho cửa hàng', style: AppTextStyles.label14),
           const SizedBox(height: 8),
           TextField(
             decoration: InputDecoration(

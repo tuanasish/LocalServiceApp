@@ -12,7 +12,8 @@ class ProductPickerScreen extends ConsumerStatefulWidget {
   const ProductPickerScreen({super.key, required this.shopId});
 
   @override
-  ConsumerState<ProductPickerScreen> createState() => _ProductPickerScreenState();
+  ConsumerState<ProductPickerScreen> createState() =>
+      _ProductPickerScreenState();
 }
 
 class _ProductPickerScreenState extends ConsumerState<ProductPickerScreen> {
@@ -42,7 +43,9 @@ class _ProductPickerScreenState extends ConsumerState<ProductPickerScreen> {
     });
 
     try {
-      final results = await ref.read(merchantRepositoryProvider).searchMasterCatalog(query: value);
+      final results = await ref
+          .read(merchantRepositoryProvider)
+          .searchMasterCatalog(query: value);
       setState(() {
         _results = results;
         _isSearching = false;
@@ -51,7 +54,10 @@ class _ProductPickerScreenState extends ConsumerState<ProductPickerScreen> {
       setState(() => _isSearching = false);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi tìm kiếm: $e'), backgroundColor: AppColors.danger),
+          SnackBar(
+            content: Text('Lỗi tìm kiếm: $e'),
+            backgroundColor: AppColors.danger,
+          ),
         );
       }
     }
@@ -59,11 +65,10 @@ class _ProductPickerScreenState extends ConsumerState<ProductPickerScreen> {
 
   Future<void> _handleAddProduct(ProductModel product) async {
     try {
-      await ref.read(merchantRepositoryProvider).addProductToShop(
-        shopId: widget.shopId,
-        productId: product.id,
-      );
-      
+      await ref
+          .read(merchantRepositoryProvider)
+          .addProductToShop(shopId: widget.shopId, productId: product.id);
+
       if (mounted) {
         ref.invalidate(shopMenuProvider(widget.shopId));
         ScaffoldMessenger.of(context).showSnackBar(
@@ -98,9 +103,7 @@ class _ProductPickerScreenState extends ConsumerState<ProductPickerScreen> {
       body: Column(
         children: [
           _buildSearchHeader(),
-          Expanded(
-            child: _buildContent(),
-          ),
+          Expanded(child: _buildContent()),
         ],
       ),
     );
@@ -240,7 +243,11 @@ class _ProductPickerScreenState extends ConsumerState<ProductPickerScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.search_off_rounded, size: 64, color: AppColors.textMuted),
+            Icon(
+              Icons.search_off_rounded,
+              size: 64,
+              color: AppColors.textMuted,
+            ),
             const SizedBox(height: 16),
             Text(
               message,

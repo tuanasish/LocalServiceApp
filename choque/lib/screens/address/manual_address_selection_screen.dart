@@ -57,12 +57,12 @@ class ManualAddressSelectionScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Địa chỉ hiện tại',
-                style: AppTextStyles.heading18,
-              ),
+              Text('Địa chỉ hiện tại', style: AppTextStyles.heading18),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -111,10 +111,7 @@ class ManualAddressSelectionScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Nhập địa chỉ mới',
-            style: AppTextStyles.heading18,
-          ),
+          Text('Nhập địa chỉ mới', style: AppTextStyles.heading18),
           const SizedBox(height: 12),
           _buildTextField(
             label: 'Họ và tên',
@@ -140,7 +137,7 @@ class ManualAddressSelectionScreen extends StatelessWidget {
               final result = await context.push<LocationModel>(
                 '/address/map-picker',
               );
-              if (result != null) {
+              if (result != null && context.mounted) {
                 // TODO: Cập nhật form với result
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -181,18 +178,12 @@ class ManualAddressSelectionScreen extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: _buildTextField(
-                  label: 'Quận / Huyện',
-                  hint: 'Quận 1',
-                ),
+                child: _buildTextField(label: 'Quận / Huyện', hint: 'Quận 1'),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildTextField(
-            label: 'Tỉnh / Thành phố',
-            hint: 'TP. Hồ Chí Minh',
-          ),
+          _buildTextField(label: 'Tỉnh / Thành phố', hint: 'TP. Hồ Chí Minh'),
           const SizedBox(height: 12),
           _buildTextField(
             label: 'Ghi chú cho tài xế (tuỳ chọn)',
@@ -326,4 +317,3 @@ class ManualAddressSelectionScreen extends StatelessWidget {
     );
   }
 }
-

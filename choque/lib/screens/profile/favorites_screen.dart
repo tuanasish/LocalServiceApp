@@ -101,7 +101,11 @@ class FavoritesScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildFavoriteShopCard(BuildContext context, WidgetRef ref, MerchantModel shop) {
+  Widget _buildFavoriteShopCard(
+    BuildContext context,
+    WidgetRef ref,
+    MerchantModel shop,
+  ) {
     return GestureDetector(
       onTap: () => context.push('/store/${shop.id}'),
       child: Container(
@@ -124,16 +128,23 @@ class FavoritesScreen extends ConsumerWidget {
               ),
               child: Consumer(
                 builder: (context, ref, child) {
-                  final imageUrlAsync = ref.watch(shopImageUrlProvider(shop.id));
+                  final imageUrlAsync = ref.watch(
+                    shopImageUrlProvider(shop.id),
+                  );
                   return imageUrlAsync.when(
-                    data: (url) => url != null 
+                    data: (url) => url != null
                         ? ClipRRect(
-                            borderRadius: BorderRadius.circular(AppRadius.small),
+                            borderRadius: BorderRadius.circular(
+                              AppRadius.small,
+                            ),
                             child: Image.network(url, fit: BoxFit.cover),
                           )
                         : const Icon(Icons.store, color: Color(0xFF94A3B8)),
-                    loading: () => const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                    error: (_, __) => const Icon(Icons.store, color: Color(0xFF94A3B8)),
+                    loading: () => const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                    error: (_, _) =>
+                        const Icon(Icons.store, color: Color(0xFF94A3B8)),
                   );
                 },
               ),
@@ -154,7 +165,11 @@ class FavoritesScreen extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      const Icon(Icons.star, size: 14, color: Color(0xFFFACC15)),
+                      const Icon(
+                        Icons.star,
+                        size: 14,
+                        color: Color(0xFFFACC15),
+                      ),
                       const SizedBox(width: 4),
                       Text(
                         shop.rating?.toStringAsFixed(1) ?? 'N/A',
@@ -165,7 +180,10 @@ class FavoritesScreen extends ConsumerWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
-                      const Text('•', style: TextStyle(color: Color(0xFFCBD5E1))),
+                      const Text(
+                        '•',
+                        style: TextStyle(color: Color(0xFFCBD5E1)),
+                      ),
                       const SizedBox(width: 8),
                       Text(
                         shop.openingHours ?? 'Đang mở cửa',
@@ -199,13 +217,17 @@ class FavoritesScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _removeFromFavorites(BuildContext context, WidgetRef ref, String shopId) async {
+  Future<void> _removeFromFavorites(
+    BuildContext context,
+    WidgetRef ref,
+    String shopId,
+  ) async {
     try {
       final repo = ref.read(favoriteRepositoryProvider);
       await repo.toggleFavorite(shopId, false);
       ref.invalidate(myFavoritesProvider);
       ref.invalidate(isFavoriteProvider(shopId));
-      
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã bỏ yêu thích cửa hàng')),
@@ -213,9 +235,9 @@ class FavoritesScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
       }
     }
   }

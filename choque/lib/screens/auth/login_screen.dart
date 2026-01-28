@@ -46,7 +46,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       // Wait for profile to load
       // ignore: unused_result
       await ref.refresh(userProfileProvider.future);
-      
+
       if (mounted) {
         _navigateAfterLogin();
       }
@@ -77,7 +77,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     try {
       final authNotifier = ref.read(authNotifierProvider.notifier);
       await authNotifier.continueAsGuest();
-      
+
       if (mounted) {
         context.go('/');
       }
@@ -92,28 +92,33 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     }
   }
 
-  void _navigateAfterLogin() {
-    // Check if there's a redirect parameter in the current route
-    // Get it from the router's current location
+  Future<void> _navigateAfterLogin() async {
+    // Wait for a tiny bit to ensure providers are updated after profile refresh
+    await Future.delayed(const Duration(milliseconds: 100));
+
+    final roles = ref.read(availableRolesProvider);
+    final needsRoleSelection = roles.length > 1;
+
+    // Check if there's a redirect parameter
     final router = GoRouter.of(context);
     final location = router.routerDelegate.currentConfiguration.uri.toString();
     final uri = Uri.parse(location);
     final redirectTo = uri.queryParameters['redirect'];
-    
+
     if (redirectTo != null && redirectTo.isNotEmpty) {
-      // Navigate to the intended route
       context.go(redirectTo);
       return;
     }
-    
-    final needsRoleSelection = ref.read(needsRoleSelectionProvider);
+
     if (needsRoleSelection) {
       context.go('/role-switcher');
-    } else {
-      final roles = ref.read(availableRolesProvider);
+    } else if (roles.isNotEmpty) {
       final role = roles.first;
       ref.read(activeRoleProvider.notifier).setRole(role);
       context.go(role.route);
+    } else {
+      // Fallback to home if no roles found (should not happen with default)
+      context.go('/');
     }
   }
 
@@ -180,10 +185,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         const SizedBox(height: 8),
         Text(
           'Đăng nhập để tiếp tục',
-          style: GoogleFonts.inter(
-            fontSize: 15,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: 15, color: Colors.grey[600]),
         ),
       ],
     );
@@ -257,7 +259,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               icon: Icon(
                 _obscurePassword ? Icons.visibility_off : Icons.visibility,
               ),
-              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+              onPressed: () =>
+                  setState(() => _obscurePassword = !_obscurePassword),
             ),
             filled: true,
             fillColor: Colors.grey[100],
@@ -327,9 +330,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         elevation: 0,
       ),
       child: _isLoading
@@ -357,17 +358,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       style: OutlinedButton.styleFrom(
         foregroundColor: Colors.grey[700],
         padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         side: BorderSide(color: Colors.grey[300]!),
       ),
       child: Text(
         'Tiếp tục với tư cách Khách',
-        style: GoogleFonts.inter(
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-        ),
+        style: GoogleFonts.inter(fontSize: 15, fontWeight: FontWeight.w500),
       ),
     );
   }

@@ -22,10 +22,9 @@ class DistanceInfoWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return FutureBuilder<Map<String, double>>(
-      future: ref.read(distanceCalculatorProvider).getDistanceBetweenLocations(
-        pickup,
-        dropoff,
-      ),
+      future: ref
+          .read(distanceCalculatorProvider)
+          .getDistanceBetweenLocations(pickup, dropoff),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Row(
@@ -53,14 +52,18 @@ class DistanceInfoWidget extends ConsumerWidget {
 
         return Row(
           children: [
-            Expanded(child: _buildInfoColumn(
-              'Khoảng cách',
-              DistanceCalculatorService.formatDistance(distance),
-            )),
-            Expanded(child: _buildInfoColumn(
-              'Thời gian dự kiến',
-              DistanceCalculatorService.formatDuration(duration),
-            )),
+            Expanded(
+              child: _buildInfoColumn(
+                'Khoảng cách',
+                DistanceCalculatorService.formatDistance(distance),
+              ),
+            ),
+            Expanded(
+              child: _buildInfoColumn(
+                'Thời gian dự kiến',
+                DistanceCalculatorService.formatDuration(duration),
+              ),
+            ),
           ],
         );
       },
@@ -73,7 +76,10 @@ class DistanceInfoWidget extends ConsumerWidget {
       children: [
         Text(
           label,
-          style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+          style: GoogleFonts.inter(
+            fontSize: 11,
+            color: AppColors.textSecondary,
+          ),
         ),
         const SizedBox(height: 2),
         Text(

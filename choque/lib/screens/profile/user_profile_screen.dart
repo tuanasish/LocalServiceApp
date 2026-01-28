@@ -21,14 +21,14 @@ class UserProfileScreen extends ConsumerWidget {
     final profile = profileAsync.value;
     final currentUser = ref.watch(currentUserProvider).value;
     final isGuest = !isAuthenticated || (profile?.isGuest ?? false);
-    
+
     // Hiển thị error nếu có lỗi network
     if (profileAsync.hasError) {
       final error = profileAsync.error;
-      if (error != null && 
+      if (error != null &&
           (error.toString().contains('Failed host lookup') ||
-           error.toString().contains('SocketException') ||
-           error.toString().contains('Network'))) {
+              error.toString().contains('SocketException') ||
+              error.toString().contains('Network'))) {
         return Scaffold(
           backgroundColor: AppColors.backgroundLight,
           body: SafeArea(
@@ -67,9 +67,7 @@ class UserProfileScreen extends ConsumerWidget {
                       ),
                       child: Text(
                         'Thử lại',
-                        style: GoogleFonts.inter(
-                          fontWeight: FontWeight.w600,
-                        ),
+                        style: GoogleFonts.inter(fontWeight: FontWeight.w600),
                       ),
                     ),
                   ],
@@ -155,7 +153,12 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildProfileCard(BuildContext context, WidgetRef ref, bool isAuthenticated, UserProfile? profile) {
+  Widget _buildProfileCard(
+    BuildContext context,
+    WidgetRef ref,
+    bool isAuthenticated,
+    UserProfile? profile,
+  ) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -188,11 +191,7 @@ class UserProfileScreen extends ConsumerWidget {
                     : null,
               ),
               child: profile?.avatarUrl == null
-                  ? const Icon(
-                      Icons.person,
-                      size: 36,
-                      color: Color(0xFFA58860),
-                    )
+                  ? const Icon(Icons.person, size: 36, color: Color(0xFFA58860))
                   : null,
             ),
           ),
@@ -202,8 +201,8 @@ class UserProfileScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isAuthenticated && !(profile?.isGuest ?? false) 
-                      ? (profile?.fullName ?? 'Hội viên') 
+                  isAuthenticated && !(profile?.isGuest ?? false)
+                      ? (profile?.fullName ?? 'Hội viên')
                       : 'Khách hàng',
                   style: GoogleFonts.inter(
                     fontSize: 18,
@@ -214,7 +213,7 @@ class UserProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   isAuthenticated && !(profile?.isGuest ?? false)
-                      ? (profile?.phone ?? 'Chưa cập nhật SĐT') 
+                      ? (profile?.phone ?? 'Chưa cập nhật SĐT')
                       : 'Đang duyệt ẩn danh',
                   style: GoogleFonts.inter(
                     fontSize: 14,
@@ -224,7 +223,10 @@ class UserProfileScreen extends ConsumerWidget {
                 if (isAuthenticated && !(profile?.isGuest ?? false)) ...[
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(20),
@@ -273,10 +275,15 @@ class UserProfileScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildInfoCard(BuildContext context, WidgetRef ref, UserProfile? profile, User? currentUser) {
+  Widget _buildInfoCard(
+    BuildContext context,
+    WidgetRef ref,
+    UserProfile? profile,
+    User? currentUser,
+  ) {
     // Lấy email từ auth user
     final email = currentUser?.email ?? 'Chưa cập nhật';
-    
+
     // Lấy giới tính từ profile
     String genderText = 'Chưa xác định';
     if (profile?.gender != null && profile!.gender!.isNotEmpty) {
@@ -300,7 +307,7 @@ class UserProfileScreen extends ConsumerWidget {
           genderText = profile.gender!;
       }
     }
-    
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -534,9 +541,9 @@ class UserProfileScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi upload: ${e.toString()}')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi upload: ${e.toString()}')));
       }
     }
   }
@@ -596,10 +603,7 @@ class UserProfileScreen extends ConsumerWidget {
     return Center(
       child: Text(
         'Phiên bản 2.4.0',
-        style: GoogleFonts.inter(
-          fontSize: 13,
-          color: Colors.grey[400],
-        ),
+        style: GoogleFonts.inter(fontSize: 13, color: Colors.grey[400]),
       ),
     );
   }

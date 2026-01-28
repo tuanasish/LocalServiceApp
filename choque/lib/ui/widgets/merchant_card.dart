@@ -58,7 +58,11 @@ class MerchantCard extends StatelessWidget {
                       height: 160,
                       color: AppColors.borderSoft,
                       alignment: Alignment.center,
-                      child: const Icon(Icons.image, size: 28, color: AppColors.textMuted),
+                      child: const Icon(
+                        Icons.image,
+                        size: 28,
+                        color: AppColors.textMuted,
+                      ),
                     ),
                   ),
                 ),
@@ -73,12 +77,18 @@ class MerchantCard extends StatelessWidget {
                         const SizedBox(width: 4),
                         Text(
                           rating.toString(),
-                          style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                         const SizedBox(width: 4),
                         Text(
                           '($reviews)',
-                          style: GoogleFonts.inter(fontSize: 10, color: AppColors.textSecondary),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ),
@@ -88,7 +98,10 @@ class MerchantCard extends StatelessWidget {
                   bottom: 12,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
                       borderRadius: BorderRadius.circular(12),
@@ -96,7 +109,11 @@ class MerchantCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.schedule, color: Colors.white, size: 14),
+                        const Icon(
+                          Icons.schedule,
+                          color: Colors.white,
+                          size: 14,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           deliveryTime,
@@ -161,7 +178,9 @@ class MerchantCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.9),
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4)],
+        boxShadow: [
+          BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4),
+        ],
       ),
       child: child,
     );

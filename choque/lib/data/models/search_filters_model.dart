@@ -1,5 +1,5 @@
 /// Search Filters Model
-/// 
+///
 /// Lưu trữ các bộ lọc cho search results.
 class SearchFilters {
   final double? minPrice;
@@ -7,7 +7,8 @@ class SearchFilters {
   final double? minRating;
   final double? maxDistance; // km
   final List<String>? categories;
-  final String? sortBy; // 'relevance', 'price_asc', 'price_desc', 'rating', 'distance'
+  final String?
+  sortBy; // 'relevance', 'price_asc', 'price_desc', 'rating', 'distance'
 
   const SearchFilters({
     this.minPrice,
@@ -36,13 +37,13 @@ class SearchFilters {
     );
   }
 
-  bool get hasFilters => 
-    minPrice != null ||
-    maxPrice != null ||
-    minRating != null ||
-    maxDistance != null ||
-    (categories != null && categories!.isNotEmpty) ||
-    sortBy != null;
+  bool get hasFilters =>
+      minPrice != null ||
+      maxPrice != null ||
+      minRating != null ||
+      maxDistance != null ||
+      (categories != null && categories!.isNotEmpty) ||
+      sortBy != null;
 
   static const SearchFilters empty = SearchFilters();
 }

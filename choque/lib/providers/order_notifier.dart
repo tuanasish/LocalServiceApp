@@ -13,11 +13,7 @@ class OrderState {
   final String? error;
   final OrderModel? lastCreatedOrder;
 
-  const OrderState({
-    this.isPlacing = false,
-    this.error,
-    this.lastCreatedOrder,
-  });
+  const OrderState({this.isPlacing = false, this.error, this.lastCreatedOrder});
 
   OrderState copyWith({
     bool? isPlacing,
@@ -71,14 +67,16 @@ class OrderNotifier extends Notifier<OrderState> {
 
       // 1. Chuẩn bị dữ liệu items
       final itemsJson = cartItems
-          .map((item) => {
-                'product_id': item.id,
-                'product_name': item.name,
-                'quantity': item.quantity,
-                'unit_price': item.price,
-                'subtotal': item.subtotal,
-                'note': '', 
-              })
+          .map(
+            (item) => {
+              'product_id': item.id,
+              'product_name': item.name,
+              'quantity': item.quantity,
+              'unit_price': item.price,
+              'subtotal': item.subtotal,
+              'note': '',
+            },
+          )
           .toList();
 
       // 2. Xác định Dropoff Location (Tối ưu: dùng lat/lng có sẵn)
@@ -92,11 +90,11 @@ class OrderNotifier extends Notifier<OrderState> {
           lat: selectedAddress.lat ?? 0,
           lng: selectedAddress.lng ?? 0,
         );
-        
+
         // Fallback geocoding nếu thiếu tọa độ (chỉ dành cho đia chỉ cũ chưa update)
         if (dropoff.lat == 0 || dropoff.lng == 0) {
-           // Ở đây có thể call Vietmap nếu cần, nhưng plan là ép user có tọa độ
-           // Để đơn giản hóa Phase 2, ta giả định user đã có tọa độ từ MapPicker
+          // Ở đây có thể call Vietmap nếu cần, nhưng plan là ép user có tọa độ
+          // Để đơn giản hóa Phase 2, ta giả định user đã có tọa độ từ MapPicker
         }
       }
 
@@ -128,7 +126,7 @@ class OrderNotifier extends Notifier<OrderState> {
       // 5. Cleanup & Update state
       ref.read(cartProvider.notifier).clear();
       ref.invalidate(myOrdersProvider);
-      
+
       state = state.copyWith(isPlacing: false, lastCreatedOrder: createdOrder);
       return createdOrder;
     } catch (e) {

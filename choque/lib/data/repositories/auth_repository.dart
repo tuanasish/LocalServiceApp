@@ -3,7 +3,7 @@ import '../models/profile_model.dart';
 import '../../config/constants.dart';
 
 /// Auth Repository
-/// 
+///
 /// Xử lý xác thực và quản lý phiên người dùng.
 class AuthRepository {
   final SupabaseClient _client;
@@ -38,9 +38,7 @@ class AuthRepository {
 
   /// Đăng nhập bằng OTP (Phone)
   Future<void> signInWithOtp(String phone) async {
-    await _client.auth.signInWithOtp(
-      phone: phone,
-    );
+    await _client.auth.signInWithOtp(phone: phone);
   }
 
   /// Xác thực OTP

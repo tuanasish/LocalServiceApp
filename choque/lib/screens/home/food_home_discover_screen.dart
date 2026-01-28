@@ -16,10 +16,12 @@ class FoodHomeDiscoverScreen extends ConsumerStatefulWidget {
   const FoodHomeDiscoverScreen({super.key});
 
   @override
-  ConsumerState<FoodHomeDiscoverScreen> createState() => _FoodHomeDiscoverScreenState();
+  ConsumerState<FoodHomeDiscoverScreen> createState() =>
+      _FoodHomeDiscoverScreenState();
 }
 
-class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen> {
+class _FoodHomeDiscoverScreenState
+    extends ConsumerState<FoodHomeDiscoverScreen> {
   final String _searchQuery = '';
   String? _selectedCategory;
 
@@ -27,7 +29,7 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
   Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(productCategoriesProvider);
     final userProfile = ref.watch(currentProfileProvider).value;
-    
+
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
@@ -47,12 +49,12 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
                     children: [
                       const SizedBox(height: 12),
                       _buildCategorySection(categoriesAsync),
-                      
-                      if (_searchQuery.isNotEmpty)
-                        _buildSearchResultsSection()
-                      else if (_selectedCategory != null)
-                        _buildCategoryProductsSection()
-                      else ...[
+
+                      if (_searchQuery.isNotEmpty) ...[
+                        _buildSearchResultsSection(),
+                      ] else if (_selectedCategory != null) ...[
+                        _buildCategoryProductsSection(),
+                      ] else ...[
                         const SizedBox(height: 12),
                         const _SortFilters(),
                         const SizedBox(height: 16),
@@ -72,7 +74,7 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
 
   Widget _buildHeader(BuildContext context, dynamic profile) {
     final addressesAsync = ref.watch(userAddressesProvider);
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       color: Colors.white,
@@ -88,16 +90,19 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
                     UserAddress? defaultAddress;
                     if (addresses.isNotEmpty) {
                       try {
-                        defaultAddress = addresses.firstWhere((a) => a.isDefault);
+                        defaultAddress = addresses.firstWhere(
+                          (a) => a.isDefault,
+                        );
                       } catch (e) {
                         defaultAddress = addresses.first;
                       }
                     }
-                    
-                    final displayAddress = defaultAddress?.details ?? 
-                                         defaultAddress?.fullDisplayAddress ?? 
-                                         'Chưa có địa chỉ';
-                    
+
+                    final displayAddress =
+                        defaultAddress?.details ??
+                        defaultAddress?.fullDisplayAddress ??
+                        'Chưa có địa chỉ';
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -184,7 +189,8 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
             onTap: () => context.push('/search'),
             child: AppSearchBar(
               hintText: 'Tìm món ăn, nhà hàng…',
-              onChanged: null, // Disable inline search, navigate to unified search
+              onChanged:
+                  null, // Disable inline search, navigate to unified search
             ),
           ),
         ],
@@ -192,7 +198,10 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
     );
   }
 
-  Widget _buildTappableCircleIcon({required IconData icon, required VoidCallback onTap}) {
+  Widget _buildTappableCircleIcon({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -231,16 +240,21 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
               isSelected: _selectedCategory == null,
               onTap: () => setState(() => _selectedCategory = null),
             ),
-            ...categories.map((cat) => _buildCategoryChip(
-                  label: cat,
-                  icon: _getCategoryIcon(cat),
-                  isSelected: _selectedCategory == cat,
-                  onTap: () => setState(() => _selectedCategory = cat),
-                )),
+            ...categories.map(
+              (cat) => _buildCategoryChip(
+                label: cat,
+                icon: _getCategoryIcon(cat),
+                isSelected: _selectedCategory == cat,
+                onTap: () => setState(() => _selectedCategory = cat),
+              ),
+            ),
           ],
         ),
       ),
-      loading: () => const SizedBox(height: 80, child: Center(child: CircularProgressIndicator())),
+      loading: () => const SizedBox(
+        height: 80,
+        child: Center(child: CircularProgressIndicator()),
+      ),
       error: (e, st) => const SizedBox.shrink(),
     );
   }
@@ -253,10 +267,10 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
   }) {
     // Màu sắc cho icon dựa trên category
     final categoryColor = _getCategoryColor(label);
-    final iconColor = isSelected 
-        ? AppColors.primary 
+    final iconColor = isSelected
+        ? AppColors.primary
         : categoryColor.withValues(alpha: 0.7);
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -267,13 +281,13 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: isSelected 
-                    ? AppColors.primary.withValues(alpha: 0.1) 
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.1)
                     : categoryColor.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isSelected 
-                      ? AppColors.primary 
+                  color: isSelected
+                      ? AppColors.primary
                       : categoryColor.withValues(alpha: 0.2),
                   width: isSelected ? 2 : 1,
                 ),
@@ -310,22 +324,23 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
     if (lower.contains('phở') || lower.contains('bún')) return Colors.amber;
     if (lower.contains('uống') || lower.contains('cafe')) return Colors.blue;
     if (lower.contains('vặt')) return Colors.red;
-    if (lower.contains('tráng miệng') || lower.contains('bánh')) return Colors.pink;
+    if (lower.contains('tráng miệng') || lower.contains('bánh')) {
+      return Colors.pink;
+    }
     return AppColors.primary;
   }
 
   Widget _buildSearchResultsSection() {
     final searchResults = ref.watch(productSearchProvider(_searchQuery));
     return searchResults.when(
-      data: (products) => _buildProductListSection('Kết quả tìm kiếm', products),
+      data: (products) =>
+          _buildProductListSection('Kết quả tìm kiếm', products),
       loading: () => const Padding(
         padding: EdgeInsets.all(20),
         child: Center(child: CircularProgressIndicator()),
       ),
-      error: (e, _) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Text('Lỗi: $e'),
-      ),
+      error: (e, _) =>
+          Padding(padding: const EdgeInsets.all(20), child: Text('Lỗi: $e')),
     );
   }
 
@@ -334,8 +349,13 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
     final productsAsync = ref.watch(allProductsProvider);
     return productsAsync.when(
       data: (all) {
-        final filtered = all.where((p) => p.category == _selectedCategory).toList();
-        return _buildProductListSection('Danh mục: $_selectedCategory', filtered);
+        final filtered = all
+            .where((p) => p.category == _selectedCategory)
+            .toList();
+        return _buildProductListSection(
+          'Danh mục: $_selectedCategory',
+          filtered,
+        );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (e, _) => Center(child: Text('Lỗi: $e')),
@@ -346,7 +366,12 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
     if (products.isEmpty) {
       return Padding(
         padding: const EdgeInsets.all(32),
-        child: Center(child: Text('Không tìm thấy sản phẩm nào', style: AppTextStyles.body13Secondary)),
+        child: Center(
+          child: Text(
+            'Không tìm thấy sản phẩm nào',
+            style: AppTextStyles.body13Secondary,
+          ),
+        ),
       );
     }
     return Column(
@@ -365,10 +390,13 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
             return ListTile(
               title: Text(p.name, style: AppTextStyles.label14),
               subtitle: Text(p.description ?? '', maxLines: 1),
-              trailing: Text(_formatPrice(p.basePrice), style: AppTextStyles.label14),
+              trailing: Text(
+                _formatPrice(p.basePrice),
+                style: AppTextStyles.label14,
+              ),
               onTap: () {
                 // Hiện tại ta chưa có màn hình chi tiết sản phẩm đơn lẻ (vì sp thuộc shop)
-                // Nhưng có thể redirect tới các shop bán sp này? 
+                // Nhưng có thể redirect tới các shop bán sp này?
                 // Ở MVP này ta chỉ hiển thị.
               },
             );
@@ -380,11 +408,21 @@ class _FoodHomeDiscoverScreenState extends ConsumerState<FoodHomeDiscoverScreen>
 
   IconData _getCategoryIcon(String category) {
     category = category.toLowerCase();
-    if (category.contains('cơm')) return Icons.rice_bowl;
-    if (category.contains('phở') || category.contains('bún')) return Icons.ramen_dining;
-    if (category.contains('uống') || category.contains('cafe')) return Icons.local_cafe;
-    if (category.contains('vặt')) return Icons.cookie;
-    if (category.contains('tráng miệng') || category.contains('bánh')) return Icons.cake;
+    if (category.contains('cơm')) {
+      return Icons.rice_bowl;
+    }
+    if (category.contains('phở') || category.contains('bún')) {
+      return Icons.ramen_dining;
+    }
+    if (category.contains('uống') || category.contains('cafe')) {
+      return Icons.local_cafe;
+    }
+    if (category.contains('vặt')) {
+      return Icons.cookie;
+    }
+    if (category.contains('tráng miệng') || category.contains('bánh')) {
+      return Icons.cake;
+    }
     return Icons.category;
   }
 
@@ -417,28 +455,32 @@ class _FilterChip extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool isActive;
-  const _FilterChip({required this.label, required this.icon, this.isActive = false});
-  
+  const _FilterChip({
+    required this.label,
+    required this.icon,
+    this.isActive = false,
+  });
+
   Color _getFilterColor() {
     if (label.contains('Gần tôi')) return Colors.blue;
     if (label.contains('Giá thấp')) return Colors.green;
     if (label.contains('Đánh giá')) return Colors.amber;
     return AppColors.primary;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     final filterColor = _getFilterColor();
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
-        color: isActive 
+        color: isActive
             ? AppColors.primary
             : filterColor.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: isActive 
-              ? AppColors.primary 
+          color: isActive
+              ? AppColors.primary
               : filterColor.withValues(alpha: 0.3),
           width: isActive ? 2 : 1,
         ),
@@ -455,11 +497,9 @@ class _FilterChip extends StatelessWidget {
       child: Row(
         children: [
           Icon(
-            icon, 
-            size: 16, 
-            color: isActive 
-                ? Colors.white 
-                : filterColor.withValues(alpha: 0.8),
+            icon,
+            size: 16,
+            color: isActive ? Colors.white : filterColor.withValues(alpha: 0.8),
           ),
           const SizedBox(width: 6),
           Text(
@@ -467,8 +507,8 @@ class _FilterChip extends StatelessWidget {
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: isActive 
-                  ? Colors.white 
+              color: isActive
+                  ? Colors.white
                   : filterColor.withValues(alpha: 0.9),
             ),
           ),
@@ -496,7 +536,11 @@ class _FeaturedStoresSection extends ConsumerWidget {
               Text('Cửa hàng nổi bật', style: AppTextStyles.heading18),
               Text(
                 'Xem tất cả',
-                style: GoogleFonts.inter(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.primary),
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
               ),
             ],
           ),
@@ -541,12 +585,18 @@ class _VerticalStoreCard extends StatelessWidget {
         child: Column(
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(AppRadius.large)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(AppRadius.large),
+              ),
               child: Container(
                 height: 140,
                 width: double.infinity,
                 color: Colors.grey[200],
-                child: const Icon(Icons.store, size: 48, color: AppColors.primary),
+                child: const Icon(
+                  Icons.store,
+                  size: 48,
+                  color: AppColors.primary,
+                ),
               ),
             ),
             Padding(
@@ -560,7 +610,11 @@ class _VerticalStoreCard extends StatelessWidget {
                       Text(merchant.name, style: AppTextStyles.label16),
                       Row(
                         children: [
-                          const Icon(Icons.star, color: Color(0xFFFBBF24), size: 16),
+                          const Icon(
+                            Icons.star,
+                            color: Color(0xFFFBBF24),
+                            size: 16,
+                          ),
                           const SizedBox(width: 4),
                           Text('4.8', style: AppTextStyles.label14),
                         ],
@@ -570,25 +624,46 @@ class _VerticalStoreCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Row(
                     children: [
-                      Text('\$\$ • Bún, Phở • 1.2km', style: AppTextStyles.body13Secondary),
+                      Text(
+                        '\$\$ • Bún, Phở • 1.2km',
+                        style: AppTextStyles.body13Secondary,
+                      ),
                       const SizedBox(width: 8),
-                      const Icon(Icons.access_time, size: 14, color: AppColors.textSecondary),
+                      const Icon(
+                        Icons.access_time,
+                        size: 14,
+                        color: AppColors.textSecondary,
+                      ),
                       const SizedBox(width: 3),
                       Text('20-30m', style: AppTextStyles.body12),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(color: const Color(0xFFF0FDFA), borderRadius: BorderRadius.circular(4)),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF0FDFA),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.flash_on, color: Color(0xFF0D9488), size: 12),
+                        const Icon(
+                          Icons.flash_on,
+                          color: Color(0xFF0D9488),
+                          size: 12,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Giảm 15k cho đơn từ 100k',
-                          style: GoogleFonts.inter(fontSize: 10, fontWeight: FontWeight.w600, color: const Color(0xFF0D9488)),
+                          style: GoogleFonts.inter(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF0D9488),
+                          ),
                         ),
                       ],
                     ),

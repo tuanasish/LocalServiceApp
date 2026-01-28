@@ -14,10 +14,12 @@ class MerchantPriceManagementScreen extends ConsumerStatefulWidget {
   const MerchantPriceManagementScreen({super.key});
 
   @override
-  ConsumerState<MerchantPriceManagementScreen> createState() => _MerchantPriceManagementScreenState();
+  ConsumerState<MerchantPriceManagementScreen> createState() =>
+      _MerchantPriceManagementScreenState();
 }
 
-class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceManagementScreen> {
+class _MerchantPriceManagementScreenState
+    extends ConsumerState<MerchantPriceManagementScreen> {
   final TextEditingController _searchController = TextEditingController();
   String? _selectedCategory;
   String _searchQuery = '';
@@ -56,7 +58,11 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.store_outlined, size: 64, color: AppColors.textSecondary),
+            Icon(
+              Icons.store_outlined,
+              size: 64,
+              color: AppColors.textSecondary,
+            ),
             const SizedBox(height: 16),
             Text(
               'Chưa có cửa hàng',
@@ -206,7 +212,9 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+              ),
             ),
           ),
         ],
@@ -224,11 +232,7 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            size: 20,
-            color: AppColors.textSecondary,
-          ),
+          const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -272,7 +276,9 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
 
     return menuAsync.when(
       data: (menuItems) {
-        final categories = menuItems.map((item) => item.category ?? 'Khác').toSet().toList()..sort();
+        final categories =
+            menuItems.map((item) => item.category ?? 'Khác').toSet().toList()
+              ..sort();
         categories.insert(0, 'Tất cả');
 
         return SizedBox(
@@ -280,7 +286,9 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
           child: ListView(
             scrollDirection: Axis.horizontal,
             children: categories.map((category) {
-              final isActive = _selectedCategory == category || (_selectedCategory == null && category == 'Tất cả');
+              final isActive =
+                  _selectedCategory == category ||
+                  (_selectedCategory == null && category == 'Tất cả');
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: _buildCategoryChip(
@@ -288,7 +296,9 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                   isActive: isActive,
                   onTap: () {
                     setState(() {
-                      _selectedCategory = category == 'Tất cả' ? null : category;
+                      _selectedCategory = category == 'Tất cả'
+                          ? null
+                          : category;
                     });
                   },
                 ),
@@ -298,11 +308,15 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
         );
       },
       loading: () => const SizedBox(height: 40),
-      error: (_, __) => const SizedBox(height: 40),
+      error: (_, _) => const SizedBox(height: 40),
     );
   }
 
-  Widget _buildCategoryChip(String label, {required bool isActive, required VoidCallback onTap}) {
+  Widget _buildCategoryChip(
+    String label, {
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -335,10 +349,14 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
         // Filter by category and search
         var filteredItems = menuItems;
         if (_selectedCategory != null) {
-          filteredItems = filteredItems.where((item) => (item.category ?? 'Khác') == _selectedCategory).toList();
+          filteredItems = filteredItems
+              .where((item) => (item.category ?? 'Khác') == _selectedCategory)
+              .toList();
         }
         if (_searchQuery.isNotEmpty) {
-          filteredItems = filteredItems.where((item) => item.name.toLowerCase().contains(_searchQuery)).toList();
+          filteredItems = filteredItems
+              .where((item) => item.name.toLowerCase().contains(_searchQuery))
+              .toList();
         }
 
         if (filteredItems.isEmpty) {
@@ -355,10 +373,13 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
         );
       },
       loading: () => Column(
-        children: List.generate(3, (index) => Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: _buildMenuItemCardSkeleton(),
-        )),
+        children: List.generate(
+          3,
+          (index) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildMenuItemCardSkeleton(),
+          ),
+        ),
       ),
       error: (error, stack) => Center(
         child: Padding(
@@ -427,12 +448,16 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                 value: item.isAvailable,
                 onChanged: (value) async {
                   try {
-                    await ref.read(merchantRepositoryProvider).setMenuOverride(
-                      shopId: shopId,
-                      productId: item.productId,
-                      priceOverride: item.effectivePrice != item.basePrice ? item.effectivePrice : null,
-                      isAvailable: value,
-                    );
+                    await ref
+                        .read(merchantRepositoryProvider)
+                        .setMenuOverride(
+                          shopId: shopId,
+                          productId: item.productId,
+                          priceOverride: item.effectivePrice != item.basePrice
+                              ? item.effectivePrice
+                              : null,
+                          isAvailable: value,
+                        );
                     ref.invalidate(shopMenuProvider(shopId));
                     if (mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -456,7 +481,11 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                 activeThumbColor: AppColors.primary,
               ),
               IconButton(
-                icon: const Icon(Icons.delete_outline, color: AppColors.danger, size: 20),
+                icon: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.danger,
+                  size: 20,
+                ),
                 onPressed: () => _confirmRemove(context, item, shopId),
               ),
             ],
@@ -477,7 +506,10 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                     ),
                     const SizedBox(height: 6),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.backgroundLight,
                         borderRadius: BorderRadius.circular(AppRadius.medium),
@@ -497,7 +529,10 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                           ),
                           if (item.effectivePrice != item.basePrice)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: AppColors.primary.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(4),
@@ -520,7 +555,10 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
               const SizedBox(width: 12),
               OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   side: const BorderSide(color: AppColors.primary),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(AppRadius.medium),
@@ -546,12 +584,16 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
                       }
 
                       try {
-                        await ref.read(merchantRepositoryProvider).setMenuOverride(
-                          shopId: shopId,
-                          productId: item.productId,
-                          priceOverride: newPrice != item.basePrice ? newPrice : null,
-                          isAvailable: item.isAvailable,
-                        );
+                        await ref
+                            .read(merchantRepositoryProvider)
+                            .setMenuOverride(
+                              shopId: shopId,
+                              productId: item.productId,
+                              priceOverride: newPrice != item.basePrice
+                                  ? newPrice
+                                  : null,
+                              isAvailable: item.isAvailable,
+                            );
                         ref.invalidate(shopMenuProvider(shopId));
                         if (mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -611,7 +653,11 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(width: 150, height: 16, color: AppColors.borderSoft),
+                  Container(
+                    width: 150,
+                    height: 16,
+                    color: AppColors.borderSoft,
+                  ),
                   const SizedBox(height: 4),
                   Container(width: 80, height: 12, color: AppColors.borderSoft),
                 ],
@@ -631,7 +677,11 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
       padding: const EdgeInsets.all(32.0),
       child: Column(
         children: [
-          Icon(Icons.restaurant_menu_outlined, size: 64, color: AppColors.textSecondary),
+          Icon(
+            Icons.restaurant_menu_outlined,
+            size: 64,
+            color: AppColors.textSecondary,
+          ),
           const SizedBox(height: 16),
           Text(
             'Không tìm thấy món ăn',
@@ -657,14 +707,23 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
     );
   }
 
-  Future<void> _confirmRemove(BuildContext context, ShopMenuItem item, String shopId) async {
+  Future<void> _confirmRemove(
+    BuildContext context,
+    ShopMenuItem item,
+    String shopId,
+  ) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Xóa khỏi thực đơn?'),
-        content: Text('Bạn có chắc muốn xóa "${item.name}" khỏi thực đơn của quán?'),
+        content: Text(
+          'Bạn có chắc muốn xóa "${item.name}" khỏi thực đơn của quán?',
+        ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Hủy')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Hủy'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: AppColors.danger),
@@ -676,10 +735,9 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
 
     if (confirmed == true) {
       try {
-        await ref.read(merchantRepositoryProvider).removeProductFromShop(
-          shopId: shopId,
-          productId: item.productId,
-        );
+        await ref
+            .read(merchantRepositoryProvider)
+            .removeProductFromShop(shopId: shopId, productId: item.productId);
         ref.invalidate(shopMenuProvider(shopId));
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -689,7 +747,10 @@ class _MerchantPriceManagementScreenState extends ConsumerState<MerchantPriceMan
       } catch (e) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger),
+            SnackBar(
+              content: Text('Lỗi: $e'),
+              backgroundColor: AppColors.danger,
+            ),
           );
         }
       }

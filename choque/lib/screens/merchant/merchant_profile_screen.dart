@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../ui/design_system.dart';
 import '../../providers/app_providers.dart';
 import '../../data/models/merchant_model.dart';
@@ -11,19 +14,22 @@ class MerchantProfileScreen extends ConsumerStatefulWidget {
   const MerchantProfileScreen({super.key});
 
   @override
-  ConsumerState<MerchantProfileScreen> createState() => _MerchantProfileScreenState();
+  ConsumerState<MerchantProfileScreen> createState() =>
+      _MerchantProfileScreenState();
 }
 
 class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
   late TextEditingController _addressController;
   late TextEditingController _hoursController;
-  
+
   bool _isLoading = false;
   bool _isInit = false;
+  String? _shopImageUrl;
+  bool _isUploadingImage = false;
 
   @override
   void dispose() {
@@ -49,13 +55,15 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(merchantRepositoryProvider).updateShopProfile(
-        shopId: shopId,
-        name: _nameController.text.trim(),
-        phone: _phoneController.text.trim(),
-        address: _addressController.text.trim(),
-        openingHours: _hoursController.text.trim(),
-      );
+      await ref
+          .read(merchantRepositoryProvider)
+          .updateShopProfile(
+            shopId: shopId,
+            name: _nameController.text.trim(),
+            phone: _phoneController.text.trim(),
+            address: _addressController.text.trim(),
+            openingHours: _hoursController.text.trim(),
+          );
 
       if (mounted) {
         ref.invalidate(myShopProvider);
@@ -92,9 +100,11 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
       ),
       body: shopAsync.when(
         data: (shop) {
-          if (shop == null) return const Center(child: Text('Không tìm thấy cửa hàng'));
+          if (shop == null) {
+            return const Center(child: Text('Không tìm thấy cửa hàng'));
+          }
           _initFields(shop);
-          
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
             child: Form(
@@ -124,7 +134,8 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
                     controller: _addressController,
                     icon: Icons.location_on,
                     maxLines: 2,
-                    validator: (v) => v!.isEmpty ? 'Vui lòng nhập địa chỉ' : null,
+                    validator: (v) =>
+                        v!.isEmpty ? 'Vui lòng nhập địa chỉ' : null,
                   ),
                   const SizedBox(height: 20),
                   _buildTextField(
@@ -138,7 +149,9 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
                     width: double.infinity,
                     height: 55,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : () => _handleUpdate(shop.id),
+                      onPressed: _isLoading
+                          ? null
+                          : () => _handleUpdate(shop.id),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
@@ -173,17 +186,53 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
     return Center(
       child: Column(
         children: [
-          Container(
-            width: 100,
-            height: 100,
-            decoration: BoxDecoration(
-              color: AppColors.primary.withAlpha(26),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.store_rounded,
-              size: 50,
-              color: AppColors.primary,
+          GestureDetector(
+            onTap: _isUploadingImage ? null : () => _pickAndUploadImage(shop.id),
+            child: Stack(
+              children: [
+                Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withAlpha(26),
+                    shape: BoxShape.circle,
+                    image: _shopImageUrl != null
+                        ? DecorationImage(
+                            image: NetworkImage(_shopImageUrl!),
+                            fit: BoxFit.cover,
+                          )
+                        : null,
+                  ),
+                  child: _isUploadingImage
+                      ? const Center(
+                          child: CircularProgressIndicator(color: AppColors.primary),
+                        )
+                      : _shopImageUrl == null
+                          ? const Icon(
+                              Icons.store_rounded,
+                              size: 50,
+                              color: AppColors.primary,
+                            )
+                          : null,
+                ),
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(
+                      Icons.camera_alt,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 16),
@@ -206,6 +255,60 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _pickAndUploadImage(String shopId) async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 80,
+    );
+
+    if (pickedFile == null) return;
+
+    setState(() => _isUploadingImage = true);
+
+    try {
+      final file = File(pickedFile.path);
+      final fileName = 'shop_$shopId.jpg';
+      final supabase = Supabase.instance.client;
+
+      // Upload to Supabase Storage (shop-images bucket)
+      await supabase.storage.from('shop-images').upload(
+            fileName,
+            file,
+            fileOptions: const FileOptions(upsert: true),
+          );
+
+      // Get public URL
+      final imageUrl = supabase.storage.from('shop-images').getPublicUrl(fileName);
+
+      setState(() {
+        _shopImageUrl = imageUrl;
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Đã cập nhật ảnh cửa hàng'),
+            backgroundColor: AppColors.success,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Lỗi upload: $e'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isUploadingImage = false);
+    }
   }
 
   Widget _buildTextField({

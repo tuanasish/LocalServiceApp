@@ -124,11 +124,7 @@ class LoginSelectionScreen extends StatelessWidget {
                 color: AppColors.primary.withValues(alpha: 0.06),
                 borderRadius: BorderRadius.circular(AppRadius.medium),
               ),
-              child: Icon(
-                icon,
-                size: 24,
-                color: AppColors.primary,
-              ),
+              child: Icon(icon, size: 24, color: AppColors.primary),
             ),
             const SizedBox(width: 14),
             Expanded(
@@ -167,8 +163,10 @@ class LoginSelectionScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 10),
                   Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.06),
                       borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -191,4 +189,3 @@ class LoginSelectionScreen extends StatelessWidget {
     );
   }
 }
-

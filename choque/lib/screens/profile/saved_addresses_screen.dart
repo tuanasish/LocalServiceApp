@@ -62,11 +62,14 @@ class SavedAddressesScreen extends ConsumerWidget {
   }
 
   Widget _buildAddressList(
-      BuildContext context, WidgetRef ref, List<UserAddress> addresses) {
+    BuildContext context,
+    WidgetRef ref,
+    List<UserAddress> addresses,
+  ) {
     return ListView.separated(
       padding: const EdgeInsets.all(16),
       itemCount: addresses.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 12),
+      separatorBuilder: (_, _) => const SizedBox(height: 12),
       itemBuilder: (context, index) {
         final address = addresses[index];
         return _buildAddressCard(context, ref, address);
@@ -75,7 +78,10 @@ class SavedAddressesScreen extends ConsumerWidget {
   }
 
   Widget _buildAddressCard(
-      BuildContext context, WidgetRef ref, UserAddress address) {
+    BuildContext context,
+    WidgetRef ref,
+    UserAddress address,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -125,7 +131,9 @@ class SavedAddressesScreen extends ConsumerWidget {
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: AppColors.primary,
                               borderRadius: BorderRadius.circular(4),
@@ -163,10 +171,7 @@ class SavedAddressesScreen extends ConsumerWidget {
                       value: 'set_default',
                       child: Text('Đặt làm mặc định'),
                     ),
-                  const PopupMenuItem(
-                    value: 'edit',
-                    child: Text('Chỉnh sửa'),
-                  ),
+                  const PopupMenuItem(value: 'edit', child: Text('Chỉnh sửa')),
                   const PopupMenuItem(
                     value: 'delete',
                     child: Text('Xóa', style: TextStyle(color: Colors.red)),
@@ -181,7 +186,11 @@ class SavedAddressesScreen extends ConsumerWidget {
   }
 
   void _handleAction(
-      BuildContext context, WidgetRef ref, String action, UserAddress address) {
+    BuildContext context,
+    WidgetRef ref,
+    String action,
+    UserAddress address,
+  ) {
     final notifier = ref.read(addressNotifierProvider.notifier);
     switch (action) {
       case 'set_default':

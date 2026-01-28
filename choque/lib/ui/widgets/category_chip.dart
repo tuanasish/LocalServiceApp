@@ -20,7 +20,9 @@ class CategoryChip extends StatelessWidget {
   Widget build(BuildContext context) {
     final bgColor = isActive ? const Color(0xFFDCFCE7) : AppColors.surface;
     final borderColor = isActive ? AppColors.success : AppColors.borderSoft;
-    final textColor = isActive ? const Color(0xFF166534) : AppColors.textPrimary;
+    final textColor = isActive
+        ? const Color(0xFF166534)
+        : AppColors.textPrimary;
 
     return GestureDetector(
       onTap: onTap,

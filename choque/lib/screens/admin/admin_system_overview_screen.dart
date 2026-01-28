@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../ui/design_system.dart';
 import '../../ui/widgets/stat_card.dart';
 import '../../ui/widgets/activity_timeline_item.dart';
 import '../../ui/widgets/health_status_item.dart';
+import '../../providers/admin_order_provider.dart';
+import 'admin_driver_list_screen.dart';
+import 'admin_driver_monitoring_screen.dart';
 
 /// Admin System Overview Screen
 /// Tổng quan hệ thống cho admin: thống kê tổng thể, biểu đồ, hoạt động gần đây.
-class AdminSystemOverviewScreen extends StatelessWidget {
+class AdminSystemOverviewScreen extends ConsumerWidget {
   const AdminSystemOverviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
       body: SafeArea(
@@ -27,6 +32,10 @@ class AdminSystemOverviewScreen extends StatelessWidget {
                     children: [
                       const SizedBox(height: 20),
                       _buildMainStats(),
+                      const SizedBox(height: 20),
+                      _buildOrderManagement(context, ref),
+                      const SizedBox(height: 20),
+                      _buildDriverManagement(context),
                       const SizedBox(height: 20),
                       _buildQuickStats(),
                       const SizedBox(height: 20),
@@ -124,7 +133,232 @@ class AdminSystemOverviewScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildDriverManagement(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Quản lý Tài xế', style: AppTextStyles.heading18),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.list_alt,
+                  label: 'Danh sách',
+                  color: AppColors.primary,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminDriverListScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.map_outlined,
+                  label: 'Giám sát',
+                  color: AppColors.success,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            const AdminDriverMonitoringScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.pending_actions,
+                  label: 'Chờ duyệt',
+                  color: const Color(0xFFF59E0B),
+                  badge: '3', // TODO: Get from provider
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const AdminDriverListScreen(),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
+  Widget _buildOrderManagement(BuildContext context, WidgetRef ref) {
+    final pendingCount = ref.watch(pendingOrdersCountProvider);
+    final confirmedCount = ref.watch(confirmedOrdersCountProvider);
+    final activeCount = ref.watch(activeOrdersCountProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Quản lý Đơn hàng', style: AppTextStyles.heading18),
+              TextButton(
+                onPressed: () => context.push('/admin/orders'),
+                child: Text(
+                  'Xem tất cả',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.pending_outlined,
+                  label: 'Chờ xác nhận',
+                  color: AppColors.warning,
+                  badge: pendingCount.when(
+                    data: (c) => c > 0 ? '$c' : null,
+                    loading: () => null,
+                    error: (_, __) => null,
+                  ),
+                  onTap: () => context.push('/admin/orders'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.local_shipping_outlined,
+                  label: 'Chờ gán',
+                  color: AppColors.primary,
+                  badge: confirmedCount.when(
+                    data: (c) => c > 0 ? '$c' : null,
+                    loading: () => null,
+                    error: (_, __) => null,
+                  ),
+                  onTap: () => context.push('/admin/orders'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.two_wheeler_outlined,
+                  label: 'Đang giao',
+                  color: AppColors.success,
+                  badge: activeCount.when(
+                    data: (c) => c > 0 ? '$c' : null,
+                    loading: () => null,
+                    error: (_, __) => null,
+                  ),
+                  onTap: () => context.push('/admin/orders'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDriverManagementCard({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+    String? badge,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(AppRadius.medium),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(AppRadius.medium),
+          border: Border.all(color: color.withValues(alpha: 0.2)),
+        ),
+        child: Column(
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(icon, size: 32, color: color),
+                if (badge != null)
+                  Positioned(
+                    right: -4,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.danger,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 18,
+                        minHeight: 18,
+                      ),
+                      child: Text(
+                        badge,
+                        style: GoogleFonts.inter(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildQuickStats() {
     return Container(
@@ -137,10 +371,7 @@ class AdminSystemOverviewScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Thống kê nhanh',
-            style: AppTextStyles.heading18,
-          ),
+          Text('Thống kê nhanh', style: AppTextStyles.heading18),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -209,11 +440,7 @@ class AdminSystemOverviewScreen extends StatelessWidget {
   }) {
     return Column(
       children: [
-        Icon(
-          icon,
-          size: 28,
-          color: color ?? AppColors.textSecondary,
-        ),
+        Icon(icon, size: 28, color: color ?? AppColors.textSecondary),
         const SizedBox(height: 8),
         Text(
           value,
@@ -250,10 +477,7 @@ class AdminSystemOverviewScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Hoạt động gần đây',
-                style: AppTextStyles.heading18,
-              ),
+              Text('Hoạt động gần đây', style: AppTextStyles.heading18),
               TextButton(
                 onPressed: () {},
                 child: Text(
@@ -296,8 +520,6 @@ class AdminSystemOverviewScreen extends StatelessWidget {
     );
   }
 
-
-
   Widget _buildSystemHealth() {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -309,10 +531,7 @@ class AdminSystemOverviewScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Tình trạng hệ thống',
-            style: AppTextStyles.heading18,
-          ),
+          Text('Tình trạng hệ thống', style: AppTextStyles.heading18),
           const SizedBox(height: 16),
           HealthStatusItem(
             label: 'Server',
@@ -335,6 +554,4 @@ class AdminSystemOverviewScreen extends StatelessWidget {
       ),
     );
   }
-
-
 }

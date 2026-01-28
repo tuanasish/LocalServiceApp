@@ -66,8 +66,9 @@ class HomeEmptyStateScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 12),
                             side: const BorderSide(color: AppColors.primary),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () {
@@ -95,17 +96,15 @@ class HomeEmptyStateScreen extends StatelessWidget {
                             backgroundColor: AppColors.primary,
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () {
                             // TODO: mở màn search / discover
                           },
-                          icon: const Icon(
-                            Icons.search,
-                            color: Colors.white,
-                          ),
+                          icon: const Icon(Icons.search, color: Colors.white),
                           label: Text(
                             'Tìm món / cửa hàng',
                             style: GoogleFonts.inter(
@@ -128,4 +127,3 @@ class HomeEmptyStateScreen extends StatelessWidget {
     );
   }
 }
-

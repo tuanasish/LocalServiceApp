@@ -16,10 +16,12 @@ class SimpleOrderTrackingScreen extends ConsumerStatefulWidget {
   const SimpleOrderTrackingScreen({super.key, required this.orderId});
 
   @override
-  ConsumerState<SimpleOrderTrackingScreen> createState() => _SimpleOrderTrackingScreenState();
+  ConsumerState<SimpleOrderTrackingScreen> createState() =>
+      _SimpleOrderTrackingScreenState();
 }
 
-class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingScreen> {
+class _SimpleOrderTrackingScreenState
+    extends ConsumerState<SimpleOrderTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     final orderAsync = ref.watch(orderStreamProvider(widget.orderId));
@@ -44,16 +46,17 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                         const SizedBox(height: 24),
                         _buildTimeline(order),
                         const SizedBox(height: 24),
-                        if (order.status == OrderStatus.assigned || 
+                        if (order.status == OrderStatus.assigned ||
                             order.status == OrderStatus.pickedUp)
                           _buildTrackingMap(order),
-                        if (order.status == OrderStatus.assigned || 
+                        if (order.status == OrderStatus.assigned ||
                             order.status == OrderStatus.pickedUp)
                           const SizedBox(height: 24),
                         itemsAsync.when(
                           data: (items) => _buildItemsSummary(items),
-                          loading: () => const Center(child: CircularProgressIndicator()),
-                          error: (_, __) => const SizedBox.shrink(),
+                          loading: () =>
+                              const Center(child: CircularProgressIndicator()),
+                          error: (_, _) => const SizedBox.shrink(),
                         ),
                         const SizedBox(height: 24),
                         _buildStoreInfo(order),
@@ -78,7 +81,9 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
 
   Widget _buildOrderInfoCard(OrderModel order) {
     final statusColor = _getStatusColor(order.status);
-    final formattedDate = DateFormat('HH:mm • dd/MM/yyyy').format(order.createdAt);
+    final formattedDate = DateFormat(
+      'HH:mm • dd/MM/yyyy',
+    ).format(order.createdAt);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -109,7 +114,10 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -130,15 +138,26 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
           const SizedBox(height: 16),
           Row(
             children: [
-              const Icon(Icons.access_time_outlined, size: 18, color: AppColors.textSecondary),
+              const Icon(
+                Icons.access_time_outlined,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
-              Text('Đặt lúc: $formattedDate', style: AppTextStyles.body13Secondary),
+              Text(
+                'Đặt lúc: $formattedDate',
+                style: AppTextStyles.body13Secondary,
+              ),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 18, color: AppColors.textSecondary),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -186,7 +205,8 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             icon: Icons.receipt_long,
             iconColor: AppColors.primary,
             title: 'Đã đặt hàng',
-            subtitle: 'Đơn hàng đã được ghi nhận lúc ${formatTime(order.createdAt)}',
+            subtitle:
+                'Đơn hàng đã được ghi nhận lúc ${formatTime(order.createdAt)}',
             isCompleted: true,
             isActive: isStepActive(OrderStatus.pendingConfirmation),
           ),
@@ -195,7 +215,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             icon: Icons.check_circle,
             iconColor: AppColors.primary,
             title: 'Đã xác nhận',
-            subtitle: order.confirmedAt != null 
+            subtitle: order.confirmedAt != null
                 ? 'Người bán đã nhận đơn lúc ${formatTime(order.confirmedAt!)}'
                 : 'Đang chờ người bán xác nhận',
             isCompleted: isStepCompleted(OrderStatus.confirmed),
@@ -206,7 +226,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             icon: Icons.person_outline,
             iconColor: AppColors.primary,
             title: 'Đã gán tài xế',
-            subtitle: order.assignedAt != null 
+            subtitle: order.assignedAt != null
                 ? 'Tài xế đã được gán lúc ${formatTime(order.assignedAt)}'
                 : 'Đang tìm tài xế',
             isCompleted: isStepCompleted(OrderStatus.assigned),
@@ -217,7 +237,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             icon: Icons.local_shipping,
             iconColor: AppColors.primary,
             title: 'Đã lấy hàng',
-            subtitle: order.pickedUpAt != null 
+            subtitle: order.pickedUpAt != null
                 ? 'Tài xế đã lấy hàng lúc ${formatTime(order.pickedUpAt)}. Đang trên đường giao'
                 : 'Đang chuẩn bị hàng',
             isCompleted: isStepCompleted(OrderStatus.pickedUp),
@@ -228,7 +248,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             icon: Icons.home,
             iconColor: AppColors.success,
             title: 'Hoàn thành',
-            subtitle: order.completedAt != null 
+            subtitle: order.completedAt != null
                 ? 'Đơn hàng đã hoàn thành lúc ${formatTime(order.completedAt)}. Cảm ơn bạn đã mua hàng!'
                 : 'Chưa hoàn thành',
             isCompleted: isStepCompleted(OrderStatus.completed),
@@ -245,7 +265,11 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
               ),
               child: Row(
                 children: [
-                  Icon(Icons.cancel_outlined, color: AppColors.danger, size: 20),
+                  Icon(
+                    Icons.cancel_outlined,
+                    color: AppColors.danger,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Column(
@@ -304,24 +328,34 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
         children: [
           Text('Chi tiết món ăn', style: AppTextStyles.heading18),
           const SizedBox(height: 12),
-          ...items.map((item) => Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Text('${item.quantity}x', style: AppTextStyles.label14),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(item.productName, style: AppTextStyles.body13)),
-                    Text(_formatPrice(item.subtotal), style: AppTextStyles.label14),
-                  ],
-                ),
-              )),
+          ...items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                children: [
+                  Text('${item.quantity}x', style: AppTextStyles.label14),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(item.productName, style: AppTextStyles.body13),
+                  ),
+                  Text(
+                    _formatPrice(item.subtotal),
+                    style: AppTextStyles.label14,
+                  ),
+                ],
+              ),
+            ),
+          ),
           const Divider(),
           const SizedBox(height: 4),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Tổng tiền món', style: AppTextStyles.body13Secondary),
-              Text(_formatPrice(items.fold(0, (sum, item) => sum + item.subtotal)), style: AppTextStyles.label14),
+              Text(
+                _formatPrice(items.fold(0, (sum, item) => sum + item.subtotal)),
+                style: AppTextStyles.label14,
+              ),
             ],
           ),
         ],
@@ -364,13 +398,19 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(shop.name, style: AppTextStyles.label14),
-                      Text(shop.address ?? 'Không có địa chỉ', style: AppTextStyles.body11),
+                      Text(
+                        shop.address ?? 'Không có địa chỉ',
+                        style: AppTextStyles.body11,
+                      ),
                     ],
                   ),
                 ),
                 IconButton(
                   onPressed: () {}, // TODO: Call store
-                  icon: const Icon(Icons.phone_outlined, color: AppColors.primary),
+                  icon: const Icon(
+                    Icons.phone_outlined,
+                    color: AppColors.primary,
+                  ),
                 ),
               ],
             ),
@@ -378,7 +418,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
         ),
       ),
       loading: () => const SizedBox.shrink(),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -397,19 +437,35 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
           const SizedBox(height: 12),
           Row(
             children: [
-              const Icon(Icons.person_outline, size: 20, color: AppColors.textSecondary),
+              const Icon(
+                Icons.person_outline,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
               Text('Tài xế: ', style: AppTextStyles.body13Secondary),
-              Text(order.driverId != null ? 'Đang gán tài xế...' : 'Chưa có tài xế', style: AppTextStyles.label14),
+              Text(
+                order.driverId != null
+                    ? 'Đang gán tài xế...'
+                    : 'Chưa có tài xế',
+                style: AppTextStyles.label14,
+              ),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.delivery_dining_outlined, size: 20, color: AppColors.textSecondary),
+              const Icon(
+                Icons.delivery_dining_outlined,
+                size: 20,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
               Text('Phí giao hàng: ', style: AppTextStyles.body13Secondary),
-              Text(_formatPrice(order.deliveryFee), style: AppTextStyles.label14),
+              Text(
+                _formatPrice(order.deliveryFee),
+                style: AppTextStyles.label14,
+              ),
             ],
           ),
         ],
@@ -431,9 +487,17 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.success,
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.medium)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.medium),
+                ),
               ),
-              child: Text('Đánh giá ngay', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700)),
+              child: Text(
+                'Đánh giá ngay',
+                style: GoogleFonts.inter(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 12),
@@ -447,9 +511,17 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     side: const BorderSide(color: AppColors.danger),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.medium)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.medium),
+                    ),
                   ),
-                  child: Text('Hủy đơn hàng', style: GoogleFonts.inter(color: AppColors.danger, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    'Hủy đơn hàng',
+                    style: GoogleFonts.inter(
+                      color: AppColors.danger,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
               ),
             if (canCancel) const SizedBox(width: 12),
@@ -459,9 +531,17 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.medium)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(AppRadius.medium),
+                  ),
                 ),
-                child: Text('Hỗ trợ', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
+                child: Text(
+                  'Hỗ trợ',
+                  style: GoogleFonts.inter(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ],
@@ -472,7 +552,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
 
   void _showReviewDialog(OrderModel order) {
     if (order.shopId == null) return;
-    
+
     int selectedRating = 5;
     final commentController = TextEditingController();
 
@@ -483,7 +563,9 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
       builder: (context) => StatefulBuilder(
         builder: (context, setModalState) => Container(
           padding: EdgeInsets.only(
-            left: 16, right: 16, top: 24,
+            left: 16,
+            right: 16,
+            top: 24,
             bottom: MediaQuery.of(context).viewInsets.bottom + 24,
           ),
           decoration: const BoxDecoration(
@@ -496,7 +578,10 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
             children: [
               Text('Đánh giá đơn hàng', style: AppTextStyles.heading18),
               const SizedBox(height: 8),
-              Text('Chia sẻ trải nghiệm của bạn về món ăn và dịch vụ', style: AppTextStyles.body13Secondary),
+              Text(
+                'Chia sẻ trải nghiệm của bạn về món ăn và dịch vụ',
+                style: AppTextStyles.body13Secondary,
+              ),
               const SizedBox(height: 24),
               Center(
                 child: Row(
@@ -504,9 +589,12 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                   children: List.generate(5, (index) {
                     final ratingValue = index + 1;
                     return IconButton(
-                      onPressed: () => setModalState(() => selectedRating = ratingValue),
+                      onPressed: () =>
+                          setModalState(() => selectedRating = ratingValue),
                       icon: Icon(
-                        selectedRating >= ratingValue ? Icons.star : Icons.star_border,
+                        selectedRating >= ratingValue
+                            ? Icons.star
+                            : Icons.star_border,
                         color: Colors.amber,
                         size: 40,
                       ),
@@ -520,7 +608,9 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Nhập nhận xét của bạn...',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   filled: true,
                   fillColor: Colors.grey[50],
                 ),
@@ -531,31 +621,47 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
                 child: ElevatedButton(
                   onPressed: () async {
                     try {
-                      await ref.read(reviewRepositoryProvider).submitReview(
-                        shopId: order.shopId!,
-                        rating: selectedRating,
-                        comment: commentController.text,
-                        orderId: order.id,
-                      );
-                      if (!mounted) return;
+                      await ref
+                          .read(reviewRepositoryProvider)
+                          .submitReview(
+                            shopId: order.shopId!,
+                            rating: selectedRating,
+                            comment: commentController.text,
+                            orderId: order.id,
+                          );
+                      if (!context.mounted) return;
                       Navigator.pop(context);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Cảm ơn bạn đã đánh giá!')),
+                        const SnackBar(
+                          content: Text('Cảm ơn bạn đã đánh giá!'),
+                        ),
                       );
                       // Refresh reviews if needed
                       ref.invalidate(shopReviewsProvider(order.shopId!));
                     } catch (e) {
+                      if (!context.mounted) return;
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger),
+                        SnackBar(
+                          content: Text('Lỗi: $e'),
+                          backgroundColor: AppColors.danger,
+                        ),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.medium)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.medium),
+                    ),
                   ),
-                  child: Text('Gửi đánh giá', style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w700)),
+                  child: Text(
+                    'Gửi đánh giá',
+                    style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -572,10 +678,16 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
         title: const Text('Xác nhận hủy'),
         content: const Text('Bạn có chắc chắn muốn hủy đơn hàng này không?'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Không')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Không'),
+          ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Hủy đơn', style: TextStyle(color: AppColors.danger)),
+            child: const Text(
+              'Hủy đơn',
+              style: TextStyle(color: AppColors.danger),
+            ),
           ),
         ],
       ),
@@ -583,13 +695,19 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
 
     if (confirm == true) {
       try {
-        await ref.read(orderRepositoryProvider).cancelOrderByCustomer(orderId, reason: 'Khách hàng hủy từ app');
+        await ref
+            .read(orderRepositoryProvider)
+            .cancelOrderByCustomer(orderId, reason: 'Khách hàng hủy từ app');
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đã hủy đơn hàng')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Đã hủy đơn hàng')));
         ref.invalidate(myOrdersProvider);
       } catch (e) {
         if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e'), backgroundColor: AppColors.danger),
+        );
       }
     }
   }
@@ -598,10 +716,7 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Theo dõi đơn hàng',
-          style: AppTextStyles.heading18,
-        ),
+        Text('Theo dõi đơn hàng', style: AppTextStyles.heading18),
         const SizedBox(height: 12),
         OrderTrackingMapWidget(order: order),
       ],
@@ -610,13 +725,17 @@ class _SimpleOrderTrackingScreenState extends ConsumerState<SimpleOrderTrackingS
 
   Color _getStatusColor(OrderStatus status) {
     switch (status) {
-      case OrderStatus.completed: return AppColors.success;
-      case OrderStatus.canceled: return AppColors.danger;
-      case OrderStatus.pickedUp: 
+      case OrderStatus.completed:
+        return AppColors.success;
+      case OrderStatus.canceled:
+        return AppColors.danger;
+      case OrderStatus.pickedUp:
       case OrderStatus.readyForPickup:
       case OrderStatus.confirmed:
-      case OrderStatus.assigned: return const Color(0xFFF59E0B);
-      default: return AppColors.primary;
+      case OrderStatus.assigned:
+        return const Color(0xFFF59E0B);
+      default:
+        return AppColors.primary;
     }
   }
 

@@ -6,11 +6,7 @@ class AppSearchBar extends StatelessWidget {
   final String hintText;
   final ValueChanged<String>? onChanged;
 
-  const AppSearchBar({
-    super.key,
-    required this.hintText,
-    this.onChanged,
-  });
+  const AppSearchBar({super.key, required this.hintText, this.onChanged});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +33,10 @@ class AppSearchBar extends StatelessWidget {
                 ),
                 border: InputBorder.none,
               ),
-              style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
+              style: GoogleFonts.inter(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
           ),
           Container(width: 1, height: 20, color: AppColors.borderSoft),

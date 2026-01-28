@@ -19,13 +19,11 @@ import 'package:geolocator/geolocator.dart';
 class StoreDetailMenuScreen extends ConsumerStatefulWidget {
   final String shopId;
 
-  const StoreDetailMenuScreen({
-    super.key,
-    required this.shopId,
-  });
+  const StoreDetailMenuScreen({super.key, required this.shopId});
 
   @override
-  ConsumerState<StoreDetailMenuScreen> createState() => _StoreDetailMenuScreenState();
+  ConsumerState<StoreDetailMenuScreen> createState() =>
+      _StoreDetailMenuScreenState();
 }
 
 class _StoreDetailMenuScreenState extends ConsumerState<StoreDetailMenuScreen> {
@@ -80,7 +78,7 @@ class _StoreDetailMenuScreenState extends ConsumerState<StoreDetailMenuScreen> {
     if (_distanceCalculated) return;
     if (_userLat == null || _userLng == null) return;
     if (merchant.lat == null || merchant.lng == null) return;
-    
+
     _distanceCalculated = true;
     final distanceInMeters = DistanceUtils.calculateDistance(
       _userLat!,
@@ -118,9 +116,12 @@ class _StoreDetailMenuScreenState extends ConsumerState<StoreDetailMenuScreen> {
       ref.invalidate(myFavoritesProvider);
       ref.invalidate(isFavoriteProvider(widget.shopId));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Lỗi: $e')),
-      );
+      if (mounted) {
+        context.pop();
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+      }
     } finally {
       setState(() => _isTogglingFavorite = false);
     }
@@ -162,7 +163,8 @@ class _StoreDetailMenuScreenState extends ConsumerState<StoreDetailMenuScreen> {
                 selectedCategory: _selectedCategory,
                 selectedTab: _selectedTab,
                 distanceToShop: _distanceToShop,
-                onCategorySelected: (cat) => setState(() => _selectedCategory = cat),
+                onCategorySelected: (cat) =>
+                    setState(() => _selectedCategory = cat),
                 onTabSelected: (tab) => setState(() => _selectedTab = tab),
                 onMerchantLoaded: _calculateDistanceOnce,
                 onRefresh: () {
@@ -220,7 +222,7 @@ class _MerchantContentConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final merchantAsync = ref.watch(merchantDetailProvider(shopId));
-    
+
     return merchantAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (error, stack) => _MerchantErrorWidget(
@@ -230,7 +232,7 @@ class _MerchantContentConsumer extends ConsumerWidget {
       data: (merchant) {
         // Callback để tính khoảng cách (chỉ gọi 1 lần nhờ flag ở parent)
         onMerchantLoaded(merchant);
-        
+
         // Menu content là Consumer widget riêng
         return _MenuContentConsumer(
           shopId: shopId,
@@ -273,7 +275,7 @@ class _MenuContentConsumer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final menuAsync = ref.watch(shopMenuProvider(shopId));
-    
+
     return menuAsync.when(
       loading: () => _buildLoadingWithMerchant(context),
       error: (error, stack) => _MerchantErrorWidget(
@@ -299,7 +301,11 @@ class _MenuContentConsumer extends ConsumerWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context, WidgetRef ref, List<ShopMenuItem> menuItems) {
+  Widget _buildContent(
+    BuildContext context,
+    WidgetRef ref,
+    List<ShopMenuItem> menuItems,
+  ) {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -331,10 +337,7 @@ class _MerchantErrorWidget extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
 
-  const _MerchantErrorWidget({
-    required this.message,
-    required this.onRetry,
-  });
+  const _MerchantErrorWidget({required this.message, required this.onRetry});
 
   @override
   Widget build(BuildContext context) {
@@ -346,10 +349,7 @@ class _MerchantErrorWidget extends StatelessWidget {
           const SizedBox(height: 16),
           Text(message, style: AppTextStyles.body15Secondary),
           const SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: onRetry,
-            child: const Text('Thử lại'),
-          ),
+          ElevatedButton(onPressed: onRetry, child: const Text('Thử lại')),
         ],
       ),
     );
@@ -361,10 +361,7 @@ class _StoreInfoWidget extends StatelessWidget {
   final MerchantModel merchant;
   final String? distanceToShop;
 
-  const _StoreInfoWidget({
-    required this.merchant,
-    this.distanceToShop,
-  });
+  const _StoreInfoWidget({required this.merchant, this.distanceToShop});
 
   @override
   Widget build(BuildContext context) {
@@ -402,7 +399,9 @@ class _StoreInfoWidget extends StatelessWidget {
                   ),
                 ),
               ],
-              if (merchant.rating != null && (merchant.openingHours != null || distanceToShop != null)) ...[
+              if (merchant.rating != null &&
+                  (merchant.openingHours != null ||
+                      distanceToShop != null)) ...[
                 const SizedBox(width: 6),
                 const Text('•'),
               ],
@@ -417,7 +416,8 @@ class _StoreInfoWidget extends StatelessWidget {
                 ),
               ],
               if (distanceToShop != null) ...[
-                if (merchant.rating != null || merchant.openingHours != null) ...[
+                if (merchant.rating != null ||
+                    merchant.openingHours != null) ...[
                   const SizedBox(width: 6),
                   const Text('•'),
                 ],
@@ -425,7 +425,11 @@ class _StoreInfoWidget extends StatelessWidget {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.near_me, size: 14, color: AppColors.textSecondary),
+                    Icon(
+                      Icons.near_me,
+                      size: 14,
+                      color: AppColors.textSecondary,
+                    ),
                     const SizedBox(width: 2),
                     Text(
                       distanceToShop!,
@@ -443,7 +447,11 @@ class _StoreInfoWidget extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                Icon(Icons.location_on_outlined, size: 16, color: AppColors.textSecondary),
+                Icon(
+                  Icons.location_on_outlined,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: 4),
                 Expanded(
                   child: Text(
@@ -516,10 +524,7 @@ class _TabsWidget extends StatelessWidget {
   final String selectedTab;
   final void Function(String) onTabSelected;
 
-  const _TabsWidget({
-    required this.selectedTab,
-    required this.onTabSelected,
-  });
+  const _TabsWidget({required this.selectedTab, required this.onTabSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -585,13 +590,13 @@ class _MenuTabContent extends ConsumerWidget {
         .map((item) => item.category ?? 'Khác')
         .toSet()
         .toList();
-    
+
     // Lọc menu theo category đã chọn
     final filteredItems = selectedCategory == null
         ? menuItems
-        : menuItems.where((item) => 
-            (item.category ?? 'Khác') == selectedCategory
-          ).toList();
+        : menuItems
+              .where((item) => (item.category ?? 'Khác') == selectedCategory)
+              .toList();
 
     // Nhóm theo category để hiển thị
     final groupedItems = <String, List<ShopMenuItem>>{};
@@ -608,15 +613,19 @@ class _MenuTabContent extends ConsumerWidget {
         if (filteredItems.isEmpty)
           _buildEmptyMenu()
         else
-          ...groupedItems.entries.expand((entry) => [
-            _buildSectionTitle(entry.key),
-            const SizedBox(height: 12),
-            ...entry.value.map((item) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _MenuItemWidget(merchant: merchant, item: item),
-            )),
-            const SizedBox(height: 12),
-          ]),
+          ...groupedItems.entries.expand(
+            (entry) => [
+              _buildSectionTitle(entry.key),
+              const SizedBox(height: 12),
+              ...entry.value.map(
+                (item) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _MenuItemWidget(merchant: merchant, item: item),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
       ],
     );
   }
@@ -633,14 +642,16 @@ class _MenuTabContent extends ConsumerWidget {
             onTap: () => onCategorySelected(null),
           ),
           const SizedBox(width: 8),
-          ...categories.map((category) => Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: CategoryChip(
-              label: category,
-              isActive: selectedCategory == category,
-              onTap: () => onCategorySelected(category),
+          ...categories.map(
+            (category) => Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: CategoryChip(
+                label: category,
+                isActive: selectedCategory == category,
+                onTap: () => onCategorySelected(category),
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
@@ -652,12 +663,13 @@ class _MenuTabContent extends ConsumerWidget {
         padding: const EdgeInsets.all(32),
         child: Column(
           children: [
-            Icon(Icons.restaurant_menu, size: 48, color: AppColors.textSecondary),
-            const SizedBox(height: 16),
-            Text(
-              'Chưa có sản phẩm nào',
-              style: AppTextStyles.body15Secondary,
+            Icon(
+              Icons.restaurant_menu,
+              size: 48,
+              color: AppColors.textSecondary,
             ),
+            const SizedBox(height: 16),
+            Text('Chưa có sản phẩm nào', style: AppTextStyles.body15Secondary),
           ],
         ),
       ),
@@ -684,10 +696,7 @@ class _MenuItemWidget extends ConsumerWidget {
   final MerchantModel merchant;
   final ShopMenuItem item;
 
-  const _MenuItemWidget({
-    required this.merchant,
-    required this.item,
-  });
+  const _MenuItemWidget({required this.merchant, required this.item});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -707,17 +716,19 @@ class _MenuItemWidget extends ConsumerWidget {
   }
 
   void _addToCart(BuildContext context, WidgetRef ref) {
-    ref.read(cartProvider.notifier).addItem(
-      CartItem(
-        id: item.productId,
-        shopId: item.shopId,
-        shopName: merchant.name,
-        name: item.name,
-        description: item.description,
-        imageUrl: item.imagePath,
-        price: item.effectivePrice,
-      ),
-    );
+    ref
+        .read(cartProvider.notifier)
+        .addItem(
+          CartItem(
+            id: item.productId,
+            shopId: item.shopId,
+            shopName: merchant.name,
+            name: item.name,
+            description: item.description,
+            imageUrl: item.imagePath,
+            price: item.effectivePrice,
+          ),
+        );
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -725,17 +736,13 @@ class _MenuItemWidget extends ConsumerWidget {
           children: [
             const Icon(Icons.check_circle, color: Colors.white, size: 20),
             const SizedBox(width: 8),
-            Expanded(
-              child: Text('Đã thêm ${item.name} vào giỏ hàng'),
-            ),
+            Expanded(child: Text('Đã thêm ${item.name} vào giỏ hàng')),
           ],
         ),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
         backgroundColor: AppColors.success,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -747,7 +754,7 @@ class _MenuItemWidget extends ConsumerWidget {
         title: const Text('Xóa giỏ hàng?'),
         content: const Text(
           'Giỏ hàng của bạn đang có sản phẩm từ cửa hàng khác. '
-          'Bạn muốn xóa và thêm sản phẩm mới?'
+          'Bạn muốn xóa và thêm sản phẩm mới?',
         ),
         actions: [
           TextButton(
@@ -798,7 +805,11 @@ class _ReviewsTabContent extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.star_outline, size: 64, color: AppColors.textSecondary),
+                  Icon(
+                    Icons.star_outline,
+                    size: 64,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(height: 16),
                   Text(
                     'Chưa có đánh giá',
@@ -821,7 +832,7 @@ class _ReviewsTabContent extends ConsumerWidget {
         return ListView.separated(
           padding: const EdgeInsets.all(16),
           itemCount: reviews.length,
-          separatorBuilder: (_, __) => const Divider(height: 24),
+          separatorBuilder: (_, _) => const Divider(height: 24),
           itemBuilder: (context, index) {
             final review = reviews[index];
             return Column(
@@ -832,13 +843,22 @@ class _ReviewsTabContent extends ConsumerWidget {
                     CircleAvatar(
                       radius: 18,
                       backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-                      backgroundImage: review.userAvatar != null ? NetworkImage(review.userAvatar!) : null,
-                      child: review.userAvatar == null 
-                        ? Text(
-                            (review.isAnonymous ? 'A' : (review.userName?[0] ?? 'U')).toUpperCase(),
-                            style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold),
-                          )
-                        : null,
+                      backgroundImage: review.userAvatar != null
+                          ? NetworkImage(review.userAvatar!)
+                          : null,
+                      child: review.userAvatar == null
+                          ? Text(
+                              (review.isAnonymous
+                                      ? 'A'
+                                      : (review.userName?[0] ?? 'U'))
+                                  .toUpperCase(),
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
+                          : null,
                     ),
                     const SizedBox(width: 10),
                     Expanded(
@@ -846,31 +866,38 @@ class _ReviewsTabContent extends ConsumerWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            review.isAnonymous ? 'Người dùng ẩn danh' : (review.userName ?? 'Người dùng Chợ Quê'),
+                            review.isAnonymous
+                                ? 'Người dùng ẩn danh'
+                                : (review.userName ?? 'Người dùng Chợ Quê'),
                             style: AppTextStyles.label14,
                           ),
                           Text(
                             _formatDate(review.createdAt),
-                            style: GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary),
+                            style: GoogleFonts.inter(
+                              fontSize: 11,
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ],
                       ),
                     ),
                     Row(
-                      children: List.generate(5, (i) => Icon(
-                        Icons.star,
-                        size: 14,
-                        color: i < review.rating ? Colors.amber : Colors.grey.shade300,
-                      )),
+                      children: List.generate(
+                        5,
+                        (i) => Icon(
+                          Icons.star,
+                          size: 14,
+                          color: i < review.rating
+                              ? Colors.amber
+                              : Colors.grey.shade300,
+                        ),
+                      ),
                     ),
                   ],
                 ),
                 if (review.comment != null && review.comment!.isNotEmpty) ...[
                   const SizedBox(height: 8),
-                  Text(
-                    review.comment!,
-                    style: AppTextStyles.body13,
-                  ),
+                  Text(review.comment!, style: AppTextStyles.body13),
                 ],
               ],
             );
@@ -957,10 +984,7 @@ class _InfoTabContent extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                value,
-                style: AppTextStyles.body15Secondary,
-              ),
+              Text(value, style: AppTextStyles.body15Secondary),
             ],
           ),
         ),

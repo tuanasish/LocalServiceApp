@@ -16,9 +16,12 @@ import '../screens/auth/profile_setup_screen.dart';
 import '../screens/auth/forgot_password_screen.dart';
 import '../screens/auth/reset_password_screen.dart';
 import '../screens/admin/admin_system_overview_screen.dart';
+import '../screens/admin/admin_orders_screen.dart';
+import '../screens/admin/admin_order_detail_screen.dart';
 import '../screens/driver/driver_dashboard_request_screen.dart';
 import '../screens/driver/driver_home_dashboard_screen.dart';
 import '../screens/driver/driver_order_fulfillment_screen.dart';
+import '../screens/driver/driver_notifications_screen.dart';
 import '../screens/merchant/merchant_order_dashboard_screen.dart';
 import '../screens/merchant/merchant_order_management_screen.dart';
 import '../screens/merchant/merchant_price_management_screen.dart';
@@ -43,7 +46,9 @@ import '../providers/auth_provider.dart';
 final _rootNavigatorKey = GlobalKey<NavigatorState>();
 final _homeNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'home');
 final _ordersNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'orders');
-final _notificationsNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'notifications');
+final _notificationsNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'notifications',
+);
 final _profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
 // Removed comment - keys declared above
@@ -52,9 +57,9 @@ final _profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 bool _isNetworkError(Object error) {
   final errorStr = error.toString();
   return errorStr.contains('Failed host lookup') ||
-         errorStr.contains('SocketException') ||
-         errorStr.contains('Network') ||
-         errorStr.contains('timeout');
+      errorStr.contains('SocketException') ||
+      errorStr.contains('Network') ||
+      errorStr.contains('timeout');
 }
 
 // Routes that require authentication - defined outside for performance
@@ -81,47 +86,59 @@ const _authFlowRoutes = {
   '/role-switcher',
 };
 
+/// Helper class to notify GoRouter when a provider changes
+class RouterRefreshListenable extends ChangeNotifier {
+  RouterRefreshListenable(Ref ref) {
+    // Listen to changes in auth state and profile
+    ref.listen(authStateProvider, (_, __) => notifyListeners());
+    ref.listen(userProfileProvider, (_, __) => notifyListeners());
+    ref.listen(activeRoleProvider, (_, __) => notifyListeners());
+  }
+}
+
 /// Provider for the router - created once and reused
 /// Guest-first: No login required, users can browse as guest
 final appRouterProvider = Provider<GoRouter>((ref) {
+  final refreshListenable = RouterRefreshListenable(ref);
   final router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: '/',
+    refreshListenable: refreshListenable,
     redirect: (context, state) {
       final location = state.matchedLocation;
-      
+
       // OPTIMIZATION: Early return cho routes không cần check auth
       // Đa số navigations (home, store detail, search) không cần kiểm tra gì
-      if (!_authRequiredRoutes.contains(location) && 
+      if (!_authRequiredRoutes.contains(location) &&
           !_authFlowRoutes.contains(location) &&
           !location.startsWith('/register')) {
         return null;
       }
-      
+
       final isAuthenticated = ref.read(isAuthenticatedProvider);
-      
+
       // Guest trying to access auth-required route -> redirect to login
       // Check này rất nhanh, chỉ check isAuthenticated
       if (!isAuthenticated && _authRequiredRoutes.contains(location)) {
         return '/login?redirect=${Uri.encodeComponent(location)}';
       }
-      
+
       // Nếu không authenticated và không phải auth-required route, cho qua
       if (!isAuthenticated) {
         return null;
       }
-      
+
       // === Từ đây chỉ xử lý cho authenticated users ===
-      
+
       // OPTIMIZATION: Chỉ read profile khi thực sự cần
       // Đây là điểm có thể gây chậm nên chỉ gọi khi cần thiết
       final profileAsync = ref.read(userProfileProvider);
-      
+
       // Nếu đang loading profile, không redirect (đợi load xong)
       if (profileAsync.isLoading) {
         return null;
       }
-      
+
       // Nếu có lỗi network, cho phép tiếp tục (để user có thể retry)
       if (profileAsync.hasError) {
         final error = profileAsync.error;
@@ -129,17 +146,17 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return null;
         }
       }
-      
+
       final hasProfile = profileAsync.asData?.value != null;
-      
+
       // Authenticated nhưng chưa có profile -> redirect đến setup
-      if (!hasProfile && 
-          location != '/register/profile' && 
+      if (!hasProfile &&
+          location != '/register/profile' &&
           location != '/register/verify' &&
           !location.startsWith('/register')) {
         return '/register/profile';
       }
-      
+
       // Authenticated và có profile, đang ở login/register -> redirect về home/role
       if (hasProfile && (location == '/login' || location == '/register')) {
         final uri = Uri.parse(state.uri.toString());
@@ -147,14 +164,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         if (redirectTo != null && redirectTo.isNotEmpty) {
           return redirectTo;
         }
-        
+
         final needsRoleSelection = ref.read(needsRoleSelectionProvider);
         if (needsRoleSelection) {
           return '/role-switcher';
         }
         return ref.read(activeRoleProvider).route;
       }
-      
+
       return null; // No redirect needed
     },
     routes: [
@@ -164,7 +181,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => AddAddressScreen(),
       ),
-      
+
       // Auth routes (không có bottom nav)
       GoRoute(
         path: '/welcome',
@@ -205,7 +222,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const RoleSwitcherScreen(),
       ),
-      
+
       // Registration flow routes
       GoRoute(
         path: '/register',
@@ -220,7 +237,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           final email = data['email'] as String? ?? '';
           final fullName = data['full_name'] as String?;
           final type = data['type'] as String? ?? 'email';
-          return OtpVerificationScreen(email: email, fullName: fullName, type: type);
+          return OtpVerificationScreen(
+            email: email,
+            fullName: fullName,
+            type: type,
+          );
         },
       ),
       GoRoute(
@@ -232,7 +253,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return ProfileSetupScreen(fullName: fullName);
         },
       ),
-      
+
       // StatefulShellRoute: Customer Bottom Navigation với persistent state
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -319,12 +340,27 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      
+
       // Role-specific dashboards (ngoài shell, không có bottom nav customer)
       GoRoute(
         path: '/admin',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const AdminSystemOverviewScreen(),
+        routes: [
+          GoRoute(
+            path: 'orders',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const AdminOrdersScreen(),
+          ),
+          GoRoute(
+            path: 'orders/:id',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) {
+              final orderId = state.pathParameters['id']!;
+              return AdminOrderDetailScreen(orderId: orderId);
+            },
+          ),
+        ],
       ),
       GoRoute(
         path: '/merchant',
@@ -380,16 +416,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               return DriverOrderFulfillmentScreen(orderId: orderId);
             },
           ),
+          GoRoute(
+            path: 'notifications',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const DriverNotificationsScreen(),
+          ),
         ],
       ),
-      
+
       // Checkout flow (ngoài shell)
       GoRoute(
         path: '/checkout',
         parentNavigatorKey: _rootNavigatorKey,
         builder: (context, state) => const CheckoutFixedFeeScreen(),
       ),
-      
+
       // Address map picker (ngoài shell)
       GoRoute(
         path: '/address/map-picker',
@@ -399,7 +440,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           return MapAddressPickerScreen(initialLocation: initialLocation);
         },
       ),
-      
+
       // Unified Search Screen (ngoài shell)
       GoRoute(
         path: '/search',
@@ -410,13 +451,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         },
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text('Page not found: ${state.error}'),
-      ),
-    ),
+    errorBuilder: (context, state) =>
+        Scaffold(body: Center(child: Text('Page not found: ${state.error}'))),
   );
-  
+
   ref.onDispose(() => router.dispose());
   return router;
 });

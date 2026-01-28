@@ -20,7 +20,7 @@ class OrderHistoryScreen extends ConsumerStatefulWidget {
 
 class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
   String _selectedFilter = 'Tất cả';
-  
+
   // Cache filtered orders để tránh tính lại mỗi build
   List<OrderModel>? _cachedFilteredOrders;
   String? _cachedFilter;
@@ -41,14 +41,14 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
               child: ordersAsync.when(
                 data: (orders) {
                   // Cache filtered orders - chỉ tính lại khi filter hoặc orders thay đổi
-                  if (_cachedFilter != _selectedFilter || 
+                  if (_cachedFilter != _selectedFilter ||
                       _cachedOrders != orders ||
                       _cachedFilteredOrders == null) {
                     _cachedFilteredOrders = _filterOrders(orders);
                     _cachedFilter = _selectedFilter;
                     _cachedOrders = orders;
                   }
-                  
+
                   final filteredOrders = _cachedFilteredOrders!;
                   if (filteredOrders.isEmpty) {
                     return _buildEmptyState();
@@ -88,8 +88,13 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
   List<OrderModel> _filterOrders(List<OrderModel> orders) {
     if (_selectedFilter == 'Tất cả') return orders;
     if (_selectedFilter == 'Đang xử lý') {
-      return orders.where((o) => 
-        o.status != OrderStatus.completed && o.status != OrderStatus.canceled).toList();
+      return orders
+          .where(
+            (o) =>
+                o.status != OrderStatus.completed &&
+                o.status != OrderStatus.canceled,
+          )
+          .toList();
     }
     if (_selectedFilter == 'Đã hoàn thành') {
       return orders.where((o) => o.status == OrderStatus.completed).toList();
@@ -123,18 +128,25 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
             final filter = filters[index];
             final isActive = filter == _selectedFilter;
             return Padding(
-              padding: EdgeInsets.only(right: index < filters.length - 1 ? 8 : 0),
+              padding: EdgeInsets.only(
+                right: index < filters.length - 1 ? 8 : 0,
+              ),
               child: GestureDetector(
                 onTap: () {
                   setState(() => _selectedFilter = filter);
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: isActive ? AppColors.primary : AppColors.surface,
                     borderRadius: BorderRadius.circular(AppRadius.pill),
                     border: Border.all(
-                      color: isActive ? AppColors.primary : AppColors.borderSoft,
+                      color: isActive
+                          ? AppColors.primary
+                          : AppColors.borderSoft,
                       width: 1,
                     ),
                   ),
@@ -144,7 +156,9 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
                       style: GoogleFonts.inter(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isActive ? Colors.white : AppColors.textSecondary,
+                        color: isActive
+                            ? Colors.white
+                            : AppColors.textSecondary,
                       ),
                     ),
                   ),
@@ -189,12 +203,21 @@ class _OrderHistoryScreenState extends ConsumerState<OrderHistoryScreen> {
             const SizedBox(height: 16),
             Text('Đã có lỗi xảy ra', style: AppTextStyles.heading18),
             const SizedBox(height: 8),
-            Text(error.toString(), textAlign: TextAlign.center, style: AppTextStyles.body13Secondary),
+            Text(
+              error.toString(),
+              textAlign: TextAlign.center,
+              style: AppTextStyles.body13Secondary,
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () => ref.refresh(myOrdersProvider),
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: const Text('Thử lại', style: TextStyle(color: Colors.white)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+              ),
+              child: const Text(
+                'Thử lại',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         ),
@@ -211,8 +234,10 @@ class _OrderCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusColor = _getStatusColor(order.status);
-    final formattedDate = DateFormat('dd/MM/yyyy HH:mm').format(order.createdAt);
-    
+    final formattedDate = DateFormat(
+      'dd/MM/yyyy HH:mm',
+    ).format(order.createdAt);
+
     // Tối ưu: Dùng select() để chỉ watch name field thay vì toàn bộ merchant
     String storeName = 'Đơn hàng dịch vụ';
     if (order.shopId != null) {
@@ -220,7 +245,7 @@ class _OrderCard extends ConsumerWidget {
       storeName = merchantAsync.when(
         data: (merchant) => merchant.name,
         loading: () => 'Đang tải...',
-        error: (_, __) {
+        error: (_, _) {
           final shopId = order.shopId!;
           return 'Cửa hàng #${shopId.length > 4 ? shopId.substring(0, 4) : shopId}';
         },
@@ -251,7 +276,10 @@ class _OrderCard extends ConsumerWidget {
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -270,7 +298,11 @@ class _OrderCard extends ConsumerWidget {
             const SizedBox(height: 12),
             Row(
               children: [
-                const Icon(Icons.store_outlined, size: 16, color: AppColors.textSecondary),
+                const Icon(
+                  Icons.store_outlined,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -287,11 +319,18 @@ class _OrderCard extends ConsumerWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.calendar_today_outlined, size: 16, color: AppColors.textSecondary),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 16,
+                  color: AppColors.textSecondary,
+                ),
                 const SizedBox(width: 6),
                 Text(
                   formattedDate,
-                  style: GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary),
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
                 const Spacer(),
                 Text(
@@ -313,11 +352,17 @@ class _OrderCard extends ConsumerWidget {
                 if (order.status == OrderStatus.completed)
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       side: const BorderSide(color: AppColors.primary),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
                     ),
-                    onPressed: () => _handleReorder(context, ref, order, storeName),
+                    onPressed: () =>
+                        _handleReorder(context, ref, order, storeName),
                     child: Text(
                       'Đặt lại',
                       style: GoogleFonts.inter(
@@ -327,13 +372,19 @@ class _OrderCard extends ConsumerWidget {
                       ),
                     ),
                   ),
-                if (order.status != OrderStatus.completed && order.status != OrderStatus.canceled) ...[
+                if (order.status != OrderStatus.completed &&
+                    order.status != OrderStatus.canceled) ...[
                   const SizedBox(width: 8),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.pill)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                      ),
                     ),
                     onPressed: () => context.push('/orders/${order.id}'),
                     child: Text(
@@ -405,9 +456,12 @@ class _OrderCard extends ConsumerWidget {
       return;
     }
 
+    if (!context.mounted) return;
+
     // Check conflict với cart hiện tại
     final cart = ref.read(cartProvider);
-    final hasConflict = cart.isNotEmpty &&
+    final hasConflict =
+        cart.isNotEmpty &&
         order.shopId != null &&
         cart.first.shopId != order.shopId;
 
@@ -441,7 +495,9 @@ class _OrderCard extends ConsumerWidget {
     }
 
     // Reorder
-    final success = ref.read(cartProvider.notifier).reorderFromOrder(
+    final success = ref
+        .read(cartProvider.notifier)
+        .reorderFromOrder(
           order: order,
           orderItems: items,
           shopName: shopName,

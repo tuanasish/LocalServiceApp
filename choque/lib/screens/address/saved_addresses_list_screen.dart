@@ -26,7 +26,8 @@ class SavedAddressesListScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       _buildAddressCard(
                         title: 'Nhà riêng',
-                        address: '123 Đường Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
+                        address:
+                            '123 Đường Lê Lợi, Phường Bến Thành, Quận 1, TP. Hồ Chí Minh',
                         isDefault: true,
                         onTap: () {},
                         onEdit: () {},
@@ -35,7 +36,8 @@ class SavedAddressesListScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildAddressCard(
                         title: 'Văn phòng',
-                        address: '456 Đường Nguyễn Huệ, Phường Đa Kao, Quận 1, TP. Hồ Chí Minh',
+                        address:
+                            '456 Đường Nguyễn Huệ, Phường Đa Kao, Quận 1, TP. Hồ Chí Minh',
                         isDefault: false,
                         onTap: () {},
                         onEdit: () {},
@@ -44,7 +46,8 @@ class SavedAddressesListScreen extends StatelessWidget {
                       const SizedBox(height: 12),
                       _buildAddressCard(
                         title: 'Nhà bạn',
-                        address: '789 Đường Pasteur, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
+                        address:
+                            '789 Đường Pasteur, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh',
                         isDefault: false,
                         onTap: () {},
                         onEdit: () {},
@@ -58,7 +61,9 @@ class SavedAddressesListScreen extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(vertical: 14),
                             side: const BorderSide(color: AppColors.primary),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(AppRadius.pill),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.pill,
+                              ),
                             ),
                           ),
                           onPressed: () {
@@ -154,7 +159,10 @@ class SavedAddressesListScreen extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppRadius.large),
           boxShadow: AppShadows.soft(0.04),
           border: isDefault
-              ? Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.5)
+              ? Border.all(
+                  color: AppColors.primary.withValues(alpha: 0.3),
+                  width: 1.5,
+                )
               : Border.all(color: AppColors.borderSoft),
         ),
         child: Column(
@@ -176,7 +184,10 @@ class SavedAddressesListScreen extends StatelessWidget {
                     if (isDefault) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppRadius.pill),

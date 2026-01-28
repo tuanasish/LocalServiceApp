@@ -53,7 +53,10 @@ class StatCard extends StatelessWidget {
                 ),
                 if (showBadge == true)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.danger.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -94,7 +97,10 @@ class StatCard extends StatelessWidget {
                 ),
                 if (change != null && isPositive != null)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: isPositive!
                           ? AppColors.success.withValues(alpha: 0.1)
@@ -105,9 +111,13 @@ class StatCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          isPositive! ? Icons.arrow_upward : Icons.arrow_downward,
+                          isPositive!
+                              ? Icons.arrow_upward
+                              : Icons.arrow_downward,
                           size: 12,
-                          color: isPositive! ? AppColors.success : AppColors.danger,
+                          color: isPositive!
+                              ? AppColors.success
+                              : AppColors.danger,
                         ),
                         const SizedBox(width: 2),
                         Text(
@@ -115,7 +125,9 @@ class StatCard extends StatelessWidget {
                           style: GoogleFonts.inter(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
-                            color: isPositive! ? AppColors.success : AppColors.danger,
+                            color: isPositive!
+                                ? AppColors.success
+                                : AppColors.danger,
                           ),
                         ),
                       ],

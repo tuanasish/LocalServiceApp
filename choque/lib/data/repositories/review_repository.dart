@@ -20,7 +20,9 @@ class ReviewRepository {
         .order('created_at', ascending: false)
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => ShopReviewModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => ShopReviewModel.fromJson(json))
+        .toList();
   }
 
   /// Gửi đánh giá mới
@@ -34,13 +36,16 @@ class ReviewRepository {
     final userId = _client.auth.currentUser?.id;
     if (userId == null) throw Exception('Not authenticated');
 
-    await _client.from('shop_reviews').insert({
-      'shop_id': shopId,
-      'user_id': userId,
-      'order_id': orderId,
-      'rating': rating,
-      'comment': comment,
-      'is_anonymous': isAnonymous,
-    }).timeout(AppConstants.apiTimeout);
+    await _client
+        .from('shop_reviews')
+        .insert({
+          'shop_id': shopId,
+          'user_id': userId,
+          'order_id': orderId,
+          'rating': rating,
+          'comment': comment,
+          'is_anonymous': isAnonymous,
+        })
+        .timeout(AppConstants.apiTimeout);
   }
 }

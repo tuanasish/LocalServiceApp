@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../ui/design_system.dart';
+import '../../data/models/order_item_model.dart';
 
 /// New Order Request Popup
 /// Popup hiển thị đơn hàng mới cho merchant: thông tin đơn, khách hàng, items, hành động.
@@ -10,6 +11,7 @@ class NewOrderRequestPopup extends StatelessWidget {
   final String customerPhone;
   final String deliveryAddress;
   final String totalAmount;
+  final List<OrderItemModel>? orderItems;
   final VoidCallback? onAccept;
   final VoidCallback? onReject;
   final VoidCallback? onClose;
@@ -21,6 +23,7 @@ class NewOrderRequestPopup extends StatelessWidget {
     required this.customerPhone,
     required this.deliveryAddress,
     required this.totalAmount,
+    this.orderItems,
     this.onAccept,
     this.onReject,
     this.onClose,
@@ -33,6 +36,7 @@ class NewOrderRequestPopup extends StatelessWidget {
     required String customerPhone,
     required String deliveryAddress,
     required String totalAmount,
+    List<OrderItemModel>? orderItems,
     VoidCallback? onAccept,
     VoidCallback? onReject,
   }) {
@@ -46,6 +50,7 @@ class NewOrderRequestPopup extends StatelessWidget {
         customerPhone: customerPhone,
         deliveryAddress: deliveryAddress,
         totalAmount: totalAmount,
+        orderItems: orderItems,
         onAccept: onAccept,
         onReject: onReject,
         onClose: () => Navigator.of(context).pop(),
@@ -101,10 +106,7 @@ class NewOrderRequestPopup extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.borderSoft,
-            width: 1,
-          ),
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
         ),
       ),
       child: Row(
@@ -145,10 +147,7 @@ class NewOrderRequestPopup extends StatelessWidget {
             ),
           ),
           IconButton(
-            icon: const Icon(
-              Icons.close,
-              color: AppColors.textSecondary,
-            ),
+            icon: const Icon(Icons.close, color: AppColors.textSecondary),
             onPressed: onClose,
           ),
         ],
@@ -218,10 +217,7 @@ class NewOrderRequestPopup extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Thông tin khách hàng',
-                style: AppTextStyles.label14,
-              ),
+              Text('Thông tin khách hàng', style: AppTextStyles.label14),
             ],
           ),
           const SizedBox(height: 12),
@@ -252,10 +248,7 @@ class NewOrderRequestPopup extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 8),
-              Text(
-                customerPhone,
-                style: AppTextStyles.body13Secondary,
-              ),
+              Text(customerPhone, style: AppTextStyles.body13Secondary),
             ],
           ),
           const SizedBox(height: 8),
@@ -282,25 +275,36 @@ class NewOrderRequestPopup extends StatelessWidget {
   }
 
   Widget _buildOrderItems() {
+    if (orderItems == null || orderItems!.isEmpty) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Chi tiết đơn hàng', style: AppTextStyles.label14),
+          const SizedBox(height: 12),
+          Text(
+            'Đang tải...',
+            style: GoogleFonts.inter(
+              fontSize: 14,
+              color: AppColors.textSecondary,
+            ),
+          ),
+        ],
+      );
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Chi tiết đơn hàng',
-          style: AppTextStyles.label14,
-        ),
+        Text('Chi tiết đơn hàng', style: AppTextStyles.label14),
         const SizedBox(height: 12),
-        _buildOrderItem(
-          name: 'Phở Bò Tái',
-          quantity: 2,
-          price: '85000',
-        ),
-        const SizedBox(height: 8),
-        _buildOrderItem(
-          name: 'Bánh Mì Thịt Nướng',
-          quantity: 1,
-          price: '45000',
-        ),
+        ...orderItems!.map((item) => Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: _buildOrderItem(
+            name: item.productName,
+            quantity: item.quantity,
+            price: item.unitPrice.toString(),
+          ),
+        )),
       ],
     );
   }
@@ -364,9 +368,7 @@ class NewOrderRequestPopup extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppRadius.medium),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -406,10 +408,7 @@ class NewOrderRequestPopup extends StatelessWidget {
               ),
             ),
             onPressed: onAccept,
-            icon: const Icon(
-              Icons.check_circle_outline,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.check_circle_outline, color: Colors.white),
             label: Text(
               'Chấp nhận đơn hàng',
               style: GoogleFonts.inter(
@@ -432,10 +431,7 @@ class NewOrderRequestPopup extends StatelessWidget {
               ),
             ),
             onPressed: onReject,
-            icon: const Icon(
-              Icons.close,
-              color: AppColors.danger,
-            ),
+            icon: const Icon(Icons.close, color: AppColors.danger),
             label: Text(
               'Từ chối đơn hàng',
               style: GoogleFonts.inter(

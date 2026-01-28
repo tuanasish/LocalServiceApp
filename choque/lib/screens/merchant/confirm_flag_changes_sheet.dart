@@ -99,10 +99,7 @@ class ConfirmFlagChangesSheet extends StatelessWidget {
           ),
         ),
         IconButton(
-          icon: const Icon(
-            Icons.close,
-            color: AppColors.textSecondary,
-          ),
+          icon: const Icon(Icons.close, color: AppColors.textSecondary),
           onPressed: onCancel,
         ),
       ],
@@ -145,17 +142,12 @@ class ConfirmFlagChangesSheet extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.primary.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(AppRadius.medium),
-        border: Border.all(
-          color: AppColors.primary.withValues(alpha: 0.2),
-        ),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Thay đổi trạng thái',
-            style: AppTextStyles.label14,
-          ),
+          Text('Thay đổi trạng thái', style: AppTextStyles.label14),
           const SizedBox(height: 12),
           Row(
             children: [
@@ -207,7 +199,9 @@ class ConfirmFlagChangesSheet extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.medium),
         border: Border.all(
-          color: isCurrent ? AppColors.borderSoft : AppColors.primary.withValues(alpha: 0.3),
+          color: isCurrent
+              ? AppColors.borderSoft
+              : AppColors.primary.withValues(alpha: 0.3),
           width: isCurrent ? 1 : 2,
         ),
       ),
@@ -255,10 +249,7 @@ class ConfirmFlagChangesSheet extends StatelessWidget {
               ),
             ),
             onPressed: onConfirm,
-            icon: const Icon(
-              Icons.check_circle_outline,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.check_circle_outline, color: Colors.white),
             label: Text(
               'Xác nhận thay đổi',
               style: GoogleFonts.inter(

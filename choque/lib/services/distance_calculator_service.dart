@@ -42,30 +42,35 @@ class DistanceCalculatorService {
 
     // Fallback: Haversine formula
     final distance = _calculateHaversineDistance(
-      originLat, originLng, destLat, destLng,
+      originLat,
+      originLng,
+      destLat,
+      destLng,
     );
 
     // Estimate duration: average speed 25 km/h in urban areas
     final duration = (distance / 25) * 60;
 
-    return {
-      'distance': distance,
-      'duration': duration,
-    };
+    return {'distance': distance, 'duration': duration};
   }
 
   /// Tính khoảng cách Haversine (đường chim bay)
   double _calculateHaversineDistance(
-    double lat1, double lon1,
-    double lat2, double lon2,
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
   ) {
     const R = 6371.0; // Radius of Earth in km
     final dLat = _toRadians(lat2 - lat1);
     final dLon = _toRadians(lon2 - lon1);
 
-    final a = sin(dLat / 2) * sin(dLat / 2) +
-        cos(_toRadians(lat1)) * cos(_toRadians(lat2)) *
-        sin(dLon / 2) * sin(dLon / 2);
+    final a =
+        sin(dLat / 2) * sin(dLat / 2) +
+        cos(_toRadians(lat1)) *
+            cos(_toRadians(lat2)) *
+            sin(dLon / 2) *
+            sin(dLon / 2);
 
     final c = 2 * atan2(sqrt(a), sqrt(1 - a));
     return R * c;

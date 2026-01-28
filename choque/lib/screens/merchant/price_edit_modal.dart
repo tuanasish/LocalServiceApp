@@ -4,13 +4,7 @@ import '../../ui/design_system.dart';
 
 /// Price Edit Modal & States
 /// Modal chỉnh sửa giá với các states: normal, editing, saving, success, error.
-enum PriceEditState {
-  normal,
-  editing,
-  saving,
-  success,
-  error,
-}
+enum PriceEditState { normal, editing, saving, success, error }
 
 class PriceEditModal extends StatefulWidget {
   final String itemName;
@@ -147,10 +141,7 @@ class _PriceEditModalState extends State<PriceEditModal> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
         border: Border(
-          bottom: BorderSide(
-            color: AppColors.borderSoft,
-            width: 1,
-          ),
+          bottom: BorderSide(color: AppColors.borderSoft, width: 1),
         ),
       ),
       child: Row(
@@ -179,10 +170,7 @@ class _PriceEditModalState extends State<PriceEditModal> {
             ),
           ),
           IconButton(
-            icon: const Icon(
-              Icons.close,
-              color: AppColors.textSecondary,
-            ),
+            icon: const Icon(Icons.close, color: AppColors.textSecondary),
             onPressed: () => Navigator.of(context).pop(),
           ),
         ],
@@ -238,10 +226,7 @@ class _PriceEditModalState extends State<PriceEditModal> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Giá mới (VNĐ)',
-          style: AppTextStyles.label14,
-        ),
+        Text('Giá mới (VNĐ)', style: AppTextStyles.label14),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
@@ -319,20 +304,12 @@ class _PriceEditModalState extends State<PriceEditModal> {
       case PriceEditState.success:
         return const Padding(
           padding: EdgeInsets.all(12),
-          child: Icon(
-            Icons.check_circle,
-            color: AppColors.success,
-            size: 20,
-          ),
+          child: Icon(Icons.check_circle, color: AppColors.success, size: 20),
         );
       case PriceEditState.error:
         return const Padding(
           padding: EdgeInsets.all(12),
-          child: Icon(
-            Icons.error_outline,
-            color: AppColors.danger,
-            size: 20,
-          ),
+          child: Icon(Icons.error_outline, color: AppColors.danger, size: 20),
         );
       default:
         return null;
@@ -347,25 +324,16 @@ class _PriceEditModalState extends State<PriceEditModal> {
       decoration: BoxDecoration(
         color: AppColors.danger.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppRadius.medium),
-        border: Border.all(
-          color: AppColors.danger.withValues(alpha: 0.3),
-        ),
+        border: Border.all(color: AppColors.danger.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.error_outline,
-            size: 16,
-            color: AppColors.danger,
-          ),
+          const Icon(Icons.error_outline, size: 16, color: AppColors.danger),
           const SizedBox(width: 8),
           Expanded(
             child: Text(
               _errorMessage!,
-              style: GoogleFonts.inter(
-                fontSize: 12,
-                color: AppColors.danger,
-              ),
+              style: GoogleFonts.inter(fontSize: 12, color: AppColors.danger),
             ),
           ),
         ],
@@ -400,16 +368,13 @@ class _PriceEditModalState extends State<PriceEditModal> {
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                     ),
                   )
-                : const Icon(
-                    Icons.save_outlined,
-                    color: Colors.white,
-                  ),
+                : const Icon(Icons.save_outlined, color: Colors.white),
             label: Text(
               isSaving
                   ? 'Đang lưu...'
                   : isSuccess
-                      ? 'Đã lưu thành công'
-                      : 'Lưu thay đổi',
+                  ? 'Đã lưu thành công'
+                  : 'Lưu thay đổi',
               style: GoogleFonts.inter(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,

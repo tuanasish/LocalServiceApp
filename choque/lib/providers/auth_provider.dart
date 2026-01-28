@@ -26,29 +26,29 @@ final userProfileProvider = FutureProvider<UserProfile?>((ref) async {
   if (user == null) return null;
 
   final supabase = ref.watch(supabaseProvider);
-  
+
   try {
     final response = await supabase
         .from('profiles')
         .select()
         .eq('user_id', user.id)
         .single();
-    
+
     return UserProfile.fromJson(response);
   } catch (e) {
     // Log error để debug
     debugPrint('Error fetching profile: $e');
-    
+
     // Nếu là lỗi network, throw để provider hiển thị error state
     // Nếu là lỗi "not found", return null (user chưa có profile)
-    if (e.toString().contains('Failed host lookup') || 
+    if (e.toString().contains('Failed host lookup') ||
         e.toString().contains('SocketException') ||
         e.toString().contains('Network') ||
         e.toString().contains('timeout')) {
       // Network error - rethrow để provider hiển thị error
       rethrow;
     }
-    
+
     // Profile not found hoặc lỗi khác - return null (user chưa có profile)
     return null;
   }
@@ -58,7 +58,7 @@ final userProfileProvider = FutureProvider<UserProfile?>((ref) async {
 class ActiveRoleNotifier extends Notifier<UserRole> {
   @override
   UserRole build() => UserRole.customer;
-  
+
   void setRole(UserRole role) {
     state = role;
   }
@@ -129,9 +129,7 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
       final response = await _supabase.auth.signUp(
         email: email,
         password: password,
-        data: {
-          'full_name': fullName,
-        },
+        data: {'full_name': fullName},
       );
 
       state = const AsyncValue.data(null);
@@ -170,12 +168,12 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
         token: token,
         type: type,
       );
-      
+
       // Refresh profile data if verification successful
       if (response.user != null) {
         ref.invalidate(userProfileProvider);
       }
-      
+
       state = const AsyncValue.data(null);
       return response;
     } catch (e, st) {
@@ -224,10 +222,7 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
   }
 
   /// Update user profile
-  Future<void> updateProfile({
-    String? fullName,
-    String? avatarUrl,
-  }) async {
+  Future<void> updateProfile({String? fullName, String? avatarUrl}) async {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return;
 
@@ -240,7 +235,7 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
       if (avatarUrl != null) updates['avatar_url'] = avatarUrl;
 
       await _supabase.from('profiles').update(updates).eq('user_id', user.id);
-      
+
       // Invalidate profile provider to refresh data
       ref.invalidate(userProfileProvider);
       state = const AsyncValue.data(null);
@@ -257,10 +252,13 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
 
     final bytes = await image.readAsBytes();
     final fileExt = image.path.split('.').last;
-    final fileName = '${user.id}_${DateTime.now().millisecondsSinceEpoch}.$fileExt';
+    final fileName =
+        '${user.id}_${DateTime.now().millisecondsSinceEpoch}.$fileExt';
     final filePath = fileName;
 
-    await _supabase.storage.from('avatars').uploadBinary(
+    await _supabase.storage
+        .from('avatars')
+        .uploadBinary(
           filePath,
           bytes,
           fileOptions: FileOptions(contentType: 'image/$fileExt'),
@@ -302,7 +300,8 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
     try {
       await _supabase.auth.signInWithOtp(
         email: email,
-        shouldCreateUser: false, // Don't create new user, only for existing users
+        shouldCreateUser:
+            false, // Don't create new user, only for existing users
       );
       state = const AsyncValue.data(null);
     } catch (e, st) {
@@ -335,9 +334,7 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
   Future<void> updatePassword({required String newPassword}) async {
     state = const AsyncValue.loading();
     try {
-      await _supabase.auth.updateUser(
-        UserAttributes(password: newPassword),
-      );
+      await _supabase.auth.updateUser(UserAttributes(password: newPassword));
       state = const AsyncValue.data(null);
     } catch (e, st) {
       state = AsyncValue.error(e, st);
@@ -368,10 +365,13 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return;
 
-    await _supabase.from('profiles').update({
-      'fcm_token': token,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('user_id', user.id);
+    await _supabase
+        .from('profiles')
+        .update({
+          'fcm_token': token,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('user_id', user.id);
   }
 
   /// Update driver status
@@ -379,19 +379,24 @@ class AuthNotifier extends Notifier<AsyncValue<void>> {
     final user = ref.read(currentUserProvider).value;
     if (user == null) return;
 
-    await _supabase.from('profiles').update({
-      'driver_status': status,
-      'updated_at': DateTime.now().toIso8601String(),
-    }).eq('user_id', user.id);
+    await _supabase
+        .from('profiles')
+        .update({
+          'driver_status': status,
+          'updated_at': DateTime.now().toIso8601String(),
+        })
+        .eq('user_id', user.id);
 
     ref.invalidate(userProfileProvider);
   }
 }
 
 /// Auth notifier provider
-final authNotifierProvider = NotifierProvider<AuthNotifier, AsyncValue<void>>(() {
-  return AuthNotifier();
-});
+final authNotifierProvider = NotifierProvider<AuthNotifier, AsyncValue<void>>(
+  () {
+    return AuthNotifier();
+  },
+);
 
 /// Helper provider: Check if user is authenticated
 final isAuthenticatedProvider = Provider<bool>((ref) {
@@ -401,11 +406,12 @@ final isAuthenticatedProvider = Provider<bool>((ref) {
 
 /// Helper provider: Get user's available roles
 final availableRolesProvider = Provider<List<UserRole>>((ref) {
-  final profile = ref.watch(userProfileProvider);
-  return profile.when(
-    data: (p) => p?.roles.map((r) => UserRole.fromString(r)).toList() ?? [UserRole.customer],
-    loading: () => [UserRole.customer],
-    error: (e, st) => [UserRole.customer],
+  final profileAsync = ref.watch(userProfileProvider);
+  return profileAsync.maybeWhen(
+    data: (p) =>
+        p?.roles.map((r) => UserRole.fromString(r)).toList() ??
+        [UserRole.customer],
+    orElse: () => [], // Return empty list while loading/error to avoid false "customer" role
   );
 });
 

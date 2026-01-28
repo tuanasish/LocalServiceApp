@@ -3,7 +3,7 @@ import '../models/product_model.dart';
 import '../../config/constants.dart';
 
 /// Product Repository
-/// 
+///
 /// Xử lý các thao tác liên quan đến sản phẩm/menu.
 class ProductRepository {
   final SupabaseClient _client;
@@ -24,7 +24,9 @@ class ProductRepository {
         .order('name')
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => ProductModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => ProductModel.fromJson(json))
+        .toList();
   }
 
   /// Lấy sản phẩm theo danh mục
@@ -37,7 +39,9 @@ class ProductRepository {
         .order('name')
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => ProductModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => ProductModel.fromJson(json))
+        .toList();
   }
 
   /// Lấy chi tiết sản phẩm
@@ -61,11 +65,15 @@ class ProductRepository {
         .from('products')
         .select()
         .eq('status', 'active')
-        .or('name.ilike.%$trimmedQuery%,description.ilike.%$trimmedQuery%,category.ilike.%$trimmedQuery%')
+        .or(
+          'name.ilike.%$trimmedQuery%,description.ilike.%$trimmedQuery%,category.ilike.%$trimmedQuery%',
+        )
         .limit(50)
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => ProductModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => ProductModel.fromJson(json))
+        .toList();
   }
 
   /// Lấy danh sách danh mục
@@ -83,7 +91,7 @@ class ProductRepository {
         .cast<String>()
         .toSet()
         .toList();
-    
+
     categories.sort();
     return categories;
   }

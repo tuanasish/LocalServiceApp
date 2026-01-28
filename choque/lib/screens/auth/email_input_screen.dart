@@ -29,9 +29,9 @@ class _EmailInputScreenState extends ConsumerState<EmailInputScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(authNotifierProvider.notifier).signInWithOtp(
-            email: _emailController.text.trim(),
-          );
+      await ref
+          .read(authNotifierProvider.notifier)
+          .signInWithOtp(email: _emailController.text.trim());
 
       if (mounted) {
         context.push('/register/verify', extra: _emailController.text.trim());
@@ -105,10 +105,7 @@ class _EmailInputScreenState extends ConsumerState<EmailInputScreen> {
                 const SizedBox(height: 8),
                 Text(
                   'Nhập email để nhận mã xác thực',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 48),
@@ -158,8 +155,9 @@ class _EmailInputScreenState extends ConsumerState<EmailInputScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text(

@@ -187,11 +187,7 @@ class AdminMerchantListScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            size: 20,
-            color: AppColors.textSecondary,
-          ),
+          const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -224,21 +220,21 @@ class AdminMerchantListScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Expanded(
-            child: _buildFilterTab('Tất cả', isActive: true),
-          ),
+          Expanded(child: _buildFilterTab('Tất cả', isActive: true)),
           Expanded(
             child: _buildFilterTab('Chờ duyệt', isActive: false, badge: '3'),
           ),
-          Expanded(
-            child: _buildFilterTab('Hoạt động', isActive: false),
-          ),
+          Expanded(child: _buildFilterTab('Hoạt động', isActive: false)),
         ],
       ),
     );
   }
 
-  Widget _buildFilterTab(String label, {required bool isActive, String? badge}) {
+  Widget _buildFilterTab(
+    String label, {
+    required bool isActive,
+    String? badge,
+  }) {
     return GestureDetector(
       onTap: () {},
       child: Container(
@@ -383,7 +379,9 @@ class AdminMerchantListScreen extends StatelessWidget {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: statusColor.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -485,7 +483,9 @@ class AdminMerchantListScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),

@@ -8,6 +8,7 @@ class AppColors {
 
   static const primary = Color(0xFF1E7F43);
   static const backgroundLight = Color(0xFFF8FAFC);
+  static const background = backgroundLight;
   static const surface = Colors.white;
 
   static const textPrimary = Color(0xFF0F172A);
@@ -15,9 +16,21 @@ class AppColors {
   static const textMuted = Color(0xFF94A3B8);
 
   static const borderSoft = Color(0xFFE2E8F0);
+  static const border = borderSoft;
 
   static const success = Color(0xFF16A34A);
+  static const warning = Color(0xFFF59E0B);
   static const danger = Color(0xFFDC2626);
+  static const error = danger;
+  
+  // Accent colors
+  static const accentYellow = Color(0xFFF2C94C);
+  
+  // Driver specific colors
+  static const driverBackgroundLight = Color(0xFFF6F8F7);
+  static const driverBackgroundDark = Color(0xFF131F18);
+  static const driverSurfaceDark = Color(0xFF1A2621);
+  static const driverTextSecondary = Color(0xFF678379);
 }
 
 class AppRadius {
@@ -33,76 +46,62 @@ class AppShadows {
   AppShadows._();
 
   static List<BoxShadow> soft([double opacity = 0.05]) => [
-        BoxShadow(
-          color: Colors.black.withValues(alpha: opacity),
-          blurRadius: 16,
-          offset: const Offset(0, 4),
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black.withValues(alpha: opacity),
+      blurRadius: 16,
+      offset: const Offset(0, 4),
+    ),
+  ];
 }
 
 class AppTextStyles {
   AppTextStyles._();
 
   static TextStyle get heading20 => GoogleFonts.inter(
-        fontSize: 20,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.5,
-      );
+    fontSize: 20,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    letterSpacing: -0.5,
+  );
 
   static TextStyle get heading18 => GoogleFonts.inter(
-        fontSize: 18,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-        letterSpacing: -0.5,
-      );
+    fontSize: 18,
+    fontWeight: FontWeight.w700,
+    color: AppColors.textPrimary,
+    letterSpacing: -0.5,
+  );
 
   static TextStyle get label14 => GoogleFonts.inter(
-        fontSize: 14,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      );
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
 
-  static TextStyle get body13Secondary => GoogleFonts.inter(
-        fontSize: 13,
-        color: AppColors.textSecondary,
-      );
+  static TextStyle get body13Secondary =>
+      GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary);
 
-  static TextStyle get body15Secondary => GoogleFonts.inter(
-        fontSize: 15,
-        color: AppColors.textSecondary,
-      );
+  static TextStyle get body15Secondary =>
+      GoogleFonts.inter(fontSize: 15, color: AppColors.textSecondary);
 
-  static TextStyle get body13 => GoogleFonts.inter(
-        fontSize: 13,
-        color: AppColors.textPrimary,
-      );
+  static TextStyle get body13 =>
+      GoogleFonts.inter(fontSize: 13, color: AppColors.textPrimary);
 
-  static TextStyle get body12 => GoogleFonts.inter(
-        fontSize: 12,
-        color: AppColors.textSecondary,
-      );
+  static TextStyle get body12 =>
+      GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary);
 
-  static TextStyle get body11 => GoogleFonts.inter(
-        fontSize: 11,
-        color: AppColors.textSecondary,
-      );
+  static TextStyle get body11 =>
+      GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary);
 
   static TextStyle get label16 => GoogleFonts.inter(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      );
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: AppColors.textPrimary,
+  );
 }
 
 /// Header đơn giản với nút back + title, dùng lại cho nhiều màn.
 class AppSimpleHeader extends StatelessWidget {
-  const AppSimpleHeader({
-    super.key,
-    required this.title,
-    this.actions,
-  });
+  const AppSimpleHeader({super.key, required this.title, this.actions});
 
   final String title;
   final List<Widget>? actions;
@@ -158,4 +157,3 @@ class AppSimpleHeader extends StatelessWidget {
     );
   }
 }
-

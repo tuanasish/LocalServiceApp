@@ -47,7 +47,7 @@ class ShopMenuItem {
 }
 
 /// Merchant Repository
-/// 
+///
 /// Xử lý các thao tác liên quan đến cửa hàng.
 class MerchantRepository {
   final SupabaseClient _client;
@@ -68,7 +68,9 @@ class MerchantRepository {
         .order('name')
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => MerchantModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => MerchantModel.fromJson(json))
+        .toList();
   }
 
   /// Tìm kiếm cửa hàng theo tên
@@ -89,7 +91,9 @@ class MerchantRepository {
         .limit(limit)
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => MerchantModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => MerchantModel.fromJson(json))
+        .toList();
   }
 
   /// Lấy chi tiết cửa hàng
@@ -116,7 +120,9 @@ class MerchantRepository {
         .order('name')
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => ShopMenuItem.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => ShopMenuItem.fromJson(json))
+        .toList();
   }
 
   /// Cập nhật giá và availability cho sản phẩm (Merchant)
@@ -126,23 +132,25 @@ class MerchantRepository {
     int? priceOverride,
     bool isAvailable = true,
   }) async {
-    await _client.rpc(
-      'set_menu_override',
-      params: {
-        'p_shop_id': shopId,
-        'p_product_id': productId,
-        'p_price_override': priceOverride,
-        'p_is_available': isAvailable,
-      },
-    ).timeout(AppConstants.apiTimeout);
+    await _client
+        .rpc(
+          'set_menu_override',
+          params: {
+            'p_shop_id': shopId,
+            'p_product_id': productId,
+            'p_price_override': priceOverride,
+            'p_is_available': isAvailable,
+          },
+        )
+        .timeout(AppConstants.apiTimeout);
   }
 
   /// Lấy shop của merchant hiện tại
   Future<MerchantModel> getMyShop() async {
-    final response = await _client.rpc(
-      'get_my_shop',
-    ).timeout(AppConstants.apiTimeout);
-    
+    final response = await _client
+        .rpc('get_my_shop')
+        .timeout(AppConstants.apiTimeout);
+
     return MerchantModel.fromJson(response as Map<String, dynamic>);
   }
 
@@ -152,15 +160,13 @@ class MerchantRepository {
     String? status,
     int limit = 50,
   }) async {
-    final response = await _client.rpc(
-      'get_shop_orders',
-      params: {
-        'p_shop_id': shopId,
-        'p_status': status,
-        'p_limit': limit,
-      },
-    ).timeout(AppConstants.apiTimeout);
-    
+    final response = await _client
+        .rpc(
+          'get_shop_orders',
+          params: {'p_shop_id': shopId, 'p_status': status, 'p_limit': limit},
+        )
+        .timeout(AppConstants.apiTimeout);
+
     return (response as List)
         .map((json) => OrderModel.fromJson(json as Map<String, dynamic>))
         .toList();
@@ -172,15 +178,17 @@ class MerchantRepository {
     DateTime? dateFrom,
     DateTime? dateTo,
   }) async {
-    final response = await _client.rpc(
-      'get_shop_stats',
-      params: {
-        'p_shop_id': shopId,
-        'p_date_from': dateFrom?.toIso8601String(),
-        'p_date_to': dateTo?.toIso8601String(),
-      },
-    ).timeout(AppConstants.apiTimeout);
-    
+    final response = await _client
+        .rpc(
+          'get_shop_stats',
+          params: {
+            'p_shop_id': shopId,
+            'p_date_from': dateFrom?.toIso8601String(),
+            'p_date_to': dateTo?.toIso8601String(),
+          },
+        )
+        .timeout(AppConstants.apiTimeout);
+
     return response as Map<String, dynamic>;
   }
 
@@ -193,9 +201,9 @@ class MerchantRepository {
         .eq('is_available', true)
         .not('category', 'is', null)
         .timeout(AppConstants.apiTimeout);
-    
+
     if (response.isEmpty) return null;
-    
+
     // Đếm số lượng mỗi category
     final categoryCount = <String, int>{};
     for (final item in response) {
@@ -204,7 +212,7 @@ class MerchantRepository {
         categoryCount[cat] = (categoryCount[cat] ?? 0) + 1;
       }
     }
-    
+
     // Trả về category có nhiều nhất
     if (categoryCount.isEmpty) return null;
     return categoryCount.entries
@@ -222,44 +230,41 @@ class MerchantRepository {
         .not('image_path', 'is', null)
         .limit(1)
         .timeout(AppConstants.apiTimeout);
-    
+
     if (response.isEmpty) return null;
     final imagePath = response.first['image_path'] as String?;
     if (imagePath == null) return null;
-    
+
     // Tạo URL từ Supabase Storage (tương tự ProductModel.imageUrl)
     return 'https://ipdwpzgbznphkmdewjdl.supabase.co/storage/v1/object/public/products/$imagePath';
   }
 
   /// Xác nhận đơn hàng (Merchant)
   Future<OrderModel> confirmOrder(String orderId) async {
-    final response = await _client.rpc(
-      'confirm_order_by_merchant',
-      params: {'p_order_id': orderId},
-    ).timeout(AppConstants.apiTimeout);
+    final response = await _client
+        .rpc('confirm_order_by_merchant', params: {'p_order_id': orderId})
+        .timeout(AppConstants.apiTimeout);
 
     return OrderModel.fromJson(response as Map<String, dynamic>);
   }
 
   /// Từ chối đơn hàng (Merchant)
   Future<OrderModel> rejectOrder(String orderId, String reason) async {
-    final response = await _client.rpc(
-      'reject_order_by_merchant',
-      params: {
-        'p_order_id': orderId,
-        'p_reason': reason,
-      },
-    ).timeout(AppConstants.apiTimeout);
+    final response = await _client
+        .rpc(
+          'reject_order_by_merchant',
+          params: {'p_order_id': orderId, 'p_reason': reason},
+        )
+        .timeout(AppConstants.apiTimeout);
 
     return OrderModel.fromJson(response as Map<String, dynamic>);
   }
 
   /// Đánh dấu đơn hàng sẵn sàng để lấy (Merchant)
   Future<OrderModel> markOrderReady(String orderId) async {
-    final response = await _client.rpc(
-      'mark_order_ready',
-      params: {'p_order_id': orderId},
-    ).timeout(AppConstants.apiTimeout);
+    final response = await _client
+        .rpc('mark_order_ready', params: {'p_order_id': orderId})
+        .timeout(AppConstants.apiTimeout);
 
     return OrderModel.fromJson(response as Map<String, dynamic>);
   }
@@ -272,16 +277,18 @@ class MerchantRepository {
     required String address,
     required String openingHours,
   }) async {
-    final response = await _client.rpc(
-      'update_shop_profile',
-      params: {
-        'p_shop_id': shopId,
-        'p_name': name,
-        'p_phone': phone,
-        'p_address': address,
-        'p_opening_hours': openingHours,
-      },
-    ).timeout(AppConstants.apiTimeout);
+    final response = await _client
+        .rpc(
+          'update_shop_profile',
+          params: {
+            'p_shop_id': shopId,
+            'p_name': name,
+            'p_phone': phone,
+            'p_address': address,
+            'p_opening_hours': openingHours,
+          },
+        )
+        .timeout(AppConstants.apiTimeout);
 
     return MerchantModel.fromJson(response as Map<String, dynamic>);
   }
@@ -299,7 +306,9 @@ class MerchantRepository {
         .limit(limit)
         .timeout(AppConstants.apiTimeout);
 
-    return (response as List).map((json) => ProductModel.fromJson(json)).toList();
+    return (response as List)
+        .map((json) => ProductModel.fromJson(json))
+        .toList();
   }
 
   /// Thêm sản phẩm vào shop menu
@@ -307,13 +316,12 @@ class MerchantRepository {
     required String shopId,
     required String productId,
   }) async {
-    await _client.rpc(
-      'add_product_to_shop',
-      params: {
-        'p_shop_id': shopId,
-        'p_product_id': productId,
-      },
-    ).timeout(AppConstants.apiTimeout);
+    await _client
+        .rpc(
+          'add_product_to_shop',
+          params: {'p_shop_id': shopId, 'p_product_id': productId},
+        )
+        .timeout(AppConstants.apiTimeout);
   }
 
   /// Xóa sản phẩm khỏi shop menu
@@ -321,12 +329,29 @@ class MerchantRepository {
     required String shopId,
     required String productId,
   }) async {
-    await _client.rpc(
-      'remove_product_from_shop',
-      params: {
-        'p_shop_id': shopId,
-        'p_product_id': productId,
-      },
-    ).timeout(AppConstants.apiTimeout);
+    await _client
+        .rpc(
+          'remove_product_from_shop',
+          params: {'p_shop_id': shopId, 'p_product_id': productId},
+        )
+        .timeout(AppConstants.apiTimeout);
+  }
+
+  /// Toggle shop status (active/inactive) - Merchant mở/đóng cửa hàng
+  Future<MerchantModel> toggleShopStatus({
+    required String shopId,
+    required String status, // 'active' hoặc 'inactive'
+  }) async {
+    final response = await _client
+        .rpc(
+          'toggle_shop_status',
+          params: {
+            'p_shop_id': shopId,
+            'p_status': status,
+          },
+        )
+        .timeout(AppConstants.apiTimeout);
+
+    return MerchantModel.fromJson(response as Map<String, dynamic>);
   }
 }

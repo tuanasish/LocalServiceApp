@@ -1,5 +1,5 @@
 /// Merchant Model (Shop)
-/// 
+///
 /// Ánh xạ bảng `shops` trong Supabase.
 class MerchantModel {
   final String id;
@@ -40,7 +40,9 @@ class MerchantModel {
       address: json['address'] as String?,
       phone: json['phone'] as String?,
       ownerUserId: json['owner_user_id'] as String?,
-      rating: json['rating'] != null ? (json['rating'] as num).toDouble() : null,
+      rating: json['rating'] != null
+          ? (json['rating'] as num).toDouble()
+          : null,
       openingHours: json['opening_hours'] as String?,
       lat: json['lat'] != null ? (json['lat'] as num).toDouble() : null,
       lng: json['lng'] != null ? (json['lng'] as num).toDouble() : null,

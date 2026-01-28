@@ -49,7 +49,9 @@ class UserProfile {
       fcmToken: json['fcm_token'] as String?,
       isGuest: json['is_guest'] as bool? ?? false,
       status: json['status'] as String? ?? 'active',
-      birthDate: json['birth_date'] != null ? DateTime.parse(json['birth_date'] as String) : null,
+      birthDate: json['birth_date'] != null
+          ? DateTime.parse(json['birth_date'] as String)
+          : null,
       gender: json['gender'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),

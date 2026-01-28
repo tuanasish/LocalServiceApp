@@ -13,7 +13,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -24,7 +25,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     // Map filter index to notification type
     final filterType = _getFilterType(_selectedFilter);
     // Dùng stream provider để tự động cập nhật real-time
-    final notificationsAsync = ref.watch(notificationsStreamFilteredProvider(filterType));
+    final notificationsAsync = ref.watch(
+      notificationsStreamFilteredProvider(filterType),
+    );
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
@@ -42,14 +45,21 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                   return RefreshIndicator(
                     // Refresh stream provider
                     onRefresh: () async {
-                      ref.invalidate(notificationsStreamFilteredProvider(filterType));
+                      ref.invalidate(
+                        notificationsStreamFilteredProvider(filterType),
+                      );
                     },
                     child: ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
                       itemCount: notifications.length,
                       itemBuilder: (context, index) {
                         return Padding(
-                          padding: EdgeInsets.only(bottom: index < notifications.length - 1 ? 12 : 100),
+                          padding: EdgeInsets.only(
+                            bottom: index < notifications.length - 1 ? 12 : 100,
+                          ),
                           child: _buildNotificationItem(notifications[index]),
                         );
                       },
@@ -108,13 +118,17 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           Consumer(
             builder: (context, ref, child) {
               // Dùng stream provider để tự động cập nhật
-              final unreadCountAsync = ref.watch(unreadNotificationsCountStreamProvider);
-              final unreadCount = unreadCountAsync.asData?.value ?? 
-                                 ref.watch(unreadNotificationsCountProvider).asData?.value ?? 0;
+              final unreadCountAsync = ref.watch(
+                unreadNotificationsCountStreamProvider,
+              );
+              final unreadCount =
+                  unreadCountAsync.asData?.value ??
+                  ref.watch(unreadNotificationsCountProvider).asData?.value ??
+                  0;
               final hasUnread = unreadCount > 0;
-              
+
               if (!hasUnread) return const SizedBox.shrink();
-              
+
               return TextButton(
                 onPressed: () => _handleMarkAllAsRead(ref),
                 child: Text(
@@ -146,11 +160,16 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             final label = entry.value;
             final isActive = index == _selectedFilter;
             return Padding(
-              padding: EdgeInsets.only(right: index < filters.length - 1 ? 8 : 0),
+              padding: EdgeInsets.only(
+                right: index < filters.length - 1 ? 8 : 0,
+              ),
               child: GestureDetector(
                 onTap: () => setState(() => _selectedFilter = index),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: isActive ? AppColors.primary : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
@@ -189,10 +208,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           borderRadius: BorderRadius.circular(AppRadius.large),
           boxShadow: AppShadows.soft(0.04),
           border: !notification.isRead
-              ? Border.all(
-                  color: AppColors.primary.withAlpha(51),
-                  width: 1,
-                )
+              ? Border.all(color: AppColors.primary.withAlpha(51), width: 1)
               : null,
         ),
         child: Row(
@@ -205,11 +221,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 color: color.withAlpha(26),
                 borderRadius: BorderRadius.circular(AppRadius.medium),
               ),
-              child: Icon(
-                iconData,
-                size: 24,
-                color: color,
-              ),
+              child: Icon(iconData, size: 24, color: color),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -264,8 +276,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     );
   }
 
-  IconData _getIconForType(String type) {
-    switch (type.toLowerCase()) {
+  IconData _getIconForType(NotificationType type) {
+    switch (type.toDbString().toLowerCase()) {
       case 'order':
         return Icons.local_shipping_outlined;
       case 'promo':
@@ -277,8 +289,8 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     }
   }
 
-  Color _getColorForType(String type) {
-    switch (type.toLowerCase()) {
+  Color _getColorForType(NotificationType type) {
+    switch (type.toDbString().toLowerCase()) {
       case 'order':
         return AppColors.primary;
       case 'promo':
@@ -313,24 +325,26 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       try {
         final repo = ref.read(notificationRepositoryProvider);
         await repo.markAsRead(notification.id);
-        
+
         // Invalidate providers để refresh
-        ref.invalidate(notificationsStreamFilteredProvider(_getFilterType(_selectedFilter)));
+        ref.invalidate(
+          notificationsStreamFilteredProvider(_getFilterType(_selectedFilter)),
+        );
         ref.invalidate(unreadNotificationsCountProvider);
         ref.invalidate(unreadNotificationsCountStreamProvider);
       } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e')),
-          );
-        }
+        if (!mounted) return;
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
       }
     }
 
     // Navigate dựa trên type và data
-    if (notification.type == 'order' && notification.data != null) {
-      final orderId = notification.data!['order_id'] as String?;
+    if (notification.type.toDbString().toLowerCase().contains('order')) {
+      final orderId = notification.data['order_id'] as String?;
       if (orderId != null) {
+        if (!mounted) return;
         context.push('/orders/$orderId');
       }
     }
@@ -340,12 +354,14 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
     try {
       final repo = ref.read(notificationRepositoryProvider);
       await repo.markAllAsRead();
-      
+
       // Invalidate providers để refresh
-      ref.invalidate(notificationsStreamFilteredProvider(_getFilterType(_selectedFilter)));
+      ref.invalidate(
+        notificationsStreamFilteredProvider(_getFilterType(_selectedFilter)),
+      );
       ref.invalidate(unreadNotificationsCountProvider);
       ref.invalidate(unreadNotificationsCountStreamProvider);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Đã đánh dấu tất cả là đã đọc')),
@@ -353,9 +369,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
       }
     }
   }
@@ -367,11 +383,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              Icons.notifications_none,
-              size: 64,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.notifications_none, size: 64, color: Colors.grey[400]),
             const SizedBox(height: 16),
             Text(
               'Chưa có thông báo',

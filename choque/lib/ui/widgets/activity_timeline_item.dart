@@ -62,10 +62,7 @@ class ActivityTimelineItem extends StatelessWidget {
           ),
           Text(
             time,
-            style: GoogleFonts.inter(
-              fontSize: 11,
-              color: AppColors.textMuted,
-            ),
+            style: GoogleFonts.inter(fontSize: 11, color: AppColors.textMuted),
           ),
         ],
       ),

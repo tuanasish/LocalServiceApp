@@ -9,15 +9,22 @@ class ProfileEditLogoutStatesScreen extends StatefulWidget {
   const ProfileEditLogoutStatesScreen({super.key});
 
   @override
-  State<ProfileEditLogoutStatesScreen> createState() => _ProfileEditLogoutStatesScreenState();
+  State<ProfileEditLogoutStatesScreen> createState() =>
+      _ProfileEditLogoutStatesScreenState();
 }
 
-class _ProfileEditLogoutStatesScreenState extends State<ProfileEditLogoutStatesScreen> {
-  final TextEditingController _nameController = TextEditingController(text: 'Nguyễn Văn A');
-  final TextEditingController _phoneController = TextEditingController(text: '0901 234 567');
-  final TextEditingController _emailController = TextEditingController(text: 'user@email.com');
+class _ProfileEditLogoutStatesScreenState
+    extends State<ProfileEditLogoutStatesScreen> {
+  final TextEditingController _nameController = TextEditingController(
+    text: 'Nguyễn Văn A',
+  );
+  final TextEditingController _phoneController = TextEditingController(
+    text: '0901 234 567',
+  );
+  final TextEditingController _emailController = TextEditingController(
+    text: 'user@email.com',
+  );
   String _selectedGender = 'Nam';
-
 
   @override
   void dispose() {
@@ -139,9 +146,15 @@ class _ProfileEditLogoutStatesScreenState extends State<ProfileEditLogoutStatesS
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.1)),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                  ),
                 ),
-                child: const Icon(Icons.person, color: AppColors.primary, size: 50),
+                child: const Icon(
+                  Icons.person,
+                  color: AppColors.primary,
+                  size: 50,
+                ),
               ),
               Positioned(
                 bottom: 0,
@@ -154,7 +167,11 @@ class _ProfileEditLogoutStatesScreenState extends State<ProfileEditLogoutStatesS
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.surface, width: 2),
                   ),
-                  child: const Icon(Icons.camera_alt, color: Colors.white, size: 16),
+                  child: const Icon(
+                    Icons.camera_alt,
+                    color: Colors.white,
+                    size: 16,
+                  ),
                 ),
               ),
             ],
@@ -255,14 +272,14 @@ class _ProfileEditLogoutStatesScreenState extends State<ProfileEditLogoutStatesS
               borderRadius: BorderRadius.circular(AppRadius.medium),
               borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             filled: true,
             fillColor: AppColors.backgroundLight,
           ),
-          style: GoogleFonts.inter(
-            fontSize: 14,
-            color: AppColors.textPrimary,
-          ),
+          style: GoogleFonts.inter(fontSize: 14, color: AppColors.textPrimary),
         ),
       ],
     );
@@ -292,7 +309,10 @@ class _ProfileEditLogoutStatesScreenState extends State<ProfileEditLogoutStatesS
             value: _selectedGender,
             isExpanded: true,
             underline: const SizedBox(),
-            icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.textSecondary),
+            icon: const Icon(
+              Icons.keyboard_arrow_down,
+              color: AppColors.textSecondary,
+            ),
             items: ['Nam', 'Nữ', 'Khác'].map((String value) {
               return DropdownMenuItem<String>(
                 value: value,

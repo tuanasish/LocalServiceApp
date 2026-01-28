@@ -1,5 +1,5 @@
 /// Profile Model
-/// 
+///
 /// Ánh xạ bảng `profiles` trong Supabase.
 /// Quản lý thông tin người dùng và vai trò (customer, driver, merchant, super_admin).
 class ProfileModel {
@@ -16,6 +16,15 @@ class ProfileModel {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  // Driver approval fields
+  final String? driverApprovalStatus; // pending/approved/rejected
+  final DateTime? driverApprovedAt;
+  final String? driverApprovedBy;
+  final String? driverRejectionReason;
+  final Map<String, dynamic>? driverVehicleInfo;
+  final Map<String, dynamic>? driverLicenseInfo;
+  final List<String>? driverDocuments;
+
   const ProfileModel({
     required this.userId,
     this.phone,
@@ -29,6 +38,14 @@ class ProfileModel {
     required this.status,
     required this.createdAt,
     required this.updatedAt,
+    // Driver approval fields
+    this.driverApprovalStatus,
+    this.driverApprovedAt,
+    this.driverApprovedBy,
+    this.driverRejectionReason,
+    this.driverVehicleInfo,
+    this.driverLicenseInfo,
+    this.driverDocuments,
   });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
@@ -45,6 +62,17 @@ class ProfileModel {
       status: json['status'] as String? ?? 'active',
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
+      // Driver approval fields
+      driverApprovalStatus: json['driver_approval_status'] as String?,
+      driverApprovedAt: json['driver_approved_at'] != null
+          ? DateTime.parse(json['driver_approved_at'] as String)
+          : null,
+      driverApprovedBy: json['driver_approved_by'] as String?,
+      driverRejectionReason: json['driver_rejection_reason'] as String?,
+      driverVehicleInfo: json['driver_vehicle_info'] as Map<String, dynamic>?,
+      driverLicenseInfo: json['driver_license_info'] as Map<String, dynamic>?,
+      driverDocuments: (json['driver_documents'] as List<dynamic>?)
+          ?.cast<String>(),
     );
   }
 
@@ -60,6 +88,14 @@ class ProfileModel {
       'fcm_token': fcmToken,
       'is_guest': isGuest,
       'status': status,
+      // Driver approval fields
+      'driver_approval_status': driverApprovalStatus,
+      'driver_approved_at': driverApprovedAt?.toIso8601String(),
+      'driver_approved_by': driverApprovedBy,
+      'driver_rejection_reason': driverRejectionReason,
+      'driver_vehicle_info': driverVehicleInfo,
+      'driver_license_info': driverLicenseInfo,
+      'driver_documents': driverDocuments,
     };
   }
 
@@ -67,4 +103,12 @@ class ProfileModel {
   bool get isDriver => roles.contains('driver');
   bool get isMerchant => roles.contains('merchant');
   bool get isSuperAdmin => roles.contains('super_admin');
+
+  // Driver approval status helpers
+  bool get isDriverPending => driverApprovalStatus == 'pending';
+  bool get isDriverApproved => driverApprovalStatus == 'approved';
+  bool get isDriverRejected => driverApprovalStatus == 'rejected';
+
+  // Can driver accept orders?
+  bool get canAcceptOrders => isDriver && isDriverApproved;
 }

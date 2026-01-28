@@ -1,5 +1,5 @@
 /// Location Model
-/// 
+///
 /// Ánh xạ cấu trúc JSONB pickup/dropoff trong bảng orders.
 class LocationModel {
   final String label;
@@ -24,11 +24,6 @@ class LocationModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'label': label,
-      'address': address,
-      'lat': lat,
-      'lng': lng,
-    };
+    return {'label': label, 'address': address, 'lat': lat, 'lng': lng};
   }
 }

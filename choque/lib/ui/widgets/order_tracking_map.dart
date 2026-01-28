@@ -7,21 +7,20 @@ import '../../data/models/driver_location_model.dart';
 import '../../providers/app_providers.dart';
 
 /// Order Tracking Map Widget
-/// 
+///
 /// Widget hiển thị map với markers cho pickup, dropoff, driver location
 class OrderTrackingMapWidget extends ConsumerStatefulWidget {
   final OrderModel order;
 
-  const OrderTrackingMapWidget({
-    super.key,
-    required this.order,
-  });
+  const OrderTrackingMapWidget({super.key, required this.order});
 
   @override
-  ConsumerState<OrderTrackingMapWidget> createState() => _OrderTrackingMapWidgetState();
+  ConsumerState<OrderTrackingMapWidget> createState() =>
+      _OrderTrackingMapWidgetState();
 }
 
-class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget> {
+class _OrderTrackingMapWidgetState
+    extends ConsumerState<OrderTrackingMapWidget> {
   VietmapController? _controller;
   bool _markerAdded = false;
 
@@ -31,21 +30,25 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
     // Clear existing symbols if necessary or just add them once
     if (!_markerAdded) {
       // Pickup (Store)
-      await _controller!.addSymbol(SymbolOptions(
-        geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
-        textField: 'Cửa hàng',
-        textColor: Colors.blue,
-        textOffset: const Offset(0, 2),
-      ));
+      await _controller!.addSymbol(
+        SymbolOptions(
+          geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
+          textField: 'Cửa hàng',
+          textColor: Colors.blue,
+          textOffset: const Offset(0, 2),
+        ),
+      );
 
       // Dropoff (Customer)
-      await _controller!.addSymbol(SymbolOptions(
-        geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
-        textField: 'Bạn',
-        textColor: Colors.green,
-        textOffset: const Offset(0, 2),
-      ));
-      
+      await _controller!.addSymbol(
+        SymbolOptions(
+          geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
+          textField: 'Bạn',
+          textColor: Colors.green,
+          textOffset: const Offset(0, 2),
+        ),
+      );
+
       _markerAdded = true;
     }
 
@@ -53,24 +56,30 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
     if (driverLocation != null) {
       // For simplicity, we can remove previous driver symbol and add new one
       // In a real app, you'd track the symbol ID to update it
-      await _controller!.clearSymbols(); 
+      await _controller!.clearSymbols();
       _markerAdded = false; // Re-add static markers next time
-      
-      // Re-add pickup/dropoff (due to clearSymbols)
-       await _controller!.addSymbol(SymbolOptions(
-        geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
-        textField: 'Cửa hàng',
-      ));
-      await _controller!.addSymbol(SymbolOptions(
-        geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
-        textField: 'Bạn',
-      ));
 
-      await _controller!.addSymbol(SymbolOptions(
-        geometry: LatLng(driverLocation.lat, driverLocation.lng),
-        textField: 'Tài xế',
-        textColor: Colors.orange,
-      ));
+      // Re-add pickup/dropoff (due to clearSymbols)
+      await _controller!.addSymbol(
+        SymbolOptions(
+          geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
+          textField: 'Cửa hàng',
+        ),
+      );
+      await _controller!.addSymbol(
+        SymbolOptions(
+          geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
+          textField: 'Bạn',
+        ),
+      );
+
+      await _controller!.addSymbol(
+        SymbolOptions(
+          geometry: LatLng(driverLocation.lat, driverLocation.lng),
+          textField: 'Tài xế',
+          textColor: Colors.orange,
+        ),
+      );
     }
   }
 
@@ -78,7 +87,7 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
   Widget build(BuildContext context) {
     // Watch driver location if assigned
     final driverId = widget.order.driverId;
-    final driverLocationAsync = driverId != null 
+    final driverLocationAsync = driverId != null
         ? ref.watch(specificDriverLocationProvider(driverId))
         : const AsyncValue<DriverLocationModel?>.data(null);
 
@@ -101,8 +110,10 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
               onMapCreated: (controller) {
                 _controller = controller;
                 // Center map between pickup and dropoff
-                final centerLat = (widget.order.pickup.lat + widget.order.dropoff.lat) / 2;
-                final centerLng = (widget.order.pickup.lng + widget.order.dropoff.lng) / 2;
+                final centerLat =
+                    (widget.order.pickup.lat + widget.order.dropoff.lat) / 2;
+                final centerLng =
+                    (widget.order.pickup.lng + widget.order.dropoff.lng) / 2;
                 controller.moveCamera(
                   CameraUpdate.newLatLngZoom(
                     LatLng(centerLat, centerLng),
@@ -111,7 +122,8 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
                 );
                 _updateMarkers(driverLocationAsync.value);
               },
-              styleString: 'https://maps.vietmap.vn/maps/styles/tm/style.json?apikey=${AppConstants.vietmapTilemapKey}',
+              styleString:
+                  'https://maps.vietmap.vn/maps/styles/tm/style.json?apikey=${AppConstants.vietmapTilemapKey}',
               initialCameraPosition: CameraPosition(
                 target: LatLng(
                   widget.order.pickup.lat,
@@ -120,14 +132,17 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
                 zoom: 13.0,
               ),
             ),
-            
+
             // Legend
             Positioned(
               top: 8,
               left: 8,
               right: 8,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.9),
                   borderRadius: BorderRadius.circular(8),
@@ -135,18 +150,30 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    _buildLegendItem(Icons.store_outlined, Colors.blue, 'Cửa hàng'),
+                    _buildLegendItem(
+                      Icons.store_outlined,
+                      Colors.blue,
+                      'Cửa hàng',
+                    ),
                     const SizedBox(width: 16),
-                    _buildLegendItem(Icons.person_outline, Colors.green, 'Khách hàng'),
+                    _buildLegendItem(
+                      Icons.person_outline,
+                      Colors.green,
+                      'Khách hàng',
+                    ),
                     driverLocationAsync.when(
                       data: (location) => location != null
                           ? Padding(
                               padding: const EdgeInsets.only(left: 16),
-                              child: _buildLegendItem(Icons.local_shipping, Colors.orange, 'Tài xế'),
+                              child: _buildLegendItem(
+                                Icons.local_shipping,
+                                Colors.orange,
+                                'Tài xế',
+                              ),
                             )
                           : const SizedBox.shrink(),
                       loading: () => const SizedBox.shrink(),
-                      error: (_, __) => const SizedBox.shrink(),
+                      error: (_, _) => const SizedBox.shrink(),
                     ),
                   ],
                 ),
@@ -164,10 +191,7 @@ class _OrderTrackingMapWidgetState extends ConsumerState<OrderTrackingMapWidget>
       children: [
         Icon(icon, size: 16, color: color),
         const SizedBox(width: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 12),
-        ),
+        Text(label, style: const TextStyle(fontSize: 12)),
       ],
     );
   }

@@ -8,6 +8,7 @@ import '../../ui/widgets/stat_card.dart';
 import '../../ui/widgets/merchant_order_card.dart';
 import '../../providers/app_providers.dart';
 import '../../data/models/order_model.dart';
+import '../../services/notification_sound_service.dart';
 
 /// Merchant Order Dashboard Screen
 /// Dashboard cho chủ cửa hàng: thống kê đơn hàng, danh sách đơn mới/chờ xử lý.
@@ -23,6 +24,10 @@ class _MerchantOrderDashboardScreenState
     extends ConsumerState<MerchantOrderDashboardScreen> {
   String?
   _selectedStatus; // null = Tất cả, 'PENDING_CONFIRMATION' = Mới, 'CONFIRMED' = Đang xử lý
+  
+  // Track pending order count for new order sound
+  int _lastPendingCount = 0;
+  final _soundService = NotificationSoundService();
 
   @override
   Widget build(BuildContext context) {
@@ -148,6 +153,8 @@ class _MerchantOrderDashboardScreenState
                   children: [
                     const SizedBox(height: 16),
                     _buildStatsCards(shopId),
+                    const SizedBox(height: 12),
+                    _buildRevenueCard(shopId),
                     const SizedBox(height: 24),
                     _buildSectionHeader('Thao tác nhanh'),
                     const SizedBox(height: 12),
@@ -211,14 +218,56 @@ class _MerchantOrderDashboardScreenState
                       color: AppColors.textPrimary,
                     ),
                   ),
-                  Text(
-                    shop.status == 'active' ? 'Đang mở cửa' : 'Đã đóng cửa',
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: shop.status == 'active'
-                          ? AppColors.success
-                          : AppColors.textSecondary,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        shop.status == 'active' ? 'Đang mở cửa' : 'Đã đóng cửa',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: shop.status == 'active'
+                              ? AppColors.success
+                              : AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Switch(
+                        value: shop.status == 'active',
+                        onChanged: (isActive) async {
+                          try {
+                            await ref
+                                .read(merchantRepositoryProvider)
+                                .toggleShopStatus(
+                                  shopId: shop.id,
+                                  status: isActive ? 'active' : 'inactive',
+                                );
+                            ref.invalidate(myShopProvider);
+                            ref.invalidate(merchantDetailProvider(shop.id));
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    isActive
+                                        ? 'Đã mở cửa hàng'
+                                        : 'Đã đóng cửa hàng',
+                                  ),
+                                  backgroundColor: AppColors.success,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Lỗi: $e'),
+                                  backgroundColor: AppColors.danger,
+                                ),
+                              );
+                            }
+                          }
+                        },
+                        activeColor: AppColors.primary,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -228,7 +277,7 @@ class _MerchantOrderDashboardScreenState
                 Icons.notifications_outlined,
                 color: AppColors.textPrimary,
               ),
-              onPressed: () {},
+              onPressed: () => context.push('/notifications'),
             ),
           ],
         ),
@@ -236,7 +285,7 @@ class _MerchantOrderDashboardScreenState
           height: 56,
           child: Center(child: CircularProgressIndicator()),
         ),
-        error: (_, __) => const SizedBox(height: 56),
+        error: (_, _) => const SizedBox(height: 56),
       ),
     );
   }
@@ -249,6 +298,12 @@ class _MerchantOrderDashboardScreenState
         final pendingCount = stats['pending_orders'] as int? ?? 0;
         final preparingCount = stats['preparing_orders'] as int? ?? 0;
         final completedCount = stats['completed_orders'] as int? ?? 0;
+
+        // Play sound when new order arrives (pending count increases)
+        if (pendingCount > _lastPendingCount && _lastPendingCount > 0) {
+          _soundService.playNewOrderSound();
+        }
+        _lastPendingCount = pendingCount;
 
         return Row(
           children: [
@@ -291,7 +346,7 @@ class _MerchantOrderDashboardScreenState
           Expanded(child: _buildStatCardSkeleton()),
         ],
       ),
-      error: (_, __) => const SizedBox(),
+      error: (_, _) => const SizedBox(),
     );
   }
 
@@ -333,6 +388,134 @@ class _MerchantOrderDashboardScreenState
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildRevenueCard(String shopId) {
+    final ordersAsync = ref.watch(shopOrdersStreamProvider(shopId));
+
+    return ordersAsync.when(
+      data: (orders) {
+        final now = DateTime.now();
+        final todayStart = DateTime(now.year, now.month, now.day);
+        final monthStart = DateTime(now.year, now.month, 1);
+
+        // Calculate revenue from completed orders
+        int todayRevenue = 0;
+        int monthRevenue = 0;
+
+        for (final order in orders) {
+          if (order.status == OrderStatus.completed) {
+            if (order.createdAt.isAfter(todayStart)) {
+              todayRevenue += order.totalAmount;
+            }
+            if (order.createdAt.isAfter(monthStart)) {
+              monthRevenue += order.totalAmount;
+            }
+          }
+        }
+
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.primary, Color(0xFF2E7D32)],
+            ),
+            borderRadius: BorderRadius.circular(AppRadius.large),
+            boxShadow: AppShadows.soft(0.1),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.account_balance_wallet_outlined,
+                          size: 16,
+                          color: Colors.white70,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Doanh thu hôm nay',
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatPrice(todayRevenue),
+                      style: GoogleFonts.inter(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                width: 1,
+                height: 40,
+                color: Colors.white24,
+              ),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.calendar_month_outlined,
+                            size: 16,
+                            color: Colors.white70,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Tháng này',
+                            style: GoogleFonts.inter(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        _formatPrice(monthRevenue),
+                        style: GoogleFonts.inter(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+      loading: () => Container(
+        height: 80,
+        decoration: BoxDecoration(
+          color: AppColors.borderSoft,
+          borderRadius: BorderRadius.circular(AppRadius.large),
+        ),
+      ),
+      error: (_, _) => const SizedBox(),
     );
   }
 
@@ -590,6 +773,7 @@ class _MerchantOrderDashboardScreenState
           child: MerchantOrderCard(
             orderId: '#${order.orderNumber}',
             customerName: order.customerName ?? 'Khách hàng',
+            customerPhone: order.customerPhone,
             items: itemsText,
             total: _formatPrice(order.totalAmount),
             time: timeText,
@@ -602,9 +786,10 @@ class _MerchantOrderDashboardScreenState
         );
       },
       loading: () => _buildOrderCardSkeleton(),
-      error: (_, __) => MerchantOrderCard(
+      error: (_, _) => MerchantOrderCard(
         orderId: '#${order.orderNumber}',
         customerName: order.customerName ?? 'Khách hàng',
+        customerPhone: order.customerPhone,
         items: 'Đang tải...',
         total: _formatPrice(order.totalAmount),
         time: DateFormat('HH:mm').format(order.createdAt),

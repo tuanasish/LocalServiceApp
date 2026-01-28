@@ -63,11 +63,7 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.store_outlined,
-            size: 20,
-            color: AppColors.primary,
-          ),
+          const Icon(Icons.store_outlined, size: 20, color: AppColors.primary),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
@@ -79,10 +75,7 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
               ),
             ),
           ),
-          const Icon(
-            Icons.arrow_drop_down,
-            color: AppColors.textSecondary,
-          ),
+          const Icon(Icons.arrow_drop_down, color: AppColors.textSecondary),
         ],
       ),
     );
@@ -164,11 +157,7 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
       ),
       child: Row(
         children: [
-          const Icon(
-            Icons.search,
-            size: 20,
-            color: AppColors.textSecondary,
-          ),
+          const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
           const SizedBox(width: 8),
           Expanded(
             child: TextField(
@@ -202,7 +191,9 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
           final category = categories[index];
           final isActive = category == _selectedCategory;
           return Padding(
-            padding: EdgeInsets.only(right: index < categories.length - 1 ? 8 : 0),
+            padding: EdgeInsets.only(
+              right: index < categories.length - 1 ? 8 : 0,
+            ),
             child: GestureDetector(
               onTap: () {
                 setState(() {
@@ -210,7 +201,10 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
                 });
               },
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isActive ? AppColors.primary : AppColors.surface,
                   borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -350,7 +344,9 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -401,7 +397,9 @@ class _AdminMenuManagementScreenState extends State<AdminMenuManagementScreen> {
                         const SizedBox(width: 12),
                         IconButton(
                           icon: Icon(
-                            isActive ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                            isActive
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
                             size: 18,
                             color: AppColors.textSecondary,
                           ),

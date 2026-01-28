@@ -3,7 +3,7 @@ import '../models/search_history_model.dart';
 import '../../config/constants.dart';
 
 /// Search Repository
-/// 
+///
 /// Xử lý các thao tác liên quan đến search history.
 class SearchRepository {
   final SupabaseClient _client;
@@ -22,11 +22,14 @@ class SearchRepository {
   }) async {
     if (query.trim().isEmpty) return;
 
-    await _client.from('search_history').insert({
-      'user_id': userId,
-      'query': query.trim(),
-      'search_type': searchType,
-    }).timeout(AppConstants.apiTimeout);
+    await _client
+        .from('search_history')
+        .insert({
+          'user_id': userId,
+          'query': query.trim(),
+          'search_type': searchType,
+        })
+        .timeout(AppConstants.apiTimeout);
   }
 
   /// Lấy search history của user
@@ -43,7 +46,9 @@ class SearchRepository {
         .timeout(AppConstants.apiTimeout);
 
     return (response as List)
-        .map((json) => SearchHistoryModel.fromJson(json as Map<String, dynamic>))
+        .map(
+          (json) => SearchHistoryModel.fromJson(json as Map<String, dynamic>),
+        )
         .toList();
   }
 

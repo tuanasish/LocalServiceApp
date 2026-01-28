@@ -33,7 +33,9 @@ class DriverOrderCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppRadius.large),
         boxShadow: AppShadows.soft(0.04),
-        border: isActive ? Border.all(color: AppColors.primary, width: 2) : null,
+        border: isActive
+            ? Border.all(color: AppColors.primary, width: 2)
+            : null,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -50,7 +52,10 @@ class DriverOrderCard extends StatelessWidget {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: isActive
                       ? AppColors.primary.withValues(alpha: 0.1)
@@ -62,7 +67,9 @@ class DriverOrderCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: isActive ? AppColors.primary : const Color(0xFF92400E),
+                    color: isActive
+                        ? AppColors.primary
+                        : const Color(0xFF92400E),
                   ),
                 ),
               ),
@@ -71,7 +78,11 @@ class DriverOrderCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Icon(Icons.store_outlined, size: 18, color: AppColors.textSecondary),
+              const Icon(
+                Icons.store_outlined,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -88,12 +99,19 @@ class DriverOrderCard extends StatelessWidget {
           const SizedBox(height: 8),
           Row(
             children: [
-              const Icon(Icons.location_on_outlined, size: 18, color: AppColors.textSecondary),
+              const Icon(
+                Icons.location_on_outlined,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   address,
-                  style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    color: AppColors.textSecondary,
+                  ),
                 ),
               ),
             ],
@@ -106,11 +124,18 @@ class DriverOrderCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  const Icon(Icons.navigation_outlined, size: 16, color: AppColors.textSecondary),
+                  const Icon(
+                    Icons.navigation_outlined,
+                    size: 16,
+                    color: AppColors.textSecondary,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     distance,
-                    style: GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary),
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ),

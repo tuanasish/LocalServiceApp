@@ -12,11 +12,15 @@ class AdminItemEditorScreen extends StatefulWidget {
 }
 
 class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
-  final TextEditingController _nameController = TextEditingController(text: 'Phở Bò Tái');
+  final TextEditingController _nameController = TextEditingController(
+    text: 'Phở Bò Tái',
+  );
   final TextEditingController _descriptionController = TextEditingController(
     text: 'Phở bò tái thơm ngon, nước dùng đậm đà',
   );
-  final TextEditingController _priceController = TextEditingController(text: '85000');
+  final TextEditingController _priceController = TextEditingController(
+    text: '85000',
+  );
   String _selectedCategory = 'Phở';
   bool _isActive = true;
 
@@ -80,10 +84,7 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Preview',
-                style: AppTextStyles.label14,
-              ),
+              Text('Preview', style: AppTextStyles.label14),
             ],
           ),
           const SizedBox(height: 16),
@@ -109,7 +110,9 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _nameController.text.isEmpty ? 'Tên món ăn' : _nameController.text,
+                      _nameController.text.isEmpty
+                          ? 'Tên món ăn'
+                          : _nameController.text,
                       style: GoogleFonts.inter(
                         fontSize: 18,
                         fontWeight: FontWeight.w700,
@@ -142,11 +145,15 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
                         ),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 10, vertical: 4),
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: _isActive
                                 ? AppColors.success.withValues(alpha: 0.1)
-                                : const Color(0xFFF59E0B).withValues(alpha: 0.1),
+                                : const Color(
+                                    0xFFF59E0B,
+                                  ).withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(AppRadius.pill),
                           ),
                           child: Text(
@@ -176,10 +183,7 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Thông tin món ăn',
-          style: AppTextStyles.heading18,
-        ),
+        Text('Thông tin món ăn', style: AppTextStyles.heading18),
         const SizedBox(height: 16),
         _buildTextField(
           controller: _nameController,
@@ -226,10 +230,7 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: AppTextStyles.label14,
-        ),
+        Text(label, style: AppTextStyles.label14),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
@@ -270,10 +271,7 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Danh mục',
-          style: AppTextStyles.label14,
-        ),
+        Text('Danh mục', style: AppTextStyles.label14),
         const SizedBox(height: 8),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -393,10 +391,7 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
               ),
             ),
             onPressed: () {},
-            icon: const Icon(
-              Icons.save_outlined,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.save_outlined, color: Colors.white),
             label: Text(
               'Lưu thay đổi',
               style: GoogleFonts.inter(
@@ -445,10 +440,7 @@ class _AdminItemEditorScreenState extends State<AdminItemEditorScreen> {
                   ),
                 ),
                 onPressed: () {},
-                icon: const Icon(
-                  Icons.delete_outline,
-                  color: AppColors.danger,
-                ),
+                icon: const Icon(Icons.delete_outline, color: AppColors.danger),
                 label: Text(
                   'Xóa',
                   style: GoogleFonts.inter(

@@ -63,11 +63,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(AppRadius.large),
             ),
-            child: const Icon(
-              Icons.store,
-              color: AppColors.primary,
-              size: 40,
-            ),
+            child: const Icon(Icons.store, color: AppColors.primary, size: 40),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -85,11 +81,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
                 const SizedBox(height: 6),
                 Row(
                   children: [
-                    const Icon(
-                      Icons.star,
-                      size: 16,
-                      color: Color(0xFFF59E0B),
-                    ),
+                    const Icon(Icons.star, size: 16, color: Color(0xFFF59E0B)),
                     const SizedBox(width: 4),
                     Text(
                       '4.8',
@@ -139,12 +131,12 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'Trạng thái',
-                style: AppTextStyles.label14,
-              ),
+              Text('Trạng thái', style: AppTextStyles.label14),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -237,10 +229,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Thông tin chủ cửa hàng',
-                style: AppTextStyles.label14,
-              ),
+              Text('Thông tin chủ cửa hàng', style: AppTextStyles.label14),
             ],
           ),
           const SizedBox(height: 12),
@@ -261,10 +250,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
                 color: AppColors.textSecondary,
               ),
               const SizedBox(width: 6),
-              Text(
-                '0901 234 567',
-                style: AppTextStyles.body13Secondary,
-              ),
+              Text('0901 234 567', style: AppTextStyles.body13Secondary),
             ],
           ),
           const SizedBox(height: 6),
@@ -306,10 +292,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
                 color: AppColors.primary,
               ),
               const SizedBox(width: 8),
-              Text(
-                'Thông tin cửa hàng',
-                style: AppTextStyles.label14,
-              ),
+              Text('Thông tin cửa hàng', style: AppTextStyles.label14),
             ],
           ),
           const SizedBox(height: 12),
@@ -361,10 +344,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Thống kê',
-            style: AppTextStyles.heading18,
-          ),
+          Text('Thống kê', style: AppTextStyles.heading18),
           const SizedBox(height: 16),
           Row(
             children: [
@@ -451,10 +431,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
               ),
             ),
             onPressed: () {},
-            icon: const Icon(
-              Icons.check_circle_outline,
-              color: Colors.white,
-            ),
+            icon: const Icon(Icons.check_circle_outline, color: Colors.white),
             label: Text(
               'Duyệt cửa hàng',
               style: GoogleFonts.inter(
@@ -478,10 +455,7 @@ class AdminMerchantDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {},
-                icon: const Icon(
-                  Icons.close,
-                  color: AppColors.danger,
-                ),
+                icon: const Icon(Icons.close, color: AppColors.danger),
                 label: Text(
                   'Từ chối',
                   style: GoogleFonts.inter(

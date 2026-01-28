@@ -28,10 +28,15 @@ class OtpVerificationScreen extends ConsumerStatefulWidget {
 
 class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   static const int _otpLength = 6;
-  
-  final List<TextEditingController> _controllers =
-      List.generate(_otpLength, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(_otpLength, (_) => FocusNode());
+
+  final List<TextEditingController> _controllers = List.generate(
+    _otpLength,
+    (_) => TextEditingController(),
+  );
+  final List<FocusNode> _focusNodes = List.generate(
+    _otpLength,
+    (_) => FocusNode(),
+  );
   bool _isLoading = false;
   int _resendCountdown = 60;
   Timer? _timer;
@@ -89,12 +94,10 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
         default:
           otpType = OtpType.email;
       }
-      
-      final response = await ref.read(authNotifierProvider.notifier).verifyOtp(
-            email: widget.email,
-            token: code,
-            type: otpType,
-          );
+
+      final response = await ref
+          .read(authNotifierProvider.notifier)
+          .verifyOtp(email: widget.email, token: code, type: otpType);
 
       if (mounted && response.user != null) {
         // Handle based on type
@@ -103,16 +106,19 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
           context.go('/reset-password', extra: {'email': widget.email});
           return;
         }
-        
+
         // Signup/email flow - check profile and navigate
         // Essential: wait for provider refresh
         final profile = await ref.refresh(userProfileProvider.future);
-        
+
         if (!mounted) return;
-        
+
         if (profile == null) {
           // New user - go to profile setup
-          context.go('/register/profile', extra: {'full_name': widget.fullName});
+          context.go(
+            '/register/profile',
+            extra: {'full_name': widget.fullName},
+          );
         } else {
           // Existing user - go to home
           context.go('/');
@@ -147,13 +153,13 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
     try {
       // Use appropriate method based on type
       if (widget.type == 'recovery') {
-        await ref.read(authNotifierProvider.notifier).sendRecoveryOtp(
-              email: widget.email,
-            );
+        await ref
+            .read(authNotifierProvider.notifier)
+            .sendRecoveryOtp(email: widget.email);
       } else {
-        await ref.read(authNotifierProvider.notifier).signInWithOtp(
-              email: widget.email,
-            );
+        await ref
+            .read(authNotifierProvider.notifier)
+            .signInWithOtp(email: widget.email);
       }
       _startCountdown();
       if (mounted) {
@@ -192,7 +198,8 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
   }
 
   void _handleBackspace(int index, KeyEvent event) {
-    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.backspace) {
+    if (event is KeyDownEvent &&
+        event.logicalKey == LogicalKeyboardKey.backspace) {
       if (_controllers[index].text.isEmpty && index > 0) {
         _focusNodes[index - 1].requestFocus();
       }
@@ -254,10 +261,7 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
               const SizedBox(height: 6),
               Text(
                 'Mã $_otpLength số đã được gửi đến\n${widget.email}',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[600],
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -345,8 +349,9 @@ class _OtpVerificationScreenState extends ConsumerState<OtpVerificationScreen> {
                         width: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.white),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Colors.white,
+                          ),
                         ),
                       )
                     : const Text(

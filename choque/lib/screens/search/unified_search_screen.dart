@@ -15,21 +15,20 @@ import '../../utils/distance_utils.dart';
 import '../../config/constants.dart';
 
 /// Unified Search Screen
-/// 
+///
 /// Tìm kiếm products và shops cùng lúc với search history và filters.
 class UnifiedSearchScreen extends ConsumerStatefulWidget {
   final String? initialQuery;
 
-  const UnifiedSearchScreen({
-    super.key,
-    this.initialQuery,
-  });
+  const UnifiedSearchScreen({super.key, this.initialQuery});
 
   @override
-  ConsumerState<UnifiedSearchScreen> createState() => _UnifiedSearchScreenState();
+  ConsumerState<UnifiedSearchScreen> createState() =>
+      _UnifiedSearchScreenState();
 }
 
-class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with SingleTickerProviderStateMixin {
+class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
+    with SingleTickerProviderStateMixin {
   final TextEditingController _searchController = TextEditingController();
   Timer? _debounceTimer;
   Timer? _suggestionsDebounceTimer;
@@ -40,7 +39,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
   SearchFilters _filters = SearchFilters.empty;
 
   late TabController _tabController;
-  
+
   // Cache cho filtered/sorted results
   List<ProductModel>? _cachedFilteredProducts;
   List<MerchantModel>? _cachedFilteredShops;
@@ -61,7 +60,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         });
       }
     });
-    
+
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _searchController.text = widget.initialQuery!;
       _searchQuery = widget.initialQuery!;
@@ -80,7 +79,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
 
   void _onSearchChanged(String value) {
     final trimmedValue = value.trim();
-    
+
     // Update suggestions query với debounce ngắn hơn (300ms)
     _suggestionsDebounceTimer?.cancel();
     _suggestionsDebounceTimer = Timer(const Duration(milliseconds: 300), () {
@@ -88,7 +87,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         _suggestionsQuery = trimmedValue;
       });
     });
-    
+
     // Update search query với debounce dài hơn (400ms)
     _debounceTimer?.cancel();
     _debounceTimer = Timer(const Duration(milliseconds: 400), () {
@@ -101,11 +100,13 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
       if (trimmedValue.isNotEmpty) {
         final user = ref.read(currentUserProvider).value;
         if (user != null) {
-          ref.read(searchRepositoryProvider).saveSearchHistory(
-            userId: user.id,
-            query: trimmedValue,
-            searchType: _selectedTab == 'all' ? null : _selectedTab,
-          );
+          ref
+              .read(searchRepositoryProvider)
+              .saveSearchHistory(
+                userId: user.id,
+                query: trimmedValue,
+                searchType: _selectedTab == 'all' ? null : _selectedTab,
+              );
         }
       }
     });
@@ -136,14 +137,16 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
           children: [
             Column(
               children: [
-            _buildHeader(),
-            if (_isSearching) ...[
-              if (_filters.hasFilters) _buildActiveFilters(),
-              _buildTabs(),
-            ],
-            Expanded(
-              child: _isSearching ? _buildSearchResults() : _buildSearchHistory(),
-            ),
+                _buildHeader(),
+                if (_isSearching) ...[
+                  if (_filters.hasFilters) _buildActiveFilters(),
+                  _buildTabs(),
+                ],
+                Expanded(
+                  child: _isSearching
+                      ? _buildSearchResults()
+                      : _buildSearchHistory(),
+                ),
               ],
             ),
             // Autocomplete overlay
@@ -188,17 +191,31 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
                     color: AppColors.textMuted,
                     fontSize: 14,
                   ),
-                  prefixIcon: const Icon(Icons.search, color: AppColors.textMuted, size: 22),
+                  prefixIcon: const Icon(
+                    Icons.search,
+                    color: AppColors.textMuted,
+                    size: 22,
+                  ),
                   suffixIcon: _searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear, size: 20, color: AppColors.textMuted),
+                          icon: const Icon(
+                            Icons.clear,
+                            size: 20,
+                            color: AppColors.textMuted,
+                          ),
                           onPressed: _clearSearch,
                         )
                       : null,
                   border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                 ),
-                style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w500),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ),
@@ -206,7 +223,11 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
           Stack(
             children: [
               IconButton(
-                icon: const Icon(Icons.tune, color: AppColors.primary, size: 24),
+                icon: const Icon(
+                  Icons.tune,
+                  color: AppColors.primary,
+                  size: 24,
+                ),
                 onPressed: () {
                   SearchFiltersSheet.show(
                     context,
@@ -241,54 +262,62 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
 
   Widget _buildActiveFilters() {
     final chips = <Widget>[];
-    
+
     if (_filters.minPrice != null || _filters.maxPrice != null) {
-      final min = _filters.minPrice != null ? '${(_filters.minPrice! / 1000).toStringAsFixed(0)}k' : '0';
-      final max = _filters.maxPrice != null ? '${(_filters.maxPrice! / 1000).toStringAsFixed(0)}k' : '500k';
-      chips.add(_buildFilterChip('Giá: $min - $max', () {
-        setState(() {
-          _filters = _filters.copyWith(minPrice: null, maxPrice: null);
-        });
-      }));
+      final min = _filters.minPrice != null
+          ? '${(_filters.minPrice! / 1000).toStringAsFixed(0)}k'
+          : '0';
+      final max = _filters.maxPrice != null
+          ? '${(_filters.maxPrice! / 1000).toStringAsFixed(0)}k'
+          : '500k';
+      chips.add(
+        _buildFilterChip('Giá: $min - $max', () {
+          setState(() {
+            _filters = _filters.copyWith(minPrice: null, maxPrice: null);
+          });
+        }),
+      );
     }
-    
+
     if (_filters.minRating != null) {
-      chips.add(_buildFilterChip('Đánh giá: ${_filters.minRating}+', () {
-        setState(() {
-          _filters = _filters.copyWith(minRating: null);
-        });
-      }));
+      chips.add(
+        _buildFilterChip('Đánh giá: ${_filters.minRating}+', () {
+          setState(() {
+            _filters = _filters.copyWith(minRating: null);
+          });
+        }),
+      );
     }
-    
+
     if (_filters.maxDistance != null) {
-      final distanceText = _filters.maxDistance == null 
-          ? 'Gần tôi' 
+      final distanceText = _filters.maxDistance == null
+          ? 'Gần tôi'
           : '< ${_filters.maxDistance!.toStringAsFixed(0)}km';
-      chips.add(_buildFilterChip('Khoảng cách: $distanceText', () {
-        setState(() {
-          _filters = _filters.copyWith(maxDistance: null);
-        });
-      }));
+      chips.add(
+        _buildFilterChip('Khoảng cách: $distanceText', () {
+          setState(() {
+            _filters = _filters.copyWith(maxDistance: null);
+          });
+        }),
+      );
     }
-    
+
     if (_filters.categories != null && _filters.categories!.isNotEmpty) {
-      chips.add(_buildFilterChip('Danh mục: ${_filters.categories!.length}', () {
-        setState(() {
-          _filters = _filters.copyWith(categories: null);
-        });
-      }));
+      chips.add(
+        _buildFilterChip('Danh mục: ${_filters.categories!.length}', () {
+          setState(() {
+            _filters = _filters.copyWith(categories: null);
+          });
+        }),
+      );
     }
-    
+
     if (chips.isEmpty) return const SizedBox.shrink();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       color: Colors.white,
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: chips,
-      ),
+      child: Wrap(spacing: 8, runSpacing: 8, children: chips),
     );
   }
 
@@ -321,13 +350,15 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
 
   Widget _buildAutocompleteOverlay() {
     if (_suggestionsQuery.length < 2) return const SizedBox.shrink();
-    
-    final suggestionsAsync = ref.watch(searchSuggestionsProvider(_suggestionsQuery));
-    
+
+    final suggestionsAsync = ref.watch(
+      searchSuggestionsProvider(_suggestionsQuery),
+    );
+
     return suggestionsAsync.when(
       data: (suggestions) {
         if (suggestions.isEmpty) return const SizedBox.shrink();
-        
+
         return Container(
           margin: const EdgeInsets.symmetric(horizontal: 16),
           decoration: BoxDecoration(
@@ -337,11 +368,19 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            children: suggestions.map((suggestion) => ListTile(
-              leading: const Icon(Icons.search, size: 20, color: AppColors.textSecondary),
-              title: Text(suggestion, style: AppTextStyles.body13),
-              onTap: () => _onHistoryTap(suggestion),
-            )).toList(),
+            children: suggestions
+                .map(
+                  (suggestion) => ListTile(
+                    leading: const Icon(
+                      Icons.search,
+                      size: 20,
+                      color: AppColors.textSecondary,
+                    ),
+                    title: Text(suggestion, style: AppTextStyles.body13),
+                    onTap: () => _onHistoryTap(suggestion),
+                  ),
+                )
+                .toList(),
           ),
         );
       },
@@ -355,7 +394,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         ),
         child: const Center(child: CircularProgressIndicator()),
       ),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -373,7 +412,10 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
                 const SizedBox(height: 16),
                 Text(
                   'Tìm kiếm món ăn hoặc cửa hàng',
-                  style: GoogleFonts.inter(fontSize: 16, color: Colors.grey[600]),
+                  style: GoogleFonts.inter(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                  ),
                 ),
               ],
             ),
@@ -391,11 +433,16 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
                   onPressed: () async {
                     final user = ref.read(currentUserProvider).value;
                     if (user != null) {
-                      await ref.read(searchRepositoryProvider).clearSearchHistory(user.id);
+                      await ref
+                          .read(searchRepositoryProvider)
+                          .clearSearchHistory(user.id);
                       ref.invalidate(searchHistoryProvider);
                     }
                   },
-                  child: Text('Xóa tất cả', style: GoogleFonts.inter(color: AppColors.primary)),
+                  child: Text(
+                    'Xóa tất cả',
+                    style: GoogleFonts.inter(color: AppColors.primary),
+                  ),
                 ),
               ],
             ),
@@ -405,7 +452,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (_, __) => const SizedBox.shrink(),
+      error: (_, _) => const SizedBox.shrink(),
     );
   }
 
@@ -428,10 +475,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
     if (_searchQuery.isEmpty) return const SizedBox.shrink();
 
     final marketId = AppConstants.defaultMarketId;
-    final searchParams = {
-      'query': _searchQuery,
-      'market_id': marketId,
-    };
+    final searchParams = {'query': _searchQuery, 'market_id': marketId};
 
     // Get user location for distance filter
     final addressesAsync = ref.watch(userAddressesProvider);
@@ -447,7 +491,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         userLng = defaultAddress.lng;
       }
     });
-    
+
     // Store non-nullable values for use in filters
     final lat = userLat;
     final lng = userLng;
@@ -460,8 +504,8 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
           var shops = results['shops'] as List<MerchantModel>;
 
           // Cache filtered/sorted results để tránh tính lại mỗi build
-          if (_cachedFilters != _filters || 
-              _cachedSearchQuery != _searchQuery || 
+          if (_cachedFilters != _filters ||
+              _cachedSearchQuery != _searchQuery ||
               _cachedTab != _selectedTab ||
               _cachedUserLat != userLat ||
               _cachedUserLng != userLng ||
@@ -474,7 +518,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
             // Sort
             products = _sortProducts(products);
             shops = _sortShops(shops, lat, lng);
-            
+
             // Cache results
             _cachedFilteredProducts = products;
             _cachedFilteredShops = shops;
@@ -494,9 +538,15 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
 
           // Tính tổng số items cho ListView.builder
           final shopsHeaderCount = shops.isNotEmpty ? 2 : 0; // Header + spacing
-          final productsHeaderCount = products.isNotEmpty ? 2 : 0; // Header + spacing
-          final totalItems = shops.length + products.length + shopsHeaderCount + productsHeaderCount;
-          
+          final productsHeaderCount = products.isNotEmpty
+              ? 2
+              : 0; // Header + spacing
+          final totalItems =
+              shops.length +
+              products.length +
+              shopsHeaderCount +
+              productsHeaderCount;
+
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: totalItems,
@@ -550,8 +600,8 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
       return productsAsync.when(
         data: (products) {
           // Cache filtered/sorted results
-          if (_cachedFilters != _filters || 
-              _cachedSearchQuery != _searchQuery || 
+          if (_cachedFilters != _filters ||
+              _cachedSearchQuery != _searchQuery ||
               _cachedTab != _selectedTab ||
               _cachedFilteredProducts == null) {
             var filteredProducts = _applyProductFilters(products);
@@ -561,10 +611,10 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
             _cachedSearchQuery = _searchQuery;
             _cachedTab = _selectedTab;
           }
-          
+
           final filteredProducts = _cachedFilteredProducts!;
           if (filteredProducts.isEmpty) return _buildEmptyState();
-          
+
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: filteredProducts.length,
@@ -581,8 +631,8 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
       return shopsAsync.when(
         data: (shops) {
           // Cache filtered/sorted results
-          if (_cachedFilters != _filters || 
-              _cachedSearchQuery != _searchQuery || 
+          if (_cachedFilters != _filters ||
+              _cachedSearchQuery != _searchQuery ||
               _cachedTab != _selectedTab ||
               _cachedUserLat != lat ||
               _cachedUserLng != lng ||
@@ -596,10 +646,10 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
             _cachedUserLat = lat;
             _cachedUserLng = lng;
           }
-          
+
           final filteredShops = _cachedFilteredShops!;
           if (filteredShops.isEmpty) return _buildEmptyState();
-          
+
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: filteredShops.length,
@@ -621,8 +671,12 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
     if (_filters.minPrice != null || _filters.maxPrice != null) {
       filtered = filtered.where((p) {
         final price = p.basePrice.toDouble();
-        if (_filters.minPrice != null && price < _filters.minPrice!) return false;
-        if (_filters.maxPrice != null && price > _filters.maxPrice!) return false;
+        if (_filters.minPrice != null && price < _filters.minPrice!) {
+          return false;
+        }
+        if (_filters.maxPrice != null && price > _filters.maxPrice!) {
+          return false;
+        }
         return true;
       }).toList();
     }
@@ -637,7 +691,11 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
     return filtered;
   }
 
-  List<MerchantModel> _applyShopFilters(List<MerchantModel> shops, double? userLat, double? userLng) {
+  List<MerchantModel> _applyShopFilters(
+    List<MerchantModel> shops,
+    double? userLat,
+    double? userLng,
+  ) {
     var filtered = shops;
 
     // Rating filter
@@ -675,7 +733,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
 
   List<ProductModel> _sortProducts(List<ProductModel> products) {
     final sortBy = _filters.sortBy ?? 'relevance';
-    
+
     switch (sortBy) {
       case 'price_asc':
         products.sort((a, b) => a.basePrice.compareTo(b.basePrice));
@@ -688,13 +746,17 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         // Keep original order
         break;
     }
-    
+
     return products;
   }
 
-  List<MerchantModel> _sortShops(List<MerchantModel> shops, double? userLat, double? userLng) {
+  List<MerchantModel> _sortShops(
+    List<MerchantModel> shops,
+    double? userLat,
+    double? userLng,
+  ) {
     final sortBy = _filters.sortBy ?? 'relevance';
-    
+
     switch (sortBy) {
       case 'rating':
         shops.sort((a, b) {
@@ -731,7 +793,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
         // Keep original order
         break;
     }
-    
+
     return shops;
   }
 
@@ -760,7 +822,10 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
                 children: [
                   const Icon(Icons.star, color: Color(0xFFFBBF24), size: 16),
                   const SizedBox(width: 4),
-                  Text(shop.rating!.toStringAsFixed(1), style: AppTextStyles.body13),
+                  Text(
+                    shop.rating!.toStringAsFixed(1),
+                    style: AppTextStyles.body13,
+                  ),
                 ],
               )
             : null,
@@ -806,7 +871,11 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen> with 
             const SizedBox(height: 16),
             Text(
               'Không tìm thấy kết quả',
-              style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.grey[600]),
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
             ),
             const SizedBox(height: 8),
             Text(

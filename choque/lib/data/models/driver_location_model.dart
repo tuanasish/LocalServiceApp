@@ -1,4 +1,3 @@
-
 /// Driver Location Model
 class DriverLocationModel {
   final String driverId;

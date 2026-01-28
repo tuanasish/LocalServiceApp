@@ -10,11 +10,7 @@ class AppBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final void Function(int)? onTap;
 
-  const AppBottomNavBar({
-    super.key,
-    required this.currentIndex,
-    this.onTap,
-  });
+  const AppBottomNavBar({super.key, required this.currentIndex, this.onTap});
 
   /// Indices: 0 = Trang chủ, 1 = Đơn hàng, 2 = Thông báo, 3 = Tài khoản
   static const int indexHome = 0;
@@ -86,7 +82,7 @@ class AppBottomNavBar extends StatelessWidget {
 
   void _navigateTo(BuildContext context, int index) {
     if (currentIndex == index) return;
-    
+
     switch (index) {
       case indexHome:
         context.go('/');
@@ -112,42 +108,40 @@ class AppBottomNavBar extends StatelessWidget {
     int badgeCount = 0,
   }) {
     // Màu sắc cho icon: active = primary, inactive = xám
-    final color = isActive 
-        ? const Color(0xFF1E7F43)
-        : const Color(0xFF94A3B8);
+    final color = isActive ? const Color(0xFF1E7F43) : const Color(0xFF94A3B8);
     return GestureDetector(
       onTap: onTap,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: isActive
-                          ? BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  const Color(0xFF1E7F43).withValues(alpha: 0.15),
-                                  const Color(0xFF1E7F43).withValues(alpha: 0.05),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
-                              borderRadius: BorderRadius.circular(12),
-                            )
-                          : null,
-                      child: Icon(icon, color: color, size: 24),
-                    ),
-                    if (badgeCount > 0)
-                      Positioned(
-                        right: -4,
-                        top: -4,
-                        child: _BadgeWidget(count: badgeCount),
-                      ),
-                  ],
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: isActive
+                    ? BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            const Color(0xFF1E7F43).withValues(alpha: 0.15),
+                            const Color(0xFF1E7F43).withValues(alpha: 0.05),
+                          ],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                      )
+                    : null,
+                child: Icon(icon, color: color, size: 24),
+              ),
+              if (badgeCount > 0)
+                Positioned(
+                  right: -4,
+                  top: -4,
+                  child: _BadgeWidget(count: badgeCount),
                 ),
+            ],
+          ),
           const SizedBox(height: 4),
           Text(
             label,
@@ -176,10 +170,7 @@ class _BadgeWidget extends StatelessWidget {
         color: Color(0xFFEF4444),
         shape: BoxShape.circle,
       ),
-      constraints: const BoxConstraints(
-        minWidth: 16,
-        minHeight: 16,
-      ),
+      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
       child: Text(
         count > 99 ? '99+' : '$count',
         style: GoogleFonts.inter(
@@ -198,21 +189,18 @@ class _NotificationNavItem extends ConsumerWidget {
   final bool isActive;
   final VoidCallback onTap;
 
-  const _NotificationNavItem({
-    required this.isActive,
-    required this.onTap,
-  });
+  const _NotificationNavItem({required this.isActive, required this.onTap});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // Chỉ widget này rebuild khi notification count thay đổi
     // Ưu tiên stream provider (real-time), fallback sang future provider
-    final badgeCount = ref.watch(unreadNotificationsCountStreamProvider).asData?.value ?? 
-                       ref.watch(unreadNotificationsCountProvider).asData?.value ?? 0;
+    final badgeCount =
+        ref.watch(unreadNotificationsCountStreamProvider).asData?.value ??
+        ref.watch(unreadNotificationsCountProvider).asData?.value ??
+        0;
 
-    final color = isActive 
-        ? const Color(0xFF1E7F43)
-        : const Color(0xFF94A3B8);
+    final color = isActive ? const Color(0xFF1E7F43) : const Color(0xFF94A3B8);
 
     return GestureDetector(
       onTap: onTap,

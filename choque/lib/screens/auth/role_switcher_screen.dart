@@ -26,9 +26,7 @@ class RoleSwitcherScreen extends ConsumerWidget {
               const SizedBox(height: 60),
               _buildHeader(profileAsync),
               const SizedBox(height: 48),
-              Expanded(
-                child: _buildRoleCards(context, ref, availableRoles),
-              ),
+              Expanded(child: _buildRoleCards(context, ref, availableRoles)),
               _buildLogoutButton(context, ref),
               const SizedBox(height: 32),
             ],
@@ -54,11 +52,7 @@ class RoleSwitcherScreen extends ConsumerWidget {
             color: const Color(0xFFE8D5B7),
             shape: BoxShape.circle,
           ),
-          child: const Icon(
-            Icons.person,
-            size: 36,
-            color: Color(0xFFA58860),
-          ),
+          child: const Icon(Icons.person, size: 36, color: Color(0xFFA58860)),
         ),
         const SizedBox(height: 20),
         Text(
@@ -73,16 +67,17 @@ class RoleSwitcherScreen extends ConsumerWidget {
         const SizedBox(height: 8),
         Text(
           'Bạn muốn tiếp tục với vai trò nào?',
-          style: GoogleFonts.inter(
-            fontSize: 15,
-            color: Colors.grey[600],
-          ),
+          style: GoogleFonts.inter(fontSize: 15, color: Colors.grey[600]),
         ),
       ],
     );
   }
 
-  Widget _buildRoleCards(BuildContext context, WidgetRef ref, List<UserRole> roles) {
+  Widget _buildRoleCards(
+    BuildContext context,
+    WidgetRef ref,
+    List<UserRole> roles,
+  ) {
     return ListView.separated(
       itemCount: roles.length,
       separatorBuilder: (context, index) => const SizedBox(height: 16),
@@ -110,10 +105,7 @@ class RoleSwitcherScreen extends ConsumerWidget {
       icon: Icon(Icons.logout, color: Colors.grey[600], size: 20),
       label: Text(
         'Đăng xuất',
-        style: GoogleFonts.inter(
-          fontSize: 14,
-          color: Colors.grey[600],
-        ),
+        style: GoogleFonts.inter(fontSize: 14, color: Colors.grey[600]),
       ),
     );
   }
@@ -123,10 +115,7 @@ class _RoleCard extends StatelessWidget {
   final UserRole role;
   final VoidCallback onTap;
 
-  const _RoleCard({
-    required this.role,
-    required this.onTap,
-  });
+  const _RoleCard({required this.role, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -156,10 +145,7 @@ class _RoleCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Center(
-                child: Text(
-                  role.icon,
-                  style: const TextStyle(fontSize: 28),
-                ),
+                child: Text(role.icon, style: const TextStyle(fontSize: 28)),
               ),
             ),
             const SizedBox(width: 16),

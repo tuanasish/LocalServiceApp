@@ -25,21 +25,21 @@ class AddAddressScreen extends ConsumerStatefulWidget {
 
 class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
   final _formKey = GlobalKey<FormState>();
-  
+
   // Contact info (from profile or custom)
   late final TextEditingController _recipientNameController;
   late final TextEditingController _recipientPhoneController;
-  
+
   // Address fields
   late final TextEditingController _detailsController;
   late final TextEditingController _buildingController;
   late final TextEditingController _gateController;
   late final TextEditingController _driverNoteController;
-  
+
   // Address type tag
   late AddressType _selectedAddressType;
   late bool _isDefault;
-  
+
   // Location data
   double? _selectedLat;
   double? _selectedLng;
@@ -48,19 +48,23 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
   void initState() {
     super.initState();
     final editing = widget.addressToEdit;
-    
-    _recipientNameController = TextEditingController(text: editing?.recipientName);
-    _recipientPhoneController = TextEditingController(text: editing?.recipientPhone);
+
+    _recipientNameController = TextEditingController(
+      text: editing?.recipientName,
+    );
+    _recipientPhoneController = TextEditingController(
+      text: editing?.recipientPhone,
+    );
     _detailsController = TextEditingController(text: editing?.details);
     _buildingController = TextEditingController(text: editing?.building);
     _gateController = TextEditingController(text: editing?.gate);
     _driverNoteController = TextEditingController(text: editing?.driverNote);
-    
+
     _selectedAddressType = editing?.addressType ?? AddressType.home;
     _isDefault = editing?.isDefault ?? false;
     _selectedLat = editing?.lat;
     _selectedLng = editing?.lng;
-    
+
     // Pre-fill contact info from user profile if adding new address
     if (editing == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -107,24 +111,34 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     }
 
     final notifier = ref.read(addressNotifierProvider.notifier);
-    
+
     try {
       if (widget.addressToEdit != null) {
         // Update existing
-        debugPrint('[AddAddress] Updating address: ${widget.addressToEdit!.id}');
-        await notifier.updateAddress(widget.addressToEdit!.copyWith(
-          label: _selectedAddressType.displayName,
-          details: _detailsController.text.trim(),
-          lat: _selectedLat,
-          lng: _selectedLng,
-          isDefault: _isDefault,
-          addressType: _selectedAddressType,
-          building: _buildingController.text.trim().isEmpty ? null : _buildingController.text.trim(),
-          gate: _gateController.text.trim().isEmpty ? null : _gateController.text.trim(),
-          driverNote: _driverNoteController.text.trim().isEmpty ? null : _driverNoteController.text.trim(),
-          recipientName: _recipientNameController.text.trim(),
-          recipientPhone: _recipientPhoneController.text.trim(),
-        ));
+        debugPrint(
+          '[AddAddress] Updating address: ${widget.addressToEdit!.id}',
+        );
+        await notifier.updateAddress(
+          widget.addressToEdit!.copyWith(
+            label: _selectedAddressType.displayName,
+            details: _detailsController.text.trim(),
+            lat: _selectedLat,
+            lng: _selectedLng,
+            isDefault: _isDefault,
+            addressType: _selectedAddressType,
+            building: _buildingController.text.trim().isEmpty
+                ? null
+                : _buildingController.text.trim(),
+            gate: _gateController.text.trim().isEmpty
+                ? null
+                : _gateController.text.trim(),
+            driverNote: _driverNoteController.text.trim().isEmpty
+                ? null
+                : _driverNoteController.text.trim(),
+            recipientName: _recipientNameController.text.trim(),
+            recipientPhone: _recipientPhoneController.text.trim(),
+          ),
+        );
         debugPrint('[AddAddress] Update completed');
       } else {
         // Add new
@@ -139,9 +153,15 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           lng: _selectedLng,
           isDefault: _isDefault,
           addressType: _selectedAddressType,
-          building: _buildingController.text.trim().isEmpty ? null : _buildingController.text.trim(),
-          gate: _gateController.text.trim().isEmpty ? null : _gateController.text.trim(),
-          driverNote: _driverNoteController.text.trim().isEmpty ? null : _driverNoteController.text.trim(),
+          building: _buildingController.text.trim().isEmpty
+              ? null
+              : _buildingController.text.trim(),
+          gate: _gateController.text.trim().isEmpty
+              ? null
+              : _gateController.text.trim(),
+          driverNote: _driverNoteController.text.trim().isEmpty
+              ? null
+              : _driverNoteController.text.trim(),
           recipientName: _recipientNameController.text.trim(),
           recipientPhone: _recipientPhoneController.text.trim(),
         );
@@ -156,9 +176,11 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(widget.addressToEdit != null 
-                    ? 'Đã cập nhật địa chỉ thành công' 
-                    : 'Đã thêm địa chỉ thành công'),
+                content: Text(
+                  widget.addressToEdit != null
+                      ? 'Đã cập nhật địa chỉ thành công'
+                      : 'Đã thêm địa chỉ thành công',
+                ),
                 backgroundColor: Colors.green,
                 duration: const Duration(seconds: 2),
               ),
@@ -225,14 +247,19 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final title = widget.addressToEdit != null ? 'Sửa địa chỉ' : 'Thêm địa chỉ mới';
+    final title = widget.addressToEdit != null
+        ? 'Sửa địa chỉ'
+        : 'Thêm địa chỉ mới';
     final isLoading = ref.watch(addressNotifierProvider).isLoading;
     final hasAddress = _detailsController.text.isNotEmpty;
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text(title, style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 17)),
+        title: Text(
+          title,
+          style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 17),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: AppColors.textPrimary,
@@ -254,7 +281,8 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         controller: _recipientNameController,
                         hint: 'Tên người nhận',
                         icon: Icons.person_outline,
-                        validator: (v) => v!.isEmpty ? 'Vui lòng nhập tên' : null,
+                        validator: (v) =>
+                            v!.isEmpty ? 'Vui lòng nhập tên' : null,
                       ),
                       const Divider(height: 1),
                       _buildContactField(
@@ -262,19 +290,18 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         hint: 'Số điện thoại',
                         icon: Icons.phone_outlined,
                         keyboardType: TextInputType.phone,
-                        validator: (v) => v!.isEmpty ? 'Vui lòng nhập SĐT' : null,
+                        validator: (v) =>
+                            v!.isEmpty ? 'Vui lòng nhập SĐT' : null,
                       ),
                     ]),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Section 2: Address Selection (ShopeeFood style)
-                    _buildSection([
-                      _buildAddressSelector(),
-                    ]),
-                    
+                    _buildSection([_buildAddressSelector()]),
+
                     const SizedBox(height: 8),
-                    
+
                     // Section 3: Building & Gate (optional)
                     _buildSection([
                       _buildOptionalField(
@@ -287,9 +314,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         hint: 'Cổng (không bắt buộc)',
                       ),
                     ]),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Section 4: Address Type Tags (ShopeeFood style)
                     _buildSection([
                       Padding(
@@ -304,9 +331,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         ),
                       ),
                     ]),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Section 5: Driver Note (optional)
                     _buildSection([
                       _buildOptionalField(
@@ -315,9 +342,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         maxLines: 2,
                       ),
                     ]),
-                    
+
                     const SizedBox(height: 8),
-                    
+
                     // Section 6: Default toggle
                     _buildSection([
                       SwitchListTile(
@@ -330,13 +357,13 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                         activeThumbColor: AppColors.primary,
                       ),
                     ]),
-                    
+
                     const SizedBox(height: 100),
                   ],
                 ),
               ),
             ),
-            
+
             // Bottom Save Button
             _buildBottomButton(isLoading, hasAddress),
           ],
@@ -348,9 +375,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
   Widget _buildSection(List<Widget> children) {
     return Container(
       color: Colors.white,
-      child: Column(
-        children: children,
-      ),
+      child: Column(children: children),
     );
   }
 
@@ -387,7 +412,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
 
   Widget _buildAddressSelector() {
     final hasAddress = _detailsController.text.isNotEmpty;
-    
+
     return InkWell(
       onTap: _openMapPicker,
       child: Padding(
@@ -421,10 +446,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            Icon(
-              Icons.chevron_right,
-              color: Colors.grey[400],
-            ),
+            Icon(Icons.chevron_right, color: Colors.grey[400]),
           ],
         ),
       ),
@@ -459,13 +481,15 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
       AddressType.work => 'Work',
       AddressType.other => 'Other',
     };
-    
+
     return GestureDetector(
       onTap: () => setState(() => _selectedAddressType = type),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.grey[100],
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.1)
+              : Colors.grey[100],
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.grey[300]!,
@@ -485,10 +509,11 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
   }
 
   Widget _buildBottomButton(bool isLoading, bool hasAddress) {
-    final canSave = hasAddress && 
-        _recipientNameController.text.isNotEmpty && 
+    final canSave =
+        hasAddress &&
+        _recipientNameController.text.isNotEmpty &&
         _recipientPhoneController.text.isNotEmpty;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -522,7 +547,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2, 
+                      strokeWidth: 2,
                       color: Colors.white,
                     ),
                   )

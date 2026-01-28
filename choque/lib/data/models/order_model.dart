@@ -1,7 +1,7 @@
 import 'location_model.dart';
 
 /// Order Status Enum
-/// 
+///
 /// Các trạng thái đơn hàng theo State Machine trong Brief.
 enum OrderStatus {
   pendingConfirmation,
@@ -14,38 +14,60 @@ enum OrderStatus {
 
   static OrderStatus fromString(String s) {
     switch (s) {
-      case 'PENDING_CONFIRMATION': return OrderStatus.pendingConfirmation;
-      case 'CONFIRMED': return OrderStatus.confirmed;
-      case 'READY_FOR_PICKUP': return OrderStatus.readyForPickup;
-      case 'ASSIGNED': return OrderStatus.assigned;
-      case 'PICKED_UP': return OrderStatus.pickedUp;
-      case 'COMPLETED': return OrderStatus.completed;
-      case 'CANCELED': return OrderStatus.canceled;
-      default: return OrderStatus.pendingConfirmation;
+      case 'PENDING_CONFIRMATION':
+        return OrderStatus.pendingConfirmation;
+      case 'CONFIRMED':
+        return OrderStatus.confirmed;
+      case 'READY_FOR_PICKUP':
+        return OrderStatus.readyForPickup;
+      case 'ASSIGNED':
+        return OrderStatus.assigned;
+      case 'PICKED_UP':
+        return OrderStatus.pickedUp;
+      case 'COMPLETED':
+        return OrderStatus.completed;
+      case 'CANCELED':
+        return OrderStatus.canceled;
+      default:
+        return OrderStatus.pendingConfirmation;
     }
   }
 
   String toDbString() {
     switch (this) {
-      case OrderStatus.pendingConfirmation: return 'PENDING_CONFIRMATION';
-      case OrderStatus.confirmed: return 'CONFIRMED';
-      case OrderStatus.readyForPickup: return 'READY_FOR_PICKUP';
-      case OrderStatus.assigned: return 'ASSIGNED';
-      case OrderStatus.pickedUp: return 'PICKED_UP';
-      case OrderStatus.completed: return 'COMPLETED';
-      case OrderStatus.canceled: return 'CANCELED';
+      case OrderStatus.pendingConfirmation:
+        return 'PENDING_CONFIRMATION';
+      case OrderStatus.confirmed:
+        return 'CONFIRMED';
+      case OrderStatus.readyForPickup:
+        return 'READY_FOR_PICKUP';
+      case OrderStatus.assigned:
+        return 'ASSIGNED';
+      case OrderStatus.pickedUp:
+        return 'PICKED_UP';
+      case OrderStatus.completed:
+        return 'COMPLETED';
+      case OrderStatus.canceled:
+        return 'CANCELED';
     }
   }
 
   String get displayName {
     switch (this) {
-      case OrderStatus.pendingConfirmation: return 'Chờ xác nhận';
-      case OrderStatus.confirmed: return 'Đang chuẩn bị';
-      case OrderStatus.readyForPickup: return 'Sẵn sàng';
-      case OrderStatus.assigned: return 'Đã gán tài xế';
-      case OrderStatus.pickedUp: return 'Đã lấy hàng';
-      case OrderStatus.completed: return 'Hoàn thành';
-      case OrderStatus.canceled: return 'Đã hủy';
+      case OrderStatus.pendingConfirmation:
+        return 'Chờ xác nhận';
+      case OrderStatus.confirmed:
+        return 'Đang chuẩn bị';
+      case OrderStatus.readyForPickup:
+        return 'Sẵn sàng';
+      case OrderStatus.assigned:
+        return 'Đã gán tài xế';
+      case OrderStatus.pickedUp:
+        return 'Đã lấy hàng';
+      case OrderStatus.completed:
+        return 'Hoàn thành';
+      case OrderStatus.canceled:
+        return 'Đã hủy';
     }
   }
 }
@@ -58,15 +80,18 @@ enum ServiceType {
 
   static ServiceType fromString(String s) {
     switch (s) {
-      case 'ride': return ServiceType.ride;
-      case 'delivery': return ServiceType.delivery;
-      default: return ServiceType.food;
+      case 'ride':
+        return ServiceType.ride;
+      case 'delivery':
+        return ServiceType.delivery;
+      default:
+        return ServiceType.food;
     }
   }
 }
 
 /// Order Model
-/// 
+///
 /// Ánh xạ bảng `orders` trong Supabase.
 class OrderModel {
   final String id;
@@ -154,11 +179,21 @@ class OrderModel {
       shopName: json['shop_name'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
       updatedAt: DateTime.parse(json['updated_at'] as String),
-      confirmedAt: json['confirmed_at'] != null ? DateTime.parse(json['confirmed_at'] as String) : null,
-      assignedAt: json['assigned_at'] != null ? DateTime.parse(json['assigned_at'] as String) : null,
-      pickedUpAt: json['picked_up_at'] != null ? DateTime.parse(json['picked_up_at'] as String) : null,
-      completedAt: json['completed_at'] != null ? DateTime.parse(json['completed_at'] as String) : null,
-      canceledAt: json['canceled_at'] != null ? DateTime.parse(json['canceled_at'] as String) : null,
+      confirmedAt: json['confirmed_at'] != null
+          ? DateTime.parse(json['confirmed_at'] as String)
+          : null,
+      assignedAt: json['assigned_at'] != null
+          ? DateTime.parse(json['assigned_at'] as String)
+          : null,
+      pickedUpAt: json['picked_up_at'] != null
+          ? DateTime.parse(json['picked_up_at'] as String)
+          : null,
+      completedAt: json['completed_at'] != null
+          ? DateTime.parse(json['completed_at'] as String)
+          : null,
+      canceledAt: json['canceled_at'] != null
+          ? DateTime.parse(json['canceled_at'] as String)
+          : null,
     );
   }
 
@@ -188,10 +223,10 @@ class OrderModel {
 
   /// Kiểm tra xem đơn có thể hủy được không (chỉ khi PENDING_CONFIRMATION)
   bool get canCancel => status == OrderStatus.pendingConfirmation;
-  
+
   /// Kiểm tra xem đơn đã hoàn thành chưa
   bool get isCompleted => status == OrderStatus.completed;
-  
+
   /// Kiểm tra xem đơn đã bị hủy chưa
   bool get isCanceled => status == OrderStatus.canceled;
 

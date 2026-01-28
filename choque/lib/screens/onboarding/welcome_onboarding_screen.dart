@@ -72,11 +72,7 @@ class WelcomeOnboardingScreen extends StatelessWidget {
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _buildDot(isActive: true),
-                  _buildDot(),
-                  _buildDot(),
-                ],
+                children: [_buildDot(isActive: true), _buildDot(), _buildDot()],
               ),
               const SizedBox(height: 16),
               SizedBox(
@@ -127,10 +123,11 @@ class WelcomeOnboardingScreen extends StatelessWidget {
       width: isActive ? 18 : 6,
       height: 6,
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primary : AppColors.textMuted.withValues(alpha: 0.3),
+        color: isActive
+            ? AppColors.primary
+            : AppColors.textMuted.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
     );
   }
 }
-

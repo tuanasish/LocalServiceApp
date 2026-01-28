@@ -7,11 +7,12 @@ import '../routing/app_router.dart';
 import '../providers/app_providers.dart';
 
 /// Notification Service
-/// 
+///
 /// Xử lý FCM push notifications và local notifications.
 class NotificationService {
-  static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
-  static final FlutterLocalNotificationsPlugin _localNotifications = 
+  static final FirebaseMessaging _firebaseMessaging =
+      FirebaseMessaging.instance;
+  static final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
   static bool _initialized = false;
@@ -33,7 +34,9 @@ class NotificationService {
     }
 
     // Initialize local notifications
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -106,14 +109,14 @@ class NotificationService {
   static void _handleNotificationTap(RemoteMessage message, WidgetRef ref) {
     final data = message.data;
     if (data.isEmpty) return;
-    
+
     final type = data['type'] as String?;
     if (type == null) return;
 
     // Lấy router từ ref (cần access GoRouter)
     // Vì đây là static method, cần pass router hoặc dùng global navigator key
     final router = ref.read(appRouterProvider);
-    
+
     // Navigate based on type
     switch (type) {
       case 'order':
@@ -132,7 +135,7 @@ class NotificationService {
         router.push('/notifications');
         break;
     }
-    
+
     // Invalidate providers để refresh
     ref.invalidate(notificationsProvider(null));
     ref.invalidate(unreadNotificationsCountProvider);

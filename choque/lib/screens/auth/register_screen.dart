@@ -83,9 +83,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     } catch (e) {
       String message = 'Đăng ký thất bại. Vui lòng thử lại.';
       final errStr = e.toString();
-      
+
       if (errStr.contains('User already registered')) {
-        message = 'Email này đã được sử dụng. Hãy thử đăng nhập hoặc dùng email khác.';
+        message =
+            'Email này đã được sử dụng. Hãy thử đăng nhập hoặc dùng email khác.';
       } else if (errStr.contains('Password should be')) {
         message = 'Mật khẩu quá yếu. Vui lòng thêm ký tự đặc biệt hoặc số.';
       } else if (errStr.contains('network')) {
@@ -94,10 +95,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -154,8 +152,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   label: 'Họ và tên',
                   icon: Icons.person_outline,
                   textCapitalization: TextCapitalization.words,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Vui lòng nhập họ và tên';
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập họ tên';
+                    }
                     return null;
                   },
                 ),
@@ -166,9 +166,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   label: 'Email',
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return 'Vui lòng nhập email';
-                    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập email';
+                    }
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
                       return 'Email không hợp lệ';
                     }
                     return null;
@@ -182,8 +186,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   icon: Icons.lock_outlined,
                   obscureText: !_showPassword,
                   suffixIcon: IconButton(
-                    icon: Icon(_showPassword ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () => setState(() => _showPassword = !_showPassword),
+                    icon: Icon(
+                      _showPassword ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () =>
+                        setState(() => _showPassword = !_showPassword),
                   ),
                   validator: _validatePassword,
                 ),
@@ -197,8 +204,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   label: 'Xác nhận mật khẩu',
                   icon: Icons.check_circle_outline,
                   obscureText: !_showPassword,
-                  validator: (v) {
-                    if (v != _passwordController.text) return 'Mật khẩu không khớp';
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Vui lòng nhập lại mật khẩu';
+                    }
+                    if (value != _passwordController.text) {
+                      return 'Mật khẩu không khớp';
+                    }
                     return null;
                   },
                 ),
@@ -221,7 +233,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : Text(

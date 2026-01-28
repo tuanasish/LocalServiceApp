@@ -1,5 +1,5 @@
 /// Product Model
-/// 
+///
 /// Ánh xạ bảng `products` trong Supabase.
 class ProductModel {
   final String id;
@@ -49,9 +49,9 @@ class ProductModel {
       'status': status,
     };
   }
-  
+
   /// Tạo URL ảnh từ Supabase Storage
-  String? get imageUrl => imagePath != null 
-    ? 'https://ipdwpzgbznphkmdewjdl.supabase.co/storage/v1/object/public/products/$imagePath'
-    : null;
+  String? get imageUrl => imagePath != null
+      ? 'https://ipdwpzgbznphkmdewjdl.supabase.co/storage/v1/object/public/products/$imagePath'
+      : null;
 }

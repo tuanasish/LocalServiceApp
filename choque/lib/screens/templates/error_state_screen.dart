@@ -50,11 +50,7 @@ class ErrorStateScreen extends StatelessWidget {
         color: AppColors.danger.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
-      child: const Icon(
-        Icons.error_outline,
-        size: 64,
-        color: AppColors.danger,
-      ),
+      child: const Icon(Icons.error_outline, size: 64, color: AppColors.danger),
     );
   }
 
@@ -74,10 +70,7 @@ class ErrorStateScreen extends StatelessWidget {
     return Text(
       message ??
           'Không thể tải dữ liệu. Vui lòng kiểm tra kết nối mạng và thử lại.',
-      style: GoogleFonts.inter(
-        fontSize: 14,
-        color: AppColors.textSecondary,
-      ),
+      style: GoogleFonts.inter(fontSize: 14, color: AppColors.textSecondary),
       textAlign: TextAlign.center,
     );
   }
@@ -97,10 +90,7 @@ class ErrorStateScreen extends StatelessWidget {
                 ),
               ),
               onPressed: onRetry,
-              icon: const Icon(
-                Icons.refresh,
-                color: Colors.white,
-              ),
+              icon: const Icon(Icons.refresh, color: Colors.white),
               label: Text(
                 'Thử lại',
                 style: GoogleFonts.inter(

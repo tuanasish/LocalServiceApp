@@ -34,19 +34,21 @@ class OrderTimelineItem extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: isActive 
+                color: isActive
                     ? iconColor.withValues(alpha: 0.2)
-                    : (isCompleted ? iconColor : AppColors.textMuted.withValues(alpha: 0.1)),
+                    : (isCompleted
+                          ? iconColor
+                          : AppColors.textMuted.withValues(alpha: 0.1)),
                 shape: BoxShape.circle,
-                border: isActive 
+                border: isActive
                     ? Border.all(color: iconColor, width: 2)
                     : null,
               ),
               child: Icon(
                 icon,
                 size: 20,
-                color: isActive || isCompleted 
-                    ? iconColor 
+                color: isActive || isCompleted
+                    ? iconColor
                     : AppColors.textMuted,
               ),
             ),
@@ -54,7 +56,9 @@ class OrderTimelineItem extends StatelessWidget {
               Container(
                 width: 2,
                 height: 40,
-                color: isCompleted ? iconColor.withValues(alpha: 0.3) : AppColors.textMuted.withValues(alpha: 0.2),
+                color: isCompleted
+                    ? iconColor.withValues(alpha: 0.3)
+                    : AppColors.textMuted.withValues(alpha: 0.2),
               ),
           ],
         ),
@@ -70,8 +74,8 @@ class OrderTimelineItem extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
-                    color: isActive || isCompleted 
-                        ? AppColors.textPrimary 
+                    color: isActive || isCompleted
+                        ? AppColors.textPrimary
                         : AppColors.textMuted,
                   ),
                 ),

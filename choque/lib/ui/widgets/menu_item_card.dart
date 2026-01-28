@@ -72,11 +72,7 @@ class MenuItemCard extends StatelessWidget {
                 color: AppColors.primary,
                 borderRadius: BorderRadius.circular(999),
               ),
-              child: const Icon(
-                Icons.add,
-                size: 20,
-                color: Colors.white,
-              ),
+              child: const Icon(Icons.add, size: 20, color: Colors.white),
             ),
           ),
         ],

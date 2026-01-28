@@ -23,9 +23,7 @@ class OrdersEmptyErrorStatesScreen extends StatelessWidget {
                 child: TabBarView(
                   children: [
                     _buildEmptyState(),
-                    Builder(
-                      builder: (context) => _buildErrorState(context),
-                    ),
+                    Builder(builder: (context) => _buildErrorState(context)),
                   ],
                 ),
               ),
@@ -184,7 +182,10 @@ class OrdersEmptyErrorStatesScreen extends StatelessWidget {
               children: [
                 OutlinedButton(
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                     side: const BorderSide(color: AppColors.primary),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
@@ -207,7 +208,10 @@ class OrdersEmptyErrorStatesScreen extends StatelessWidget {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 12,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                     ),

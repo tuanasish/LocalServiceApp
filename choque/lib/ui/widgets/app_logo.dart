@@ -27,10 +27,7 @@ class AppLogo extends StatelessWidget {
     );
 
     if (padding != null) {
-      logo = Padding(
-        padding: EdgeInsets.all(padding!),
-        child: logo,
-      );
+      logo = Padding(padding: EdgeInsets.all(padding!), child: logo);
     }
 
     if (backgroundColor != null || borderRadius != null) {

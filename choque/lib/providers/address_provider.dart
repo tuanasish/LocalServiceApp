@@ -48,13 +48,17 @@ class AddressNotifier extends Notifier<AsyncValue<void>> {
     }
 
     debugPrint('[AddressProvider] Adding address for user: ${user.id}');
-    debugPrint('[AddressProvider] Address data: label=$label, details=$details, lat=$lat, lng=$lng');
-    debugPrint('[AddressProvider] AddressType: ${addressType.name}, isDefault: $isDefault');
+    debugPrint(
+      '[AddressProvider] Address data: label=$label, details=$details, lat=$lat, lng=$lng',
+    );
+    debugPrint(
+      '[AddressProvider] AddressType: ${addressType.name}, isDefault: $isDefault',
+    );
 
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final supabase = SupabaseService.client;
-      
+
       if (isDefault) {
         debugPrint('[AddressProvider] Setting other addresses to non-default');
         await supabase
@@ -77,17 +81,20 @@ class AddressNotifier extends Notifier<AsyncValue<void>> {
         'recipient_name': recipientName,
         'recipient_phone': recipientPhone,
       };
-      
+
       debugPrint('[AddressProvider] Inserting data: $insertData');
-      
-      final response = await supabase.from('addresses').insert(insertData).select();
-      
+
+      final response = await supabase
+          .from('addresses')
+          .insert(insertData)
+          .select();
+
       debugPrint('[AddressProvider] Insert response: $response');
       debugPrint('[AddressProvider] Address inserted successfully');
 
       ref.invalidate(userAddressesProvider);
     });
-    
+
     // Log final state
     state.when(
       data: (_) => debugPrint('[AddressProvider] State: Success'),
@@ -112,19 +119,22 @@ class AddressNotifier extends Notifier<AsyncValue<void>> {
             .eq('user_id', address.userId);
       }
 
-      await supabase.from('addresses').update({
-        'label': address.label,
-        'details': address.details,
-        'lat': address.lat,
-        'lng': address.lng,
-        'is_default': address.isDefault,
-        'address_type': address.addressType.name,
-        'building': address.building,
-        'gate': address.gate,
-        'driver_note': address.driverNote,
-        'recipient_name': address.recipientName,
-        'recipient_phone': address.recipientPhone,
-      }).eq('id', address.id);
+      await supabase
+          .from('addresses')
+          .update({
+            'label': address.label,
+            'details': address.details,
+            'lat': address.lat,
+            'lng': address.lng,
+            'is_default': address.isDefault,
+            'address_type': address.addressType.name,
+            'building': address.building,
+            'gate': address.gate,
+            'driver_note': address.driverNote,
+            'recipient_name': address.recipientName,
+            'recipient_phone': address.recipientPhone,
+          })
+          .eq('id', address.id);
 
       ref.invalidate(userAddressesProvider);
     });
@@ -148,7 +158,7 @@ class AddressNotifier extends Notifier<AsyncValue<void>> {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final supabase = SupabaseService.client;
-      
+
       await supabase
           .from('addresses')
           .update({'is_default': false})
@@ -166,5 +176,5 @@ class AddressNotifier extends Notifier<AsyncValue<void>> {
 
 final addressNotifierProvider =
     NotifierProvider<AddressNotifier, AsyncValue<void>>(() {
-  return AddressNotifier();
-});
+      return AddressNotifier();
+    });

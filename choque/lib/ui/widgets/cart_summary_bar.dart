@@ -90,10 +90,7 @@ class CartSummaryBar extends StatelessWidget {
                 ),
                 if (subtitle != null) ...[
                   const SizedBox(height: 2),
-                  Text(
-                    subtitle!,
-                    style: AppTextStyles.body13Secondary,
-                  ),
+                  Text(subtitle!, style: AppTextStyles.body13Secondary),
                 ],
               ],
             ),

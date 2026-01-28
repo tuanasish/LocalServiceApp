@@ -6,7 +6,7 @@ import '../../providers/app_providers.dart';
 import '../../data/models/search_filters_model.dart';
 
 /// Search Filters Sheet
-/// 
+///
 /// Bottom sheet với các bộ lọc: giá, đánh giá, khoảng cách, category, sort.
 class SearchFiltersSheet extends ConsumerStatefulWidget {
   final SearchFilters initialFilters;
@@ -27,10 +27,8 @@ class SearchFiltersSheet extends ConsumerStatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => SearchFiltersSheet(
-        initialFilters: initialFilters,
-        onApply: onApply,
-      ),
+      builder: (context) =>
+          SearchFiltersSheet(initialFilters: initialFilters, onApply: onApply),
     );
   }
 
@@ -103,9 +101,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey[200]!),
-                  ),
+                  border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
                 ),
                 child: Row(
                   children: [
@@ -135,7 +131,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
                   ],
                 ),
               ),
-              
+
               // Content
               Expanded(
                 child: SingleChildScrollView(
@@ -166,11 +162,14 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text('0đ', style: AppTextStyles.body13Secondary),
-                          Text('500.000đ', style: AppTextStyles.body13Secondary),
+                          Text(
+                            '500.000đ',
+                            style: AppTextStyles.body13Secondary,
+                          ),
                         ],
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Rating
                       _buildSectionTitle('Đánh giá'),
                       const SizedBox(height: 12),
@@ -183,7 +182,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Distance
                       _buildSectionTitle('Khoảng cách'),
                       const SizedBox(height: 12),
@@ -197,7 +196,7 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Categories
                       _buildSectionTitle('Danh mục'),
                       const SizedBox(height: 12),
@@ -205,13 +204,16 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
                         data: (categories) => Wrap(
                           spacing: 8,
                           runSpacing: 8,
-                          children: categories.map((cat) => _buildCategoryChip(cat)).toList(),
+                          children: categories
+                              .map((cat) => _buildCategoryChip(cat))
+                              .toList(),
                         ),
-                        loading: () => const Center(child: CircularProgressIndicator()),
-                        error: (_, __) => const SizedBox.shrink(),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (_, _) => const SizedBox.shrink(),
                       ),
                       const SizedBox(height: 24),
-                      
+
                       // Sort By
                       _buildSectionTitle('Sắp xếp theo'),
                       const SizedBox(height: 12),
@@ -221,14 +223,12 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
                   ),
                 ),
               ),
-              
+
               // Apply Button
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(color: Colors.grey[200]!),
-                  ),
+                  border: Border(top: BorderSide(color: Colors.grey[200]!)),
                 ),
                 child: SizedBox(
                   width: double.infinity,
@@ -347,7 +347,10 @@ class _SearchFiltersSheetState extends ConsumerState<SearchFiltersSheet> {
         items: const [
           DropdownMenuItem(value: 'relevance', child: Text('Liên quan nhất')),
           DropdownMenuItem(value: 'price_asc', child: Text('Giá thấp đến cao')),
-          DropdownMenuItem(value: 'price_desc', child: Text('Giá cao đến thấp')),
+          DropdownMenuItem(
+            value: 'price_desc',
+            child: Text('Giá cao đến thấp'),
+          ),
           DropdownMenuItem(value: 'rating', child: Text('Đánh giá cao nhất')),
           DropdownMenuItem(value: 'distance', child: Text('Gần nhất')),
         ],

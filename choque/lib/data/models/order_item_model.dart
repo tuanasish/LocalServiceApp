@@ -1,5 +1,5 @@
 /// Order Item Model
-/// 
+///
 /// Ánh xạ bảng `order_items` trong Supabase.
 class OrderItemModel {
   final String id;

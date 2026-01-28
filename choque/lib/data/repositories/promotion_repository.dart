@@ -3,7 +3,7 @@ import '../models/promotion_model.dart';
 import '../../config/constants.dart';
 
 /// Promotion Repository
-/// 
+///
 /// Xử lý các thao tác liên quan đến promotions và vouchers.
 class PromotionRepository {
   final SupabaseClient _client;
@@ -22,18 +22,20 @@ class PromotionRepository {
     required int orderValue,
   }) async {
     try {
-      final response = await _client.rpc(
-        'get_available_promotions',
-        params: {
-          'p_user_id': userId,
-          'p_market_id': marketId,
-          'p_order_value': orderValue,
-        },
-      ).timeout(AppConstants.apiTimeout);
+      final response = await _client
+          .rpc(
+            'get_available_promotions',
+            params: {
+              'p_user_id': userId,
+              'p_market_id': marketId,
+              'p_order_value': orderValue,
+            },
+          )
+          .timeout(AppConstants.apiTimeout);
 
       // RPC trả về simplified data, cần fetch full promotion details
       final promoList = (response as List).cast<Map<String, dynamic>>();
-      
+
       if (promoList.isEmpty) return [];
 
       // Lấy full promotion details từ bảng promotions
@@ -60,7 +62,7 @@ class PromotionRepository {
     int orderValue,
   ) async {
     final now = DateTime.now().toIso8601String();
-    
+
     final response = await _client
         .from('promotions')
         .select()
@@ -71,10 +73,10 @@ class PromotionRepository {
         .or('valid_to.is.null,valid_to.gte.$now')
         .timeout(AppConstants.apiTimeout);
 
-      return (response as List)
-          .map((json) => PromotionModel.fromJson(json))
-          .where((promo) => promo.isValid)
-          .toList();
+    return (response as List)
+        .map((json) => PromotionModel.fromJson(json))
+        .where((promo) => promo.isValid)
+        .toList();
   }
 
   /// Validate và lấy promotion theo code
@@ -127,14 +129,16 @@ class PromotionRepository {
     required int itemsTotal,
   }) async {
     try {
-      final response = await _client.rpc(
-        'calculate_discount',
-        params: {
-          'p_promotion_id': promotionId,
-          'p_delivery_fee': deliveryFee,
-          'p_items_total': itemsTotal,
-        },
-      ).timeout(AppConstants.apiTimeout);
+      final response = await _client
+          .rpc(
+            'calculate_discount',
+            params: {
+              'p_promotion_id': promotionId,
+              'p_delivery_fee': deliveryFee,
+              'p_items_total': itemsTotal,
+            },
+          )
+          .timeout(AppConstants.apiTimeout);
 
       return response as int? ?? 0;
     } catch (e) {
@@ -166,8 +170,8 @@ class PromotionRepository {
       switch (promo.discountType) {
         case 'freeship':
           // Freeship: giảm tối đa = delivery_fee, nhưng không quá discount_value
-          return deliveryFee < promo.discountValue 
-              ? deliveryFee 
+          return deliveryFee < promo.discountValue
+              ? deliveryFee
               : promo.discountValue;
         case 'fixed':
           // Fixed: giảm cố định

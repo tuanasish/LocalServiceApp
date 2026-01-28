@@ -9,11 +9,12 @@ import '../../ui/design_system.dart';
 /// Người dùng đặt mật khẩu mới sau khi xác thực OTP thành công
 class ResetPasswordScreen extends ConsumerStatefulWidget {
   final String? email;
-  
+
   const ResetPasswordScreen({super.key, this.email});
 
   @override
-  ConsumerState<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
+  ConsumerState<ResetPasswordScreen> createState() =>
+      _ResetPasswordScreenState();
 }
 
 class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
@@ -37,9 +38,9 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     setState(() => _isLoading = true);
 
     try {
-      await ref.read(authNotifierProvider.notifier).updatePassword(
-        newPassword: _passwordController.text,
-      );
+      await ref
+          .read(authNotifierProvider.notifier)
+          .updatePassword(newPassword: _passwordController.text);
 
       if (mounted) {
         setState(() => _resetSuccess = true);
@@ -84,7 +85,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
     bool hasUppercase = value.contains(RegExp(r'[A-Z]'));
     bool hasLowercase = value.contains(RegExp(r'[a-z]'));
     bool hasDigits = value.contains(RegExp(r'[0-9]'));
-    
+
     if (!hasUppercase || !hasLowercase || !hasDigits) {
       return 'Mật khẩu cần có chữ hoa, chữ thường và số';
     }
@@ -340,7 +341,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           children: [
             _buildRequirement('6+ ký tự', password.length >= 6),
             _buildRequirement('Chữ hoa', password.contains(RegExp(r'[A-Z]'))),
-            _buildRequirement('Chữ thường', password.contains(RegExp(r'[a-z]'))),
+            _buildRequirement(
+              'Chữ thường',
+              password.contains(RegExp(r'[a-z]')),
+            ),
             _buildRequirement('Số', password.contains(RegExp(r'[0-9]'))),
           ],
         ),
@@ -427,10 +431,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
           ),
           child: Text(
             'Đăng nhập ngay',
-            style: GoogleFonts.inter(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+            style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.w600),
           ),
         ),
       ],

@@ -1,5 +1,5 @@
 /// Search History Model
-/// 
+///
 /// Lưu lịch sử tìm kiếm của user.
 class SearchHistoryModel {
   final String id;

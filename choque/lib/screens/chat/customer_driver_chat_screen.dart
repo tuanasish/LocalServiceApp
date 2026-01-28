@@ -9,14 +9,16 @@ class CustomerDriverChatScreen extends StatefulWidget {
   const CustomerDriverChatScreen({super.key});
 
   @override
-  State<CustomerDriverChatScreen> createState() => _CustomerDriverChatScreenState();
+  State<CustomerDriverChatScreen> createState() =>
+      _CustomerDriverChatScreenState();
 }
 
 class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
   final TextEditingController _messageController = TextEditingController();
   final List<ChatMessage> _messages = [
     ChatMessage(
-      text: 'Xin chào, tôi là tài xế sẽ giao đơn hàng của bạn. Tôi đang trên đường đến cửa hàng.',
+      text:
+          'Xin chào, tôi là tài xế sẽ giao đơn hàng của bạn. Tôi đang trên đường đến cửa hàng.',
       isFromDriver: true,
       timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
     ),
@@ -26,7 +28,8 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
       timestamp: DateTime.now().subtract(const Duration(minutes: 4)),
     ),
     ChatMessage(
-      text: 'Đã nhận được đơn hàng từ cửa hàng. Tôi sẽ đến trong khoảng 15 phút nữa.',
+      text:
+          'Đã nhận được đơn hàng từ cửa hàng. Tôi sẽ đến trong khoảng 15 phút nữa.',
       isFromDriver: true,
       timestamp: DateTime.now().subtract(const Duration(minutes: 2)),
     ),
@@ -46,9 +49,7 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
         child: Column(
           children: [
             _buildHeader(context),
-            Expanded(
-              child: _buildMessagesList(),
-            ),
+            Expanded(child: _buildMessagesList()),
             _buildInputBar(),
           ],
         ),
@@ -95,11 +96,7 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
               color: AppColors.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
-              Icons.person,
-              color: AppColors.primary,
-              size: 24,
-            ),
+            child: const Icon(Icons.person, color: AppColors.primary, size: 24),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -128,10 +125,7 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
             onPressed: () {
               // TODO: gọi điện
             },
-            icon: const Icon(
-              Icons.phone_outlined,
-              color: AppColors.primary,
-            ),
+            icon: const Icon(Icons.phone_outlined, color: AppColors.primary),
           ),
         ],
       ),
@@ -166,7 +160,9 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
       child: Row(
-        mainAxisAlignment: isDriver ? MainAxisAlignment.start : MainAxisAlignment.end,
+        mainAxisAlignment: isDriver
+            ? MainAxisAlignment.start
+            : MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (isDriver) ...[
@@ -193,8 +189,12 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(AppRadius.medium),
                   topRight: const Radius.circular(AppRadius.medium),
-                  bottomLeft: Radius.circular(isDriver ? AppRadius.medium : AppRadius.small),
-                  bottomRight: Radius.circular(isDriver ? AppRadius.small : AppRadius.medium),
+                  bottomLeft: Radius.circular(
+                    isDriver ? AppRadius.medium : AppRadius.small,
+                  ),
+                  bottomRight: Radius.circular(
+                    isDriver ? AppRadius.small : AppRadius.medium,
+                  ),
                 ),
                 boxShadow: AppShadows.soft(0.03),
               ),
@@ -277,9 +277,15 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(AppRadius.pill),
-                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   filled: true,
                   fillColor: AppColors.backgroundLight,
                 ),
@@ -312,11 +318,7 @@ class _CustomerDriverChatScreenState extends State<CustomerDriverChatScreen> {
                     });
                   }
                 },
-                icon: const Icon(
-                  Icons.send,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                icon: const Icon(Icons.send, color: Colors.white, size: 20),
               ),
             ),
           ],

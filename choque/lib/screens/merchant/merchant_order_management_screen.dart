@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../ui/design_system.dart';
 import '../../providers/app_providers.dart';
 import '../../data/models/order_model.dart';
@@ -407,7 +408,7 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
             ),
             child: const Center(child: CircularProgressIndicator()),
           ),
-          error: (_, __) => const SizedBox.shrink(),
+          error: (_, _) => const SizedBox.shrink(),
         );
       },
     );
@@ -829,15 +830,29 @@ class MerchantOrderManagementScreen extends ConsumerWidget {
   }
 
   Future<void> _makePhoneCall(BuildContext context, String phoneNumber) async {
-    // TODO: Implement phone call using url_launcher or similar package
-    // For now, just show a message
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gọi số: $phoneNumber'),
-          duration: const Duration(seconds: 2),
-        ),
-      );
+    final uri = Uri.parse('tel:$phoneNumber');
+    if (await canLaunchUrl(uri)) {
+      try {
+        await launchUrl(uri);
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Không thể gọi số: $phoneNumber'),
+              backgroundColor: AppColors.danger,
+            ),
+          );
+        }
+      }
+    } else {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Thiết bị không hỗ trợ gọi điện'),
+            backgroundColor: AppColors.danger,
+          ),
+        );
+      }
     }
   }
 }

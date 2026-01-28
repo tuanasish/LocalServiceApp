@@ -90,7 +90,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
       // FIX session error: get user directly from supabase client
       final supabase = ref.read(supabaseProvider);
       final user = supabase.auth.currentUser;
-      
+
       if (user == null) {
         throw Exception('Phiên đăng nhập không tồn tại. Vui lòng thử lại.');
       }
@@ -105,16 +105,16 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
       // 2. Create profile
       await authNotifier.createProfile(
-            userId: user.id,
-            fullName: _fullNameController.text.trim(),
-            phone: _phoneController.text.trim().isNotEmpty
-                ? _phoneController.text.trim()
-                : null,
-            avatarUrl: avatarUrl,
-            birthDate: _selectedBirthDate,
-            gender: _selectedGender,
-          );
-      
+        userId: user.id,
+        fullName: _fullNameController.text.trim(),
+        phone: _phoneController.text.trim().isNotEmpty
+            ? _phoneController.text.trim()
+            : null,
+        avatarUrl: avatarUrl,
+        birthDate: _selectedBirthDate,
+        gender: _selectedGender,
+      );
+
       // 3. Add address if provided
       if (_addressController.text.trim().isNotEmpty) {
         await authNotifier.addAddress(
@@ -144,10 +144,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(message), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -245,10 +242,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 // Success message
                 Text(
                   'Email đã được xác thực',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 40),
@@ -302,13 +296,18 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           DropdownButtonFormField<String>(
                             initialValue: _selectedGender,
                             decoration: InputDecoration(
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 12,
+                              ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
                               ),
                             ),
                             hint: const Text('Chọn'),
@@ -318,7 +317,8 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                                 child: Text(gender),
                               );
                             }).toList(),
-                            onChanged: (val) => setState(() => _selectedGender = val),
+                            onChanged: (val) =>
+                                setState(() => _selectedGender = val),
                           ),
                         ],
                       ),
@@ -364,8 +364,9 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                           width: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         )
                       : const Text(
@@ -380,10 +381,7 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
                 // Terms text
                 Text(
                   'Bằng việc đăng ký, bạn đồng ý với\nĐiều khoản sử dụng và Chính sách bảo mật',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[500],
-                  ),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
                   textAlign: TextAlign.center,
                 ),
               ],

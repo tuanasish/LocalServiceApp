@@ -22,10 +22,12 @@ class CheckoutFixedFeeScreen extends ConsumerStatefulWidget {
   const CheckoutFixedFeeScreen({super.key});
 
   @override
-  ConsumerState<CheckoutFixedFeeScreen> createState() => _CheckoutFixedFeeScreenState();
+  ConsumerState<CheckoutFixedFeeScreen> createState() =>
+      _CheckoutFixedFeeScreenState();
 }
 
-class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen> {
+class _CheckoutFixedFeeScreenState
+    extends ConsumerState<CheckoutFixedFeeScreen> {
   UserAddress? _selectedAddress;
   LocationModel? _temporaryAddress;
   bool _isUsingTemporaryAddress = false;
@@ -61,22 +63,23 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
           ),
         );
       }
-      
-      if (next.lastCreatedOrder != null && next.lastCreatedOrder != previous?.lastCreatedOrder) {
-        context.go('/orders/${next.lastCreatedOrder!.id}');
+
+      if (next.lastCreatedOrder != null &&
+          next.lastCreatedOrder != previous?.lastCreatedOrder) {
+        if (mounted) {
+          context.go('/orders/${next.lastCreatedOrder!.id}');
+        }
       }
     });
 
-    final orderState = ref.watch(orderNotifierProvider);
-    final isPlacingOrder = orderState.isPlacing;
 
     // Nếu giỏ hàng trống, quay về trang trước
     if (cartItems.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Giỏ hàng trống')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Giỏ hàng trống')));
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -149,25 +152,35 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
           }
 
           // Hiển thị địa chỉ tạm thời hoặc địa chỉ đã lưu
-          final displayAddress = _isUsingTemporaryAddress && _temporaryAddress != null
+          final displayAddress =
+              _isUsingTemporaryAddress && _temporaryAddress != null
               ? _temporaryAddress!.address ?? _temporaryAddress!.label
               : _selectedAddress!.details;
           final displayLabel = _isUsingTemporaryAddress
               ? null
-              : (_selectedAddress!.label.isNotEmpty ? _selectedAddress!.label : null);
+              : (_selectedAddress!.label.isNotEmpty
+                    ? _selectedAddress!.label
+                    : null);
 
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
                 children: [
-                  const Icon(Icons.location_on, color: AppColors.primary, size: 20),
+                  const Icon(
+                    Icons.location_on,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                   const SizedBox(width: 8),
                   Text('Địa chỉ giao hàng', style: AppTextStyles.label14),
                   if (_isUsingTemporaryAddress) ...[
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: AppColors.danger.withAlpha(25),
                         borderRadius: BorderRadius.circular(4),
@@ -185,14 +198,14 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
                 ],
               ),
               const SizedBox(height: 8),
-              Text(
-                displayAddress,
-                style: AppTextStyles.body13Secondary,
-              ),
+              Text(displayAddress, style: AppTextStyles.body13Secondary),
               if (displayLabel != null) ...[
                 const SizedBox(height: 4),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withAlpha(25),
                     borderRadius: BorderRadius.circular(4),
@@ -247,12 +260,17 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
           },
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
           ),
           icon: const Icon(Icons.add, size: 18, color: Colors.white),
           label: Text(
             'Thêm địa chỉ',
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600),
+            style: GoogleFonts.inter(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ],
@@ -273,24 +291,33 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
           children: [
             Text('Chọn địa chỉ giao hàng', style: AppTextStyles.heading18),
             const SizedBox(height: 16),
-            ...addresses.map((address) => ListTile(
-              leading: Icon(
-                (!_isUsingTemporaryAddress && _selectedAddress?.id == address.id)
-                    ? Icons.radio_button_checked
-                    : Icons.radio_button_off,
-                color: AppColors.primary,
+            ...addresses.map(
+              (address) => ListTile(
+                leading: Icon(
+                  (!_isUsingTemporaryAddress &&
+                          _selectedAddress?.id == address.id)
+                      ? Icons.radio_button_checked
+                      : Icons.radio_button_off,
+                  color: AppColors.primary,
+                ),
+                title: Text(
+                  address.label.isNotEmpty ? address.label : 'Địa chỉ',
+                ),
+                subtitle: Text(
+                  address.details,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                onTap: () {
+                  setState(() {
+                    _selectedAddress = address;
+                    _isUsingTemporaryAddress = false;
+                    _temporaryAddress = null;
+                  });
+                  Navigator.pop(context);
+                },
               ),
-              title: Text(address.label.isNotEmpty ? address.label : 'Địa chỉ'),
-              subtitle: Text(address.details, maxLines: 2, overflow: TextOverflow.ellipsis),
-              onTap: () {
-                setState(() {
-                  _selectedAddress = address;
-                  _isUsingTemporaryAddress = false;
-                  _temporaryAddress = null;
-                });
-                Navigator.pop(context);
-              },
-            )),
+            ),
             const SizedBox(height: 8),
             ListTile(
               leading: Icon(
@@ -300,10 +327,14 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
                 color: AppColors.primary,
               ),
               title: const Text('Chọn địa chỉ mới trên bản đồ'),
-              subtitle: const Text('Chọn địa chỉ tạm thời, không lưu vào profile'),
+              subtitle: const Text(
+                'Chọn địa chỉ tạm thời, không lưu vào profile',
+              ),
               onTap: () async {
                 Navigator.pop(context);
-                final result = await context.push<LocationModel?>('/address/map-picker');
+                final result = await context.push<LocationModel?>(
+                  '/address/map-picker',
+                );
                 if (result != null) {
                   setState(() {
                     _temporaryAddress = result;
@@ -350,7 +381,9 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
       children: [
         Row(
           children: [
-            Expanded(child: Text('Tóm tắt đơn hàng', style: AppTextStyles.heading18)),
+            Expanded(
+              child: Text('Tóm tắt đơn hàng', style: AppTextStyles.heading18),
+            ),
             Text(
               shopName,
               style: GoogleFonts.inter(
@@ -361,14 +394,16 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
           ],
         ),
         const SizedBox(height: 12),
-        ...items.map((item) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: _buildOrderItemRow(
-            title: item.name,
-            quantity: item.quantity,
-            price: _formatPrice(item.subtotal),
+        ...items.map(
+          (item) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: _buildOrderItemRow(
+              title: item.name,
+              quantity: item.quantity,
+              price: _formatPrice(item.subtotal),
+            ),
           ),
-        )),
+        ),
       ],
     );
   }
@@ -466,7 +501,11 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
         ),
         child: Row(
           children: [
-            const Icon(Icons.confirmation_number_outlined, size: 22, color: AppColors.primary),
+            const Icon(
+              Icons.confirmation_number_outlined,
+              size: 22,
+              color: AppColors.primary,
+            ),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -476,7 +515,9 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
                 style: GoogleFonts.inter(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: _voucherDiscount > 0 ? AppColors.primary : AppColors.textSecondary,
+                  color: _voucherDiscount > 0
+                      ? AppColors.primary
+                      : AppColors.textSecondary,
                 ),
               ),
             ),
@@ -492,7 +533,11 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
-            const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF94A3B8)),
+            const Icon(
+              Icons.arrow_forward_ios,
+              size: 16,
+              color: Color(0xFF94A3B8),
+            ),
           ],
         ),
       ),
@@ -503,7 +548,7 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
     final cartTotal = ref.read(cartTotalProvider);
     final currentUserAsync = ref.read(currentUserProvider);
     final profile = ref.read(currentProfileProvider).value;
-    
+
     final currentUser = currentUserAsync.asData?.value;
     if (currentUser == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -532,7 +577,7 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
         },
         onCodeEntered: (code) async {
           await _applyVoucherCode(code, cartTotal);
-          if (mounted) Navigator.pop(context);
+          if (context.mounted) Navigator.pop(context);
         },
       ),
     );
@@ -559,7 +604,9 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
       if (promo == null) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Mã giảm giá không hợp lệ hoặc đã hết hạn')),
+            const SnackBar(
+              content: Text('Mã giảm giá không hợp lệ hoặc đã hết hạn'),
+            ),
           );
         }
         return;
@@ -577,9 +624,9 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Lỗi: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
       }
     }
   }
@@ -613,7 +660,11 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
       ),
       child: Row(
         children: [
-          const Icon(Icons.payment_outlined, size: 22, color: AppColors.primary),
+          const Icon(
+            Icons.payment_outlined,
+            size: 22,
+            color: AppColors.primary,
+          ),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
@@ -625,7 +676,11 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
               ),
             ),
           ),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF94A3B8)),
+          const Icon(
+            Icons.arrow_forward_ios,
+            size: 16,
+            color: Color(0xFF94A3B8),
+          ),
         ],
       ),
     );
@@ -668,7 +723,10 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
         children: [
           _buildPriceRow(label: 'Tạm tính', value: _formatPrice(subtotal)),
           const SizedBox(height: 8),
-          _buildPriceRow(label: 'Phí giao hàng (Fixed)', value: _formatPrice(_fixedDeliveryFee)),
+          _buildPriceRow(
+            label: 'Phí giao hàng (Fixed)',
+            value: _formatPrice(_fixedDeliveryFee),
+          ),
           if (_voucherDiscount > 0) ...[
             const SizedBox(height: 8),
             _buildPriceRow(
@@ -720,12 +778,12 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
   }
 
   Widget _buildBottomBar(int grandTotal) {
-    final hasAddress = _isUsingTemporaryAddress 
+    final hasAddress = _isUsingTemporaryAddress
         ? (_temporaryAddress != null)
         : (_selectedAddress != null);
 
     final isPlacingOrder = ref.watch(orderNotifierProvider).isPlacing;
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
@@ -783,7 +841,10 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
                 ? const SizedBox(
                     width: 16,
                     height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
                 : const Icon(
                     Icons.arrow_forward,
@@ -818,10 +879,7 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
       builder: (context) => AlertDialog(
         title: Text(
           'Yêu cầu đăng nhập',
-          style: GoogleFonts.inter(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.w600),
         ),
         content: Text(
           'Bạn cần đăng nhập để thêm địa chỉ vào profile. Bạn có muốn đăng nhập ngay bây giờ không?',
@@ -838,11 +896,11 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              context.push('/login?redirect=${Uri.encodeComponent('/profile/addresses/add')}');
+              context.push(
+                '/login?redirect=${Uri.encodeComponent('/profile/addresses/add')}',
+              );
             },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-            ),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             child: Text(
               'Đăng nhập',
               style: GoogleFonts.inter(color: Colors.white),
@@ -855,17 +913,19 @@ class _CheckoutFixedFeeScreenState extends ConsumerState<CheckoutFixedFeeScreen>
 
   Future<void> _placeOrder() async {
     final cartItems = ref.read(cartProvider);
-    
-    await ref.read(orderNotifierProvider.notifier).placeOrder(
-      cartItems: cartItems,
-      selectedAddress: _selectedAddress,
-      temporaryAddress: _temporaryAddress,
-      isUsingTemporaryAddress: _isUsingTemporaryAddress,
-      selectedPromotion: _selectedPromotion,
-      voucherDiscount: _voucherDiscount,
-      deliveryFee: _fixedDeliveryFee,
-      note: _noteController.text.trim(),
-    );
+
+    await ref
+        .read(orderNotifierProvider.notifier)
+        .placeOrder(
+          cartItems: cartItems,
+          selectedAddress: _selectedAddress,
+          temporaryAddress: _temporaryAddress,
+          isUsingTemporaryAddress: _isUsingTemporaryAddress,
+          selectedPromotion: _selectedPromotion,
+          voucherDiscount: _voucherDiscount,
+          deliveryFee: _fixedDeliveryFee,
+          note: _noteController.text.trim(),
+        );
   }
 }
 
@@ -888,10 +948,12 @@ class _VoucherSelectionSheet extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<_VoucherSelectionSheet> createState() => _VoucherSelectionSheetState();
+  ConsumerState<_VoucherSelectionSheet> createState() =>
+      _VoucherSelectionSheetState();
 }
 
-class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> {
+class _VoucherSelectionSheetState
+    extends ConsumerState<_VoucherSelectionSheet> {
   final TextEditingController _codeController = TextEditingController();
 
   @override
@@ -902,11 +964,13 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
 
   @override
   Widget build(BuildContext context) {
-    final promotionsAsync = ref.watch(availablePromotionsProvider({
-      'user_id': widget.userId,
-      'market_id': widget.marketId,
-      'order_value': widget.orderValue,
-    }));
+    final promotionsAsync = ref.watch(
+      availablePromotionsProvider({
+        'user_id': widget.userId,
+        'market_id': widget.marketId,
+        'order_value': widget.orderValue,
+      }),
+    );
 
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
@@ -924,9 +988,7 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(color: Colors.grey[200]!),
-                  ),
+                  border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
                 ),
                 child: Row(
                   children: [
@@ -945,7 +1007,7 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
                   ],
                 ),
               ),
-              
+
               // Nhập mã
               Padding(
                 padding: const EdgeInsets.all(16),
@@ -996,8 +1058,11 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.confirmation_number_outlined,
-                                size: 64, color: Colors.grey[400]),
+                            Icon(
+                              Icons.confirmation_number_outlined,
+                              size: 64,
+                              color: Colors.grey[400],
+                            ),
                             const SizedBox(height: 16),
                             Text(
                               'Không có mã giảm giá khả dụng',
@@ -1014,7 +1079,8 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
                       itemCount: promotions.length,
                       itemBuilder: (context, index) {
                         final promo = promotions[index];
-                        final isSelected = widget.selectedPromotion?.id == promo.id;
+                        final isSelected =
+                            widget.selectedPromotion?.id == promo.id;
 
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
@@ -1040,7 +1106,9 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
                                     width: 48,
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: AppColors.primary.withValues(alpha: 0.1),
+                                      color: AppColors.primary.withValues(
+                                        alpha: 0.1,
+                                      ),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: const Icon(
@@ -1051,7 +1119,8 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           promo.name,
@@ -1095,10 +1164,9 @@ class _VoucherSelectionSheetState extends ConsumerState<_VoucherSelectionSheet> 
                       },
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (error, stack) => Center(
-                    child: Text('Lỗi: $error'),
-                  ),
+                  loading: () =>
+                      const Center(child: CircularProgressIndicator()),
+                  error: (error, stack) => Center(child: Text('Lỗi: $error')),
                 ),
               ),
             ],

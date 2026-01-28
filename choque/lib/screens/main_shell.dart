@@ -7,10 +7,7 @@ import '../ui/widgets/app_bottom_nav_bar.dart';
 class MainShell extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
 
-  const MainShell({
-    super.key,
-    required this.navigationShell,
-  });
+  const MainShell({super.key, required this.navigationShell});
 
   @override
   State<MainShell> createState() => _MainShellState();

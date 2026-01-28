@@ -4,14 +4,14 @@ import '../data/models/order_item_model.dart';
 
 /// CartItem - Đại diện cho một món hàng trong giỏ hàng
 class CartItem {
-  final String id;           // productId
-  final String shopId;       // ID cửa hàng
-  final String shopName;     // Tên cửa hàng
-  final String name;         // Tên sản phẩm
+  final String id; // productId
+  final String shopId; // ID cửa hàng
+  final String shopName; // Tên cửa hàng
+  final String name; // Tên sản phẩm
   final String? description; // Mô tả sản phẩm
-  final String? imageUrl;    // Link hình ảnh
-  final int price;           // Giá (đơn vị: VND)
-  final int quantity;        // Số lượng
+  final String? imageUrl; // Link hình ảnh
+  final int price; // Giá (đơn vị: VND)
+  final int quantity; // Số lượng
 
   const CartItem({
     required this.id,
@@ -24,9 +24,7 @@ class CartItem {
     this.quantity = 1,
   });
 
-  CartItem copyWith({
-    int? quantity,
-  }) {
+  CartItem copyWith({int? quantity}) {
     return CartItem(
       id: id,
       shopId: shopId,
@@ -52,7 +50,9 @@ class CartNotifier extends Notifier<List<CartItem>> {
 
   /// Thêm item vào giỏ hàng
   void addItem(CartItem item) {
-    final existingIndex = state.indexWhere((i) => i.id == item.id && i.shopId == item.shopId);
+    final existingIndex = state.indexWhere(
+      (i) => i.id == item.id && i.shopId == item.shopId,
+    );
     if (existingIndex != -1) {
       // Tăng số lượng nếu đã có
       state = [
@@ -60,7 +60,7 @@ class CartNotifier extends Notifier<List<CartItem>> {
           if (i == existingIndex)
             state[i].copyWith(quantity: state[i].quantity + 1)
           else
-            state[i]
+            state[i],
       ];
     } else {
       state = [...state, item];
@@ -74,7 +74,7 @@ class CartNotifier extends Notifier<List<CartItem>> {
         if (item.id == itemId && item.shopId == shopId)
           item.copyWith(quantity: item.quantity + 1)
         else
-          item
+          item,
     ];
   }
 
@@ -88,13 +88,15 @@ class CartNotifier extends Notifier<List<CartItem>> {
           else
             null // Mark for removal
         else
-          item
+          item,
     ].whereType<CartItem>().toList();
   }
 
   /// Xóa item khỏi giỏ
   void removeItem(String itemId, String shopId) {
-    state = state.where((item) => !(item.id == itemId && item.shopId == shopId)).toList();
+    state = state
+        .where((item) => !(item.id == itemId && item.shopId == shopId))
+        .toList();
   }
 
   /// Xóa toàn bộ giỏ hàng
@@ -115,7 +117,9 @@ class CartNotifier extends Notifier<List<CartItem>> {
 
   /// Lấy số lượng của một item cụ thể trong giỏ
   int getItemQuantity(String itemId, String shopId) {
-    final item = state.where((i) => i.id == itemId && i.shopId == shopId).firstOrNull;
+    final item = state
+        .where((i) => i.id == itemId && i.shopId == shopId)
+        .firstOrNull;
     return item?.quantity ?? 0;
   }
 
@@ -136,42 +140,50 @@ class CartNotifier extends Notifier<List<CartItem>> {
     bool forceClear = false,
   }) {
     if (orderItems.isEmpty) return false;
-    
+
     // Nếu force clear hoặc cart rỗng, clear và add items
     if (forceClear || state.isEmpty) {
-      state = orderItems.map((item) => CartItem(
-        id: item.productId ?? item.id, // Fallback nếu productId null
-        shopId: order.shopId ?? '',
-        shopName: shopName,
-        name: item.productName,
-        price: item.unitPrice,
-        quantity: item.quantity,
-      )).toList();
+      state = orderItems
+          .map(
+            (item) => CartItem(
+              id: item.productId ?? item.id, // Fallback nếu productId null
+              shopId: order.shopId ?? '',
+              shopName: shopName,
+              name: item.productName,
+              price: item.unitPrice,
+              quantity: item.quantity,
+            ),
+          )
+          .toList();
       return true;
     }
-    
+
     // Check conflict: cart có items từ shop khác
     final currentShopId = state.first.shopId;
     if (order.shopId != null && currentShopId != order.shopId) {
       return false; // Cần confirm từ user
     }
-    
+
     // Add items vào cart hiện tại
     for (final item in orderItems) {
-      addItem(CartItem(
-        id: item.productId ?? item.id,
-        shopId: order.shopId ?? '',
-        shopName: shopName,
-        name: item.productName,
-        price: item.unitPrice,
-        quantity: item.quantity,
-      ));
+      addItem(
+        CartItem(
+          id: item.productId ?? item.id,
+          shopId: order.shopId ?? '',
+          shopName: shopName,
+          name: item.productName,
+          price: item.unitPrice,
+          quantity: item.quantity,
+        ),
+      );
     }
     return true;
   }
 }
 
-final cartProvider = NotifierProvider<CartNotifier, List<CartItem>>(CartNotifier.new);
+final cartProvider = NotifierProvider<CartNotifier, List<CartItem>>(
+  CartNotifier.new,
+);
 
 /// Provider để lấy tổng tiền giỏ hàng
 final cartTotalProvider = Provider<int>((ref) {

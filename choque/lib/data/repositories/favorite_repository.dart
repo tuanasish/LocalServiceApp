@@ -24,7 +24,10 @@ class FavoriteRepository {
         .timeout(AppConstants.apiTimeout);
 
     return (response as List)
-        .map((json) => MerchantModel.fromJson(json['shops'] as Map<String, dynamic>))
+        .map(
+          (json) =>
+              MerchantModel.fromJson(json['shops'] as Map<String, dynamic>),
+        )
         .toList();
   }
 
@@ -50,10 +53,10 @@ class FavoriteRepository {
     if (userId == null) throw Exception('Not authenticated');
 
     if (isFavorite) {
-      await _client.from('user_favorites').insert({
-        'user_id': userId,
-        'shop_id': shopId,
-      }).timeout(AppConstants.apiTimeout);
+      await _client
+          .from('user_favorites')
+          .insert({'user_id': userId, 'shop_id': shopId})
+          .timeout(AppConstants.apiTimeout);
     } else {
       await _client
           .from('user_favorites')
