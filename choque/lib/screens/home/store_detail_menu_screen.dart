@@ -117,10 +117,12 @@ class _StoreDetailMenuScreenState extends ConsumerState<StoreDetailMenuScreen> {
       ref.invalidate(isFavoriteProvider(widget.shopId));
     } catch (e) {
       if (mounted) {
-        context.pop();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+        if (context.canPop()) {
+          context.pop();
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Lỗi: $e')),
+        );
       }
     } finally {
       setState(() => _isTogglingFavorite = false);

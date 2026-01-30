@@ -15,6 +15,11 @@ llms.txt
 .env.*.local
 env-config.txt
 
+# Firebase config files (contains API keys)
+**/ios/Runner/GoogleService-Info.plist
+**/ios/**/GoogleService-Info.plist
+**/android/app/google-services.json
+
 # Cursor API setup backups
 .cursor-backup/
 

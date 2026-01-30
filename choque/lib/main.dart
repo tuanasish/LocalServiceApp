@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'data/supabase_client.dart';
 import 'routing/app_router.dart';
 import 'config/constants.dart';
+import 'config/firebase_options_ios.dart';
 import 'services/fcm_service.dart';
 import 'services/notification_handler_service.dart';
 import 'providers/notification_provider.dart';
@@ -14,34 +17,100 @@ import 'providers/notification_provider.dart';
 // Background message handler (top-level function)
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
+  if (Platform.isIOS) {
+    await Firebase.initializeApp(options: iosFirebaseOptions);
+  } else {
+    await Firebase.initializeApp();
+  }
   // Call internal background handler if needed
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
-  await Firebase.initializeApp();
+  try {
+    // Initialize Firebase (iOS dùng options từ Dart vì không gọi FirebaseApp.configure() native)
+    if (Platform.isIOS) {
+      await Firebase.initializeApp(options: iosFirebaseOptions);
+    } else {
+      await Firebase.initializeApp();
+    }
+    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
 
-  // Register background message handler
-  FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    // Load environment variables
+    await dotenv.load(fileName: '.env');
 
-  // Load environment variables
-  await dotenv.load(fileName: '.env');
+    if (!AppConstants.isConfigValid) {
+      _runErrorApp(
+        'Thiếu cấu hình .env\n\n'
+        'Cần có: SUPABASE_URL, SUPABASE_ANON_KEY\n\n'
+        'Hãy copy .env.example thành .env và điền giá trị thật từ Supabase.',
+      );
+      return;
+    }
 
-  // Validate configuration
-  if (!AppConstants.isConfigValid) {
-    throw Exception(
-      'Missing environment variables. Please check your .env file.\n'
-      'Required: SUPABASE_URL, SUPABASE_ANON_KEY',
+    // Initialize Supabase
+    await SupabaseService.initialize();
+
+    runApp(const ProviderScope(child: MyApp()));
+  } catch (e, st) {
+    // Hiển thị lỗi thay vì màn hình trắng (ví dụ: URL Supabase sai)
+    _runErrorApp(
+      'Lỗi khởi tạo:\n\n$e\n\n'
+      'Kiểm tra file .env: SUPABASE_URL và SUPABASE_ANON_KEY phải là giá trị thật từ Supabase (Settings → API).',
+      detail: st.toString(),
     );
   }
+}
 
-  // Initialize Supabase
-  await SupabaseService.initialize();
-
-  runApp(const ProviderScope(child: MyApp()));
+/// Hiển thị app chỉ với màn hình lỗi khi init thất bại
+void _runErrorApp(String message, {String? detail}) {
+  runApp(
+    MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 48),
+                const Icon(Icons.error_outline, size: 64, color: Color(0xFF1E7F43)),
+                const SizedBox(height: 24),
+                Text(
+                  'Chợ Quê',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[800],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  message,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[700], height: 1.4),
+                ),
+                if (detail != null && detail.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  Text(
+                    detail,
+                    style: TextStyle(fontSize: 11, color: Colors.grey[500], fontFamily: 'monospace'),
+                    maxLines: 8,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 class MyApp extends ConsumerStatefulWidget {

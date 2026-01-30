@@ -71,7 +71,11 @@ class _AdminItemEditorScreenState extends ConsumerState<AdminItemEditorScreen> {
             backgroundColor: AppColors.error,
           ),
         );
-        context.pop();
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/admin/menu');
+        }
       }
     }
   }
@@ -320,14 +324,27 @@ class _AdminItemEditorScreenState extends ConsumerState<AdminItemEditorScreen> {
         imageQuality: 85,
       );
       if (pickedFile != null) {
+        if (!mounted) return;
         setState(() {
           _selectedImage = File(pickedFile.path);
         });
       }
     } catch (e) {
       if (mounted) {
+        final msg = e.toString().toLowerCase();
+        final isPermissionDenied = msg.contains('permission') ||
+            msg.contains('denied') ||
+            msg.contains('photo') ||
+            msg.contains('camera');
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Không thể chọn ảnh: $e')),
+          SnackBar(
+            content: Text(
+              isPermissionDenied
+                  ? 'Quyền truy cập ảnh/camera đã bị tắt. Vui lòng bật trong Cài đặt.'
+                  : 'Không thể chọn ảnh: $e',
+            ),
+            backgroundColor: isPermissionDenied ? Colors.orange : null,
+          ),
         );
       }
     }

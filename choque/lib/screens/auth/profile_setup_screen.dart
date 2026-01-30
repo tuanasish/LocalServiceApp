@@ -37,15 +37,34 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   final List<String> _genderOptions = ['Nam', 'Nữ', 'Khác'];
 
   Future<void> _pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-      maxWidth: 500,
-    );
+    try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+        maxWidth: 500,
+      );
 
-    if (image != null) {
-      setState(() => _imageFile = image);
+      if (image != null && mounted) {
+        setState(() => _imageFile = image);
+      }
+    } catch (e) {
+      if (mounted) {
+        final msg = e.toString().toLowerCase();
+        final isPermissionDenied = msg.contains('permission') ||
+            msg.contains('denied') ||
+            msg.contains('photo');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isPermissionDenied
+                  ? 'Quyền truy cập ảnh đã bị tắt. Vui lòng bật trong Cài đặt.'
+                  : 'Không thể chọn ảnh: $e',
+            ),
+            backgroundColor: isPermissionDenied ? Colors.orange : null,
+          ),
+        );
+      }
     }
   }
 

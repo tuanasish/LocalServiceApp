@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// Design system chung cho app Chợ Quê.
+/// Trên iOS dùng font fallback (SF Pro) khi Inter chưa load.
 
 class AppColors {
   AppColors._();
@@ -57,46 +60,59 @@ class AppShadows {
 class AppTextStyles {
   AppTextStyles._();
 
-  static TextStyle get heading20 => GoogleFonts.inter(
+  static const List<String> _iosFontFallback = [
+    'SF Pro Display',
+    'SF Pro Text',
+    '.SF UI Text',
+  ];
+
+  static TextStyle _withFallback(TextStyle style) {
+    if (Platform.isIOS) {
+      return style.copyWith(fontFamilyFallback: _iosFontFallback);
+    }
+    return style;
+  }
+
+  static TextStyle get heading20 => _withFallback(GoogleFonts.inter(
     fontSize: 20,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     letterSpacing: -0.5,
-  );
+  ));
 
-  static TextStyle get heading18 => GoogleFonts.inter(
+  static TextStyle get heading18 => _withFallback(GoogleFonts.inter(
     fontSize: 18,
     fontWeight: FontWeight.w700,
     color: AppColors.textPrimary,
     letterSpacing: -0.5,
-  );
+  ));
 
-  static TextStyle get label14 => GoogleFonts.inter(
+  static TextStyle get label14 => _withFallback(GoogleFonts.inter(
     fontSize: 14,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-  );
+  ));
 
   static TextStyle get body13Secondary =>
-      GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary);
+      _withFallback(GoogleFonts.inter(fontSize: 13, color: AppColors.textSecondary));
 
   static TextStyle get body15Secondary =>
-      GoogleFonts.inter(fontSize: 15, color: AppColors.textSecondary);
+      _withFallback(GoogleFonts.inter(fontSize: 15, color: AppColors.textSecondary));
 
   static TextStyle get body13 =>
-      GoogleFonts.inter(fontSize: 13, color: AppColors.textPrimary);
+      _withFallback(GoogleFonts.inter(fontSize: 13, color: AppColors.textPrimary));
 
   static TextStyle get body12 =>
-      GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary);
+      _withFallback(GoogleFonts.inter(fontSize: 12, color: AppColors.textSecondary));
 
   static TextStyle get body11 =>
-      GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary);
+      _withFallback(GoogleFonts.inter(fontSize: 11, color: AppColors.textSecondary));
 
-  static TextStyle get label16 => GoogleFonts.inter(
+  static TextStyle get label16 => _withFallback(GoogleFonts.inter(
     fontSize: 16,
     fontWeight: FontWeight.w600,
     color: AppColors.textPrimary,
-  );
+  ));
 }
 
 /// Header đơn giản với nút back + title, dùng lại cho nhiều màn.

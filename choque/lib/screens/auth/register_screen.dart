@@ -21,15 +21,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   bool _isLoading = false;
   bool _showPassword = false;
 
+  // Listener callback để có thể remove trong dispose
+  void _onPasswordChanged() => setState(() {});
+
   @override
   void initState() {
     super.initState();
     // Listen to password changes to update hints
-    _passwordController.addListener(() => setState(() {}));
+    _passwordController.addListener(_onPasswordChanged);
   }
 
   @override
   void dispose() {
+    _passwordController.removeListener(_onPasswordChanged);
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -119,7 +123,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 24,
+            bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+          ),
           child: Form(
             key: _formKey,
             child: Column(

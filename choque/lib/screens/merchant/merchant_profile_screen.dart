@@ -258,19 +258,20 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
   }
 
   Future<void> _pickAndUploadImage(String shopId) async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(
-      source: ImageSource.gallery,
-      maxWidth: 512,
-      maxHeight: 512,
-      imageQuality: 80,
-    );
-
-    if (pickedFile == null) return;
-
-    setState(() => _isUploadingImage = true);
-
     try {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 512,
+        maxHeight: 512,
+        imageQuality: 80,
+      );
+
+      if (pickedFile == null) return;
+
+      if (!mounted) return;
+      setState(() => _isUploadingImage = true);
+
       final file = File(pickedFile.path);
       final fileName = 'shop_$shopId.jpg';
       final supabase = Supabase.instance.client;
@@ -299,10 +300,18 @@ class _MerchantProfileScreenState extends ConsumerState<MerchantProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final msg = e.toString().toLowerCase();
+        final isPermissionDenied = msg.contains('permission') ||
+            msg.contains('denied') ||
+            msg.contains('photo');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Lỗi upload: $e'),
-            backgroundColor: AppColors.danger,
+            content: Text(
+              isPermissionDenied
+                  ? 'Quyền truy cập ảnh đã bị tắt. Vui lòng bật trong Cài đặt.'
+                  : 'Lỗi upload ảnh: ${e.toString()}',
+            ),
+            backgroundColor: isPermissionDenied ? Colors.orange : null,
           ),
         );
       }

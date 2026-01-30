@@ -49,17 +49,20 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
   double? _cachedUserLat;
   double? _cachedUserLng;
 
+  // Listener callback để có thể remove trong dispose
+  void _onTabChanged() {
+    if (_tabController.indexIsChanging) {
+      setState(() {
+        _selectedTab = ['all', 'products', 'shops'][_tabController.index];
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(() {
-      if (_tabController.indexIsChanging) {
-        setState(() {
-          _selectedTab = ['all', 'products', 'shops'][_tabController.index];
-        });
-      }
-    });
+    _tabController.addListener(_onTabChanged);
 
     if (widget.initialQuery != null && widget.initialQuery!.isNotEmpty) {
       _searchController.text = widget.initialQuery!;
@@ -72,6 +75,7 @@ class _UnifiedSearchScreenState extends ConsumerState<UnifiedSearchScreen>
   void dispose() {
     _debounceTimer?.cancel();
     _suggestionsDebounceTimer?.cancel();
+    _tabController.removeListener(_onTabChanged);
     _searchController.dispose();
     _tabController.dispose();
     super.dispose();

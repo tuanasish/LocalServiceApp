@@ -76,10 +76,15 @@ class _CheckoutFixedFeeScreenState
     // Nếu giỏ hàng trống, quay về trang trước
     if (cartItems.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        context.pop();
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Giỏ hàng trống')));
+        if (!mounted) return;
+        if (context.canPop()) {
+          context.pop();
+        } else {
+          context.go('/');
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Giỏ hàng trống')),
+        );
       });
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
@@ -89,12 +94,17 @@ class _CheckoutFixedFeeScreenState
 
     return Scaffold(
       backgroundColor: AppColors.backgroundLight,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Column(
           children: [
             const AppSimpleHeader(title: 'Xác nhận đơn hàng'),
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(

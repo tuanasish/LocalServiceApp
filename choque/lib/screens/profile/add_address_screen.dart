@@ -68,6 +68,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     // Pre-fill contact info from user profile if adding new address
     if (editing == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         _prefillFromProfile();
       });
     }
@@ -272,6 +273,10 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

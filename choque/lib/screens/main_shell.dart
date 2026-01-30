@@ -17,7 +17,7 @@ class _MainShellState extends State<MainShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.navigationShell,
+      body: SafeArea(child: widget.navigationShell),
       bottomNavigationBar: _buildBottomNavBar(),
     );
   }

@@ -58,6 +58,7 @@ class _MapAddressPickerScreenState
           widget.initialLocation!.address ?? widget.initialLocation!.label;
     }
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _loadSuggestionsForLocation(_selectedLocation);
     });
   }
@@ -68,7 +69,9 @@ class _MapAddressPickerScreenState
     _suggestionDebounce?.cancel();
     _searchController.dispose();
     _sheetController.dispose();
-    _mapController?.dispose();
+    // Không gọi _mapController?.dispose() - VietmapGL widget tự dispose controller,
+    // gọi thêm sẽ gây "used after being disposed"
+    _mapController = null;
     super.dispose();
   }
 
@@ -219,18 +222,68 @@ class _MapAddressPickerScreenState
   Future<void> _getCurrentLocation() async {
     try {
       final permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        final openSettings = await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Quyền truy cập vị trí'),
+            content: const Text(
+              'Quyền truy cập vị trí đã bị tắt. Mở Cài đặt để bật lại?',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Đóng'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('Mở Cài đặt'),
+              ),
+            ],
+          ),
+        );
+        if (openSettings == true) {
+          await Geolocator.openAppSettings();
+        }
+        return;
+      }
       if (permission == LocationPermission.denied) {
         final requested = await Geolocator.requestPermission();
-        if (requested == LocationPermission.denied ||
-            requested == LocationPermission.deniedForever) {
+        if (requested == LocationPermission.deniedForever) {
+          if (!mounted) return;
+          final openSettings = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Quyền truy cập vị trí'),
+              content: const Text(
+                'Quyền truy cập vị trí đã bị tắt. Mở Cài đặt để bật lại?',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: const Text('Đóng'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: const Text('Mở Cài đặt'),
+                ),
+              ],
+            ),
+          );
+          if (openSettings == true) {
+            await Geolocator.openAppSettings();
+          }
           return;
         }
+        if (requested == LocationPermission.denied) return;
       }
 
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
 
+      if (!mounted) return;
       final location = LatLng(position.latitude, position.longitude);
 
       setState(() {

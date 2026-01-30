@@ -25,11 +25,10 @@ class _OrderTrackingMapWidgetState
   bool _markerAdded = false;
 
   void _updateMarkers(DriverLocationModel? driverLocation) async {
-    if (_controller == null) return;
+    if (_controller == null || !mounted) return;
 
     // Clear existing symbols if necessary or just add them once
     if (!_markerAdded) {
-      // Pickup (Store)
       await _controller!.addSymbol(
         SymbolOptions(
           geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
@@ -38,8 +37,8 @@ class _OrderTrackingMapWidgetState
           textOffset: const Offset(0, 2),
         ),
       );
+      if (!mounted) return;
 
-      // Dropoff (Customer)
       await _controller!.addSymbol(
         SymbolOptions(
           geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
@@ -48,30 +47,29 @@ class _OrderTrackingMapWidgetState
           textOffset: const Offset(0, 2),
         ),
       );
-
+      if (!mounted) return;
       _markerAdded = true;
     }
 
-    // Driver (updates frequently)
     if (driverLocation != null) {
-      // For simplicity, we can remove previous driver symbol and add new one
-      // In a real app, you'd track the symbol ID to update it
       await _controller!.clearSymbols();
-      _markerAdded = false; // Re-add static markers next time
+      if (!mounted) return;
+      _markerAdded = false;
 
-      // Re-add pickup/dropoff (due to clearSymbols)
       await _controller!.addSymbol(
         SymbolOptions(
           geometry: LatLng(widget.order.pickup.lat, widget.order.pickup.lng),
           textField: 'Cửa hàng',
         ),
       );
+      if (!mounted) return;
       await _controller!.addSymbol(
         SymbolOptions(
           geometry: LatLng(widget.order.dropoff.lat, widget.order.dropoff.lng),
           textField: 'Bạn',
         ),
       );
+      if (!mounted) return;
 
       await _controller!.addSymbol(
         SymbolOptions(
@@ -91,8 +89,7 @@ class _OrderTrackingMapWidgetState
         ? ref.watch(specificDriverLocationProvider(driverId))
         : const AsyncValue<DriverLocationModel?>.data(null);
 
-    // Call update markers when location changes
-    if (_controller != null) {
+    if (_controller != null && mounted) {
       _updateMarkers(driverLocationAsync.value);
     }
 

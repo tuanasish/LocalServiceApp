@@ -28,6 +28,7 @@ class _DriverHomeDashboardScreenState
     super.initState();
     // Load driver status từ profile
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       _loadDriverStatus();
     });
   }
@@ -61,6 +62,7 @@ class _DriverHomeDashboardScreenState
         final isOnline = driverStatus == 'online' || driverStatus == 'busy';
         if (_isOnline != isOnline) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
             setState(() => _isOnline = isOnline);
           });
         }

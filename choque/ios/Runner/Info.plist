@@ -49,6 +49,26 @@
 	<string>Cần vị trí để hiển thị bản đồ và chỉ đường</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Cần vị trí để tracking đơn hàng</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Cần vị trí để cập nhật khi bạn đang giao hàng</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Cần camera để chụp ảnh sản phẩm</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cần truy cập thư viện ảnh để chọn ảnh</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+		<string>location</string>
+		<string>fetch</string>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>tel</string>
+		<string>sms</string>
+		<string>mailto</string>
+		<string>https</string>
+		<string>http</string>
+	</array>
 	<key>FirebaseAppDelegateProxyEnabled</key>
 	<false/>
 </dict>

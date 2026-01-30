@@ -38,18 +38,27 @@ class FCMService {
       // Initialize local notifications
       await _initializeLocalNotifications(onMessageTapped);
 
-      // Get FCM token
-      _fcmToken = await _messaging.getToken();
-      if (_fcmToken != null) {
-        if (kDebugMode) {
-          print('[FCMService] FCM Token: ${_fcmToken!.substring(0, 20)}...');
+      // Get FCM token (trên iOS Simulator không có APNS token nên getToken() có thể throw)
+      try {
+        _fcmToken = await _messaging.getToken();
+        if (_fcmToken != null) {
+          if (kDebugMode) {
+            print('[FCMService] FCM Token: ${_fcmToken!.substring(0, 20)}...');
+          }
+          await repository.saveFCMToken(
+            token: _fcmToken!,
+            deviceType: Platform.isAndroid ? 'android' : 'ios',
+          );
         }
-
-        // Save token to database
-        await repository.saveFCMToken(
-          token: _fcmToken!,
-          deviceType: Platform.isAndroid ? 'android' : 'ios',
-        );
+      } on FirebaseException catch (e) {
+        if (e.code == 'apns-token-not-set' || e.code == 'messaging/unknown') {
+          if (kDebugMode) {
+            print('[FCMService] APNS token chưa có (iOS Simulator hoặc chưa cấp quyền) - bỏ qua getToken');
+          }
+          // Không rethrow: app vẫn chạy bình thường, push sẽ hoạt động trên thiết bị thật
+        } else {
+          rethrow;
+        }
       }
 
       // Listen to token refresh
@@ -97,6 +106,14 @@ class FCMService {
     } catch (e) {
       if (kDebugMode) {
         print('[FCMService] Error initializing: $e');
+      }
+      // Trên iOS Simulator apns-token-not-set là bình thường, không làm crash app
+      final msg = e.toString();
+      if (msg.contains('apns-token-not-set') || msg.contains('APNS token')) {
+        if (kDebugMode) {
+          print('[FCMService] Bỏ qua lỗi APNS (Simulator) - FCM sẽ hoạt động trên thiết bị thật');
+        }
+        return;
       }
       rethrow;
     }

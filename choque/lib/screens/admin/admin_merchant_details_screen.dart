@@ -77,7 +77,11 @@ class _AdminMerchantDetailsScreenState
               backgroundColor: AppColors.success,
             ),
           );
-          context.pop();
+          if (context.canPop()) {
+            context.pop();
+          } else {
+            context.go('/admin/merchants');
+          }
         }
       } catch (e) {
         if (mounted) {

@@ -87,6 +87,7 @@ class UserProfileScreen extends ConsumerWidget {
             _buildHeader(context),
             Expanded(
               child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Column(
@@ -130,7 +131,13 @@ class UserProfileScreen extends ConsumerWidget {
       child: Row(
         children: [
           IconButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () {
+              if (context.canPop()) {
+                context.pop();
+              } else {
+                context.go('/');
+              }
+            },
             icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
           ),
           const SizedBox(width: 4),
@@ -524,16 +531,16 @@ class UserProfileScreen extends ConsumerWidget {
   }
 
   Future<void> _updateAvatar(BuildContext context, WidgetRef ref) async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery,
-      imageQuality: 80,
-      maxWidth: 500,
-    );
-
-    if (image == null) return;
-
     try {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+        maxWidth: 500,
+      );
+
+      if (image == null) return;
+
       final authNotifier = ref.read(authNotifierProvider.notifier);
       final avatarUrl = await authNotifier.uploadAvatar(image);
       if (avatarUrl != null) {
@@ -541,9 +548,20 @@ class UserProfileScreen extends ConsumerWidget {
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Lỗi upload: ${e.toString()}')));
+        final msg = e.toString().toLowerCase();
+        final isPermissionDenied = msg.contains('permission') ||
+            msg.contains('denied') ||
+            msg.contains('photo');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              isPermissionDenied
+                  ? 'Quyền truy cập ảnh đã bị tắt. Vui lòng bật trong Cài đặt.'
+                  : 'Lỗi upload: ${e.toString()}',
+            ),
+            backgroundColor: isPermissionDenied ? Colors.orange : null,
+          ),
+        );
       }
     }
   }

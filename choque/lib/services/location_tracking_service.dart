@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import '../data/repositories/driver_repository.dart';
@@ -39,17 +41,24 @@ class LocationTrackingService {
   Future<Position?> getCurrentLocation() async {
     try {
       final permission = await checkPermission();
+      if (permission == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        return null;
+      }
       if (permission == LocationPermission.denied) {
         final requested = await requestPermission();
-        if (requested == LocationPermission.denied ||
-            requested == LocationPermission.deniedForever) {
+        if (requested == LocationPermission.deniedForever) {
+          await Geolocator.openAppSettings();
+          return null;
+        }
+        if (requested == LocationPermission.denied) {
           return null;
         }
       }
 
       return await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        timeLimit: Duration(seconds: Platform.isIOS ? 20 : 10),
       );
     } catch (e) {
       debugPrint('[GPS] Error getting current location: $e');
@@ -69,10 +78,21 @@ class LocationTrackingService {
 
     // Kiểm tra permission
     final permission = await checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      await Geolocator.openAppSettings();
+      throw Exception(
+        'Quyền truy cập vị trí đã bị tắt. Vui lòng bật trong Cài đặt.',
+      );
+    }
     if (permission == LocationPermission.denied) {
       final requested = await requestPermission();
-      if (requested == LocationPermission.denied ||
-          requested == LocationPermission.deniedForever) {
+      if (requested == LocationPermission.deniedForever) {
+        await Geolocator.openAppSettings();
+        throw Exception(
+          'Quyền truy cập vị trí đã bị tắt. Vui lòng bật trong Cài đặt.',
+        );
+      }
+      if (requested == LocationPermission.denied) {
         throw Exception('Location permission denied');
       }
     }
@@ -124,12 +144,21 @@ class LocationTrackingService {
   }
 
   /// Get location settings (can be adjusted for battery optimization)
+  /// iOS: AppleSettings với background location cho driver tracking
   LocationSettings _getLocationSettings() {
-    // TODO: Adjust based on battery level
-    // For now, use standard settings
+    if (Platform.isIOS) {
+      return AppleSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 50,
+        timeLimit: const Duration(seconds: 30),
+        activityType: ActivityType.other,
+        allowBackgroundLocationUpdates: true,
+        showBackgroundLocationIndicator: true,
+      );
+    }
     return const LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 50, // 50 meters
+      distanceFilter: 50,
       timeLimit: Duration(seconds: 30),
     );
   }
