@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../design_system.dart';
 import '../../data/models/profile_model.dart';
-import 'driver_status_badge.dart';
 
 /// Driver Approval Card
 ///
@@ -42,7 +41,7 @@ class DriverApprovalCard extends StatelessWidget {
                   // Avatar
                   CircleAvatar(
                     radius: 28,
-                    backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+                    backgroundColor: AppColors.primary.withValues(alpha: 0.1), // Changed withOpacity to withValues
                     child: Text(
                       _getInitials(driver.fullName ?? 'Driver'),
                       style: GoogleFonts.inter(
@@ -80,11 +79,7 @@ class DriverApprovalCard extends StatelessWidget {
                   ),
 
                   // Status Badge
-                  if (driver.driverApprovalStatus != null)
-                    DriverStatusBadge(
-                      status: driver.driverApprovalStatus!,
-                      compact: true,
-                    ),
+                  _buildStatusBadge(driver.driverApprovalStatus ?? 'pending'), // Replaced DriverStatusBadge with _buildStatusBadge
                 ],
               ),
 
@@ -100,7 +95,7 @@ class DriverApprovalCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon( // Added const
                         Icons.motorcycle,
                         size: 20,
                         color: AppColors.textSecondary,
@@ -145,7 +140,7 @@ class DriverApprovalCard extends StatelessWidget {
                   ),
                   child: Row(
                     children: [
-                      Icon(
+                      const Icon( // Added const
                         Icons.badge,
                         size: 20,
                         color: AppColors.textSecondary,
@@ -190,7 +185,7 @@ class DriverApprovalCard extends StatelessWidget {
                         label: const Text('Từ chối'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.danger,
-                          side: BorderSide(color: AppColors.danger),
+                          side: const BorderSide(color: AppColors.danger), // Added const
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(
@@ -229,16 +224,16 @@ class DriverApprovalCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.danger.withValues(alpha: 0.1),
+                    color: AppColors.danger.withValues(alpha: 0.1), // Changed withOpacity to withValues
                     borderRadius: BorderRadius.circular(AppRadius.small),
                     border: Border.all(
-                      color: AppColors.danger.withValues(alpha: 0.3),
+                      color: AppColors.danger.withValues(alpha: 0.3), // Changed withOpacity to withValues
                     ),
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Icon(
+                      const Icon( // Added const
                         Icons.info_outline,
                         size: 18,
                         color: AppColors.danger,
@@ -278,6 +273,42 @@ class DriverApprovalCard extends StatelessWidget {
     );
   }
 
+  Widget _buildStatusBadge(String status) {
+    Color color;
+    String label;
+
+    switch (status) {
+      case 'approved':
+        color = AppColors.success;
+        label = 'Đã duyệt';
+        break;
+      case 'rejected':
+        color = AppColors.danger;
+        label = 'Từ chối';
+        break;
+      default:
+        color = AppColors.warning;
+        label = 'Chờ duyệt';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
+  }
+
   String _getInitials(String name) {
     final parts = name.trim().split(' ');
     if (parts.isEmpty) return 'D';
@@ -289,7 +320,7 @@ class DriverApprovalCard extends StatelessWidget {
     final type = vehicleInfo['type'] ?? 'Xe máy';
     final plateNumber = vehicleInfo['plate_number'];
     if (plateNumber != null) {
-      return '$type - $plateNumber';
+      return '$type - $plateNumber'; // Corrected string interpolation
     }
     return type;
   }

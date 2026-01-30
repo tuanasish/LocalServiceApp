@@ -354,4 +354,133 @@ class MerchantRepository {
 
     return MerchantModel.fromJson(response as Map<String, dynamic>);
   }
+
+  // ===== ADMIN METHODS =====
+
+  /// [ADMIN] Lấy tất cả merchants (bao gồm pending, active, rejected)
+  Future<List<AdminMerchantInfo>> getAllMerchantsForAdmin({
+    required String marketId,
+    String? statusFilter,
+  }) async {
+    final response = await _client
+        .rpc(
+          'get_all_merchants',
+          params: {
+            'p_market_id': marketId,
+            'p_status': statusFilter,
+          },
+        )
+        .timeout(AppConstants.apiTimeout);
+
+    return (response as List)
+        .map((json) => AdminMerchantInfo.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// [ADMIN] Approve merchant registration
+  Future<MerchantModel> approveMerchant(String shopId) async {
+    final response = await _client
+        .rpc('approve_merchant', params: {'p_shop_id': shopId})
+        .timeout(AppConstants.apiTimeout);
+
+    return MerchantModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  /// [ADMIN] Reject merchant registration
+  Future<MerchantModel> rejectMerchant(String shopId, String reason) async {
+    final response = await _client
+        .rpc(
+          'reject_merchant',
+          params: {'p_shop_id': shopId, 'p_reason': reason},
+        )
+        .timeout(AppConstants.apiTimeout);
+
+    return MerchantModel.fromJson(response as Map<String, dynamic>);
+  }
+
+  /// [ADMIN] Get merchant statistics
+  Future<AdminMerchantStats> getMerchantStatsForAdmin(String shopId) async {
+    final response = await _client
+        .rpc('get_merchant_stats', params: {'p_shop_id': shopId})
+        .timeout(AppConstants.apiTimeout);
+
+    final data = (response as List).first as Map<String, dynamic>;
+    return AdminMerchantStats.fromJson(data);
+  }
 }
+
+/// Admin Merchant Info (từ RPC get_all_merchants)
+class AdminMerchantInfo {
+  final String id;
+  final String name;
+  final String? address;
+  final String? phone;
+  final String? imageUrl;
+  final String? ownerUserId;
+  final String? ownerName;
+  final String? ownerPhone;
+  final String status;
+  final double? rating;
+  final int orderCount;
+  final DateTime createdAt;
+
+  const AdminMerchantInfo({
+    required this.id,
+    required this.name,
+    this.address,
+    this.phone,
+    this.imageUrl,
+    this.ownerUserId,
+    this.ownerName,
+    this.ownerPhone,
+    required this.status,
+    this.rating,
+    required this.orderCount,
+    required this.createdAt,
+  });
+
+  factory AdminMerchantInfo.fromJson(Map<String, dynamic> json) {
+    return AdminMerchantInfo(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      address: json['address'] as String?,
+      phone: json['phone'] as String?,
+      imageUrl: json['image_url'] as String?,
+      ownerUserId: json['owner_user_id'] as String?,
+      ownerName: json['owner_name'] as String?,
+      ownerPhone: json['owner_phone'] as String?,
+      status: json['status'] as String? ?? 'pending',
+      rating: (json['rating'] as num?)?.toDouble(),
+      orderCount: (json['order_count'] as num?)?.toInt() ?? 0,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
+}
+
+/// Admin Merchant Stats (từ RPC get_merchant_stats)
+class AdminMerchantStats {
+  final int totalOrders;
+  final int completedOrders;
+  final int totalRevenue;
+  final double? avgRating;
+  final int productsCount;
+
+  const AdminMerchantStats({
+    required this.totalOrders,
+    required this.completedOrders,
+    required this.totalRevenue,
+    this.avgRating,
+    required this.productsCount,
+  });
+
+  factory AdminMerchantStats.fromJson(Map<String, dynamic> json) {
+    return AdminMerchantStats(
+      totalOrders: (json['total_orders'] as num?)?.toInt() ?? 0,
+      completedOrders: (json['completed_orders'] as num?)?.toInt() ?? 0,
+      totalRevenue: (json['total_revenue'] as num?)?.toInt() ?? 0,
+      avgRating: (json['avg_rating'] as num?)?.toDouble(),
+      productsCount: (json['products_count'] as num?)?.toInt() ?? 0,
+    );
+  }
+}
+

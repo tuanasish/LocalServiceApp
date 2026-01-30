@@ -1,0 +1,41 @@
+Analyzing choque...                                             
+
+  error - The method 'driverDetailProvider' isn't defined for the type 'AdminDriverDetailScreen' - lib\screens\admin\admin_driver_detail_screen.dart:18:35 - undefined_method
+  error - The method 'driverStatsProvider' isn't defined for the type 'AdminDriverDetailScreen' - lib\screens\admin\admin_driver_detail_screen.dart:19:34 - undefined_method
+  error - The method 'driverOrderHistoryProvider' isn't defined for the type 'AdminDriverDetailScreen' - lib\screens\admin\admin_driver_detail_screen.dart:20:35 - undefined_method
+  error - The method 'driverDetailProvider' isn't defined for the type 'AdminDriverDetailScreen' - lib\screens\admin\admin_driver_detail_screen.dart:35:28 - undefined_method
+  error - The method 'driverStatsProvider' isn't defined for the type 'AdminDriverDetailScreen' - lib\screens\admin\admin_driver_detail_screen.dart:36:28 - undefined_method
+  error - The method 'driverOrderHistoryProvider' isn't defined for the type 'AdminDriverDetailScreen' - lib\screens\admin\admin_driver_detail_screen.dart:37:28 - undefined_method
+warning - Unused import: '../../data/repositories/product_repository.dart' - lib\screens\admin\admin_item_editor_screen.dart:8:8 - unused_import
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_item_editor_screen.dart:257:29 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_item_editor_screen.dart:257:33 - unnecessary_underscores
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<String>>' - lib\screens\admin\admin_item_editor_screen.dart:439:40 - undefined_getter
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\screens\admin\admin_item_editor_screen.dart:547:13 - deprecated_member_use
+  error - The getter 'valueOrNull' isn't defined for the type 'AsyncValue<List<String>>' - lib\screens\admin\admin_menu_management_screen.dart:68:56 - undefined_getter
+   info - Don't use 'BuildContext's across async gaps - lib\screens\admin\admin_merchant_details_screen.dart:34:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\admin\admin_merchant_details_screen.dart:103:7 - use_build_context_synchronously
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_merchant_list_screen.dart:306:26 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_merchant_list_screen.dart:318:26 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_merchant_list_screen.dart:334:26 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_orders_screen.dart:119:24 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:265:32 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:280:32 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:295:32 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:416:32 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:491:32 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:506:32 - unnecessary_underscores
+   info - Unnecessary use of multiple underscores - lib\screens\admin\admin_system_overview_screen.dart:635:32 - unnecessary_underscores
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:103:32 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:109:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:114:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:118:7 - use_build_context_synchronously
+   info - Don't use 'BuildContext's across async gaps - lib\screens\auth\login_screen.dart:121:7 - use_build_context_synchronously
+  error - The method 'OrderRequestBottomSheet' isn't defined for the type '_DriverDashboardRequestScreenState' - lib\screens\driver\driver_dashboard_request_screen.dart:115:22 - undefined_method
+  error - The named parameter 'color' isn't defined - lib\screens\driver\driver_dashboard_request_screen.dart:198:13 - undefined_named_parameter
+   info - 'activeColor' is deprecated and shouldn't be used. Use activeThumbColor instead. This feature was deprecated after v3.31.0-2.0.pre - lib\screens\driver\driver_home_dashboard_screen.dart:352:13 - deprecated_member_use
+warning - Unused import: 'package:intl/intl.dart' - lib\screens\driver\driver_order_fulfillment_screen.dart:5:8 - unused_import
+warning - Unused import: '../../data/models/order_item_model.dart' - lib\screens\driver\driver_order_fulfillment_screen.dart:10:8 - unused_import
+warning - Unused import: '../../ui/widgets/order_tracking_map.dart' - lib\screens\driver\driver_order_fulfillment_screen.dart:13:8 - unused_import
+warning - The declaration '_getStatusColor' isn't referenced - lib\screens\driver\driver_order_fulfillment_screen.dart:878:9 - unused_element
+warning - The declaration '_formatPrice' isn't referenced - lib\screens\driver\driver_order_fulfillment_screen.dart:893:10 - unused_element
+

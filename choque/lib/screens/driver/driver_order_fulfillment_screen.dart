@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../ui/design_system.dart';
 import '../../ui/widgets/order_timeline_stepper.dart';
 import '../../providers/app_providers.dart';
 import '../../data/models/order_model.dart';
-import '../../data/models/order_item_model.dart';
 import '../../services/location_tracking_service.dart';
 import '../../services/navigation_service.dart';
-import '../../ui/widgets/order_tracking_map.dart';
 import '../../ui/widgets/stream_error_widget.dart';
 
 /// Driver Order Fulfillment Screen
@@ -173,112 +170,7 @@ class _DriverOrderFulfillmentScreenState
     );
   }
 
-  Widget _buildOrderInfoCard(OrderModel order) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.large),
-        boxShadow: AppShadows.soft(0.04),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '#${order.orderNumber}',
-                style: GoogleFonts.inter(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(order.status).withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(AppRadius.pill),
-                ),
-                child: Text(
-                  _getStatusText(order.status),
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: _getStatusColor(order.status),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              const Icon(
-                Icons.attach_money_outlined,
-                size: 18,
-                color: AppColors.textSecondary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'Phí giao hàng: ${_formatPrice(order.deliveryFee)}',
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.primary,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
-  /// Build realtime tracking map with distance/ETA info
-  Widget _buildRealtimeMap(OrderModel order) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppRadius.large),
-        boxShadow: AppShadows.soft(0.04),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text('Bản đồ giao hàng', style: AppTextStyles.heading18),
-              const Spacer(),
-              // Navigate to external map
-              IconButton(
-                onPressed: () => NavigationService.openNavigationApp(
-                  lat: order.status == OrderStatus.assigned
-                      ? order.pickup.lat
-                      : order.dropoff.lat,
-                  lng: order.status == OrderStatus.assigned
-                      ? order.pickup.lng
-                      : order.dropoff.lng,
-                  label: order.status == OrderStatus.assigned
-                      ? 'Cửa hàng'
-                      : 'Khách hàng',
-                ),
-                icon: const Icon(Icons.directions, color: AppColors.primary),
-                tooltip: 'Mở chỉ đường',
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          OrderTrackingMapWidget(order: order),
-        ],
-      ),
-    );
-  }
 
   Widget _buildMerchantCardWithMap(OrderModel order) {
     final merchantAsync = order.shopId != null
@@ -432,149 +324,6 @@ class _DriverOrderFulfillmentScreenState
         const SizedBox.shrink();
   }
 
-  Widget _buildStoreInfo(OrderModel order) {
-    final merchantAsync = order.shopId != null
-        ? ref.watch(merchantDetailProvider(order.shopId!))
-        : null;
-
-    return merchantAsync?.when(
-          data: (merchant) => Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.large),
-              boxShadow: AppShadows.soft(0.04),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(
-                      Icons.store_outlined,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(width: 8),
-                    Text('Cửa hàng', style: AppTextStyles.label14),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  merchant.name,
-                  style: GoogleFonts.inter(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textPrimary,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  order.pickup.address ?? order.pickup.label,
-                  style: AppTextStyles.body13Secondary,
-                ),
-                if (merchant.phone != null) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            side: const BorderSide(color: AppColors.primary),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.pill,
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            // TODO: Implement phone call
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Gọi số: ${merchant.phone}'),
-                                duration: const Duration(seconds: 2),
-                              ),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.phone_outlined,
-                            size: 16,
-                            color: AppColors.primary,
-                          ),
-                          label: Text(
-                            'Gọi cửa hàng',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.pill,
-                              ),
-                            ),
-                          ),
-                          onPressed: () async {
-                            final success =
-                                await NavigationService.openNavigationApp(
-                                  lat: order.pickup.lat,
-                                  lng: order.pickup.lng,
-                                  label: merchant.name,
-                                );
-                            if (!success && mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Không thể mở ứng dụng chỉ đường',
-                                  ),
-                                  backgroundColor: AppColors.danger,
-                                ),
-                              );
-                            }
-                          },
-                          icon: const Icon(
-                            Icons.navigation,
-                            size: 16,
-                            color: Colors.white,
-                          ),
-                          label: Text(
-                            'Chỉ đường',
-                            style: GoogleFonts.inter(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ],
-            ),
-          ),
-          loading: () => Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.circular(AppRadius.large),
-            ),
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-          error: (e, st) => const SizedBox.shrink(),
-        ) ??
-        const SizedBox.shrink();
-  }
 
   Widget _buildCustomerCard(OrderModel order) {
     return Container(
@@ -858,40 +607,6 @@ class _DriverOrderFulfillmentScreenState
     );
   }
 
-  Widget _buildOrderItemRow(OrderItemModel item) {
-    return Row(
-      children: [
-        Expanded(
-          child: Text(
-            item.productName,
-            style: GoogleFonts.inter(
-              fontSize: 13,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textPrimary,
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          'x${item.quantity}',
-          style: GoogleFonts.inter(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textSecondary,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Text(
-          _formatPrice(item.subtotal),
-          style: GoogleFonts.inter(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: AppColors.textPrimary,
-          ),
-        ),
-      ],
-    );
-  }
 
   Widget _buildBottomBar(OrderModel order) {
     final canPickUp = order.status == OrderStatus.assigned;
@@ -1090,53 +805,6 @@ class _DriverOrderFulfillmentScreenState
     await _locationService?.stopTracking();
   }
 
-  Future<void> _rejectOrder(OrderModel order) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Hủy nhận đơn'),
-        content: const Text('Bạn có chắc chắn muốn hủy nhận đơn hàng này?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Bỏ qua'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: TextButton.styleFrom(foregroundColor: AppColors.danger),
-            child: const Text('Xác nhận'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm != true) return;
-
-    setState(() => _isUpdatingStatus = true);
-    try {
-      await ref.read(driverRepositoryProvider).rejectOrder(order.id);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đã hủy nhận đơn hàng'),
-            backgroundColor: AppColors.success,
-          ),
-        );
-        context.go('/driver');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi: ${e.toString()}'),
-            backgroundColor: AppColors.danger,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isUpdatingStatus = false);
-    }
-  }
 
   Future<void> _updateStatus(OrderModel order, OrderStatus newStatus) async {
     setState(() => _isUpdatingStatus = true);
@@ -1204,68 +872,6 @@ class _DriverOrderFulfillmentScreenState
     }
   }
 
-  Color _getStatusColor(OrderStatus status) {
-    switch (status) {
-      case OrderStatus.readyForPickup:
-      case OrderStatus.confirmed:
-      case OrderStatus.assigned:
-        return AppColors.primary;
-      case OrderStatus.pickedUp:
-        return const Color(0xFF0EA5E9);
-      case OrderStatus.completed:
-        return AppColors.success;
-      default:
-        return AppColors.textSecondary;
-    }
-  }
-
-  String _formatPrice(int price) {
-    final formatted = price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
-    return '$formattedđ';
-  }
 
 
-  /// Build tracking status badge
-  Widget _buildTrackingStatusBadge() {
-    final isTracking = _locationService?.isTracking ?? false;
-
-    if (!isTracking) return const SizedBox.shrink();
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(AppRadius.pill),
-        border: Border.all(
-          color: AppColors.success.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 8,
-            height: 8,
-            decoration: const BoxDecoration(
-              color: AppColors.success,
-              shape: BoxShape.circle,
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            'Đang theo dõi vị trí',
-            style: GoogleFonts.inter(
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-              color: AppColors.success,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }

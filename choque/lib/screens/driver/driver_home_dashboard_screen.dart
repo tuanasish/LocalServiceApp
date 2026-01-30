@@ -349,7 +349,7 @@ class _DriverHomeDashboardScreenState
                       }
                     }
                   },
-            activeColor: AppColors.primary,
+            activeThumbColor: AppColors.primary,
           ),
         ],
       ),

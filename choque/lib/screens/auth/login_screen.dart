@@ -95,6 +95,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _navigateAfterLogin() async {
     // Wait for a tiny bit to ensure providers are updated after profile refresh
     await Future.delayed(const Duration(milliseconds: 100));
+    if (!mounted) return;
 
     final roles = ref.read(availableRolesProvider);
     final needsRoleSelection = roles.length > 1;

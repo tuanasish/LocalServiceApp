@@ -161,7 +161,6 @@ class NotificationRepository {
         .from('notifications')
         .stream(primaryKey: ['id'])
         .eq('user_id', userId)
-        .eq('read', false)
-        .map((data) => data.length);
+        .map((data) => data.where((json) => json['read'] == false).length);
   }
 }

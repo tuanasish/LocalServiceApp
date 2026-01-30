@@ -265,7 +265,7 @@ class _MerchantOrderDashboardScreenState
                             }
                           }
                         },
-                        activeColor: AppColors.primary,
+                        activeThumbColor: AppColors.primary,
                       ),
                     ],
                   ),

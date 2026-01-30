@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../ui/design_system.dart';
 import '../../providers/driver_admin_provider.dart';
-import '../../ui/widgets/driver_status_badge.dart';
 import 'admin_driver_detail_screen.dart';
 
 /// Admin Driver Monitoring Screen
@@ -270,8 +269,8 @@ class _AdminDriverMonitoringScreenState
                         style: GoogleFonts.inter(fontSize: 12),
                       ),
                       trailing: driver.driverStatus != null
-                          ? DriverStatusBadge(
-                              status: driver.driverStatus!,
+                          ? _buildStatusBadge(
+                              driver.driverStatus!,
                               compact: true,
                             )
                           : null,
@@ -319,5 +318,50 @@ class _AdminDriverMonitoringScreenState
     if (parts.isEmpty) return 'D';
     if (parts.length == 1) return parts[0][0].toUpperCase();
     return '${parts[0][0]}${parts[parts.length - 1][0]}'.toUpperCase();
+  }
+
+  Widget _buildStatusBadge(String status, {bool compact = false}) {
+    Color color;
+    String label;
+
+    switch (status.toLowerCase()) {
+      case 'online':
+      case 'active':
+        color = AppColors.success;
+        label = status == 'online' ? 'Online' : 'Hoạt động';
+        break;
+      case 'busy':
+      case 'in_progress':
+        color = const Color(0xFFF59E0B);
+        label = status == 'busy' ? 'Bận' : 'Đang giao';
+        break;
+      case 'offline':
+        color = AppColors.textSecondary;
+        label = 'Offline';
+        break;
+      default:
+        color = AppColors.textSecondary;
+        label = status;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 4 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.small),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: compact ? 11 : 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
   }
 }

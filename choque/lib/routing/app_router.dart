@@ -18,6 +18,12 @@ import '../screens/auth/reset_password_screen.dart';
 import '../screens/admin/admin_system_overview_screen.dart';
 import '../screens/admin/admin_orders_screen.dart';
 import '../screens/admin/admin_order_detail_screen.dart';
+import '../screens/admin/admin_merchant_list_screen.dart';
+import '../screens/admin/admin_merchant_details_screen.dart';
+import '../screens/admin/admin_menu_management_screen.dart';
+import '../screens/admin/admin_item_editor_screen.dart';
+import '../screens/admin/admin_config_screen.dart';
+import '../screens/admin/admin_promotion_screen.dart';
 import '../screens/driver/driver_dashboard_request_screen.dart';
 import '../screens/driver/driver_home_dashboard_screen.dart';
 import '../screens/driver/driver_order_fulfillment_screen.dart';
@@ -28,7 +34,6 @@ import '../screens/merchant/merchant_price_management_screen.dart';
 import '../screens/merchant/product_picker_screen.dart';
 import '../screens/merchant/merchant_profile_screen.dart';
 import '../screens/order/order_history_screen.dart';
-import '../screens/order/simple_order_tracking_screen.dart';
 import '../screens/profile/user_profile_screen.dart';
 import '../screens/notifications/notifications_screen.dart';
 import '../screens/profile/saved_addresses_screen.dart';
@@ -51,10 +56,8 @@ final _notificationsNavigatorKey = GlobalKey<NavigatorState>(
 );
 final _profileNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'profile');
 
-// Removed comment - keys declared above
-
 /// Helper function để kiểm tra lỗi network
-bool _isNetworkError(Object error) {
+bool isNetworkError(Object error) {
   final errorStr = error.toString();
   return errorStr.contains('Failed host lookup') ||
       errorStr.contains('SocketException') ||
@@ -63,7 +66,7 @@ bool _isNetworkError(Object error) {
 }
 
 // Routes that require authentication - defined outside for performance
-const _authRequiredRoutes = {
+const authRequiredRoutes = {
   '/profile/addresses/add',
   '/profile/addresses',
   '/profile/addresses/edit',
@@ -74,7 +77,7 @@ const _authRequiredRoutes = {
 };
 
 // Routes that are part of auth flow - không cần check profile
-const _authFlowRoutes = {
+const authFlowRoutes = {
   '/login',
   '/register',
   '/register/verify',
@@ -90,9 +93,9 @@ const _authFlowRoutes = {
 class RouterRefreshListenable extends ChangeNotifier {
   RouterRefreshListenable(Ref ref) {
     // Listen to changes in auth state and profile
-    ref.listen(authStateProvider, (_, __) => notifyListeners());
-    ref.listen(userProfileProvider, (_, __) => notifyListeners());
-    ref.listen(activeRoleProvider, (_, __) => notifyListeners());
+    ref.listen(authStateProvider, (_, _) => notifyListeners());
+    ref.listen(userProfileProvider, (_, _) => notifyListeners());
+    ref.listen(activeRoleProvider, (_, _) => notifyListeners());
   }
 }
 
@@ -109,8 +112,8 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // OPTIMIZATION: Early return cho routes không cần check auth
       // Đa số navigations (home, store detail, search) không cần kiểm tra gì
-      if (!_authRequiredRoutes.contains(location) &&
-          !_authFlowRoutes.contains(location) &&
+      if (!authRequiredRoutes.contains(location) &&
+          !authFlowRoutes.contains(location) &&
           !location.startsWith('/register')) {
         return null;
       }
@@ -119,7 +122,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       // Guest trying to access auth-required route -> redirect to login
       // Check này rất nhanh, chỉ check isAuthenticated
-      if (!isAuthenticated && _authRequiredRoutes.contains(location)) {
+      if (!isAuthenticated && authRequiredRoutes.contains(location)) {
         return '/login?redirect=${Uri.encodeComponent(location)}';
       }
 
@@ -142,7 +145,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       // Nếu có lỗi network, cho phép tiếp tục (để user có thể retry)
       if (profileAsync.hasError) {
         final error = profileAsync.error;
-        if (error != null && _isNetworkError(error)) {
+        if (error != null && isNetworkError(error)) {
           return null;
         }
       }
@@ -288,10 +291,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 builder: (context, state) => const OrderHistoryScreen(),
                 routes: [
                   GoRoute(
-                    path: ':id',
+                    path: 'details/:orderId',
                     builder: (context, state) {
-                      final orderId = state.pathParameters['id']!;
-                      return SimpleOrderTrackingScreen(orderId: orderId);
+                      final orderId = state.pathParameters['orderId']!;
+                      return AdminOrderDetailScreen(orderId: orderId);
                     },
                   ),
                 ],
@@ -359,6 +362,49 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               final orderId = state.pathParameters['id']!;
               return AdminOrderDetailScreen(orderId: orderId);
             },
+          ),
+          GoRoute(
+            path: 'merchants',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const AdminMerchantListScreen(),
+          ),
+          GoRoute(
+            path: 'merchants/:id',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) {
+              final shopId = state.pathParameters['id']!;
+              return AdminMerchantDetailsScreen(shopId: shopId);
+            },
+          ),
+          GoRoute(
+            path: 'menu',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const AdminMenuManagementScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) => const AdminItemEditorScreen(),
+              ),
+              GoRoute(
+                path: 'edit/:id',
+                parentNavigatorKey: _rootNavigatorKey,
+                builder: (context, state) {
+                  final productId = state.pathParameters['id']!;
+                  return AdminItemEditorScreen(productId: productId);
+                },
+              ),
+            ],
+          ),
+          GoRoute(
+            path: 'config',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const AdminConfigScreen(),
+          ),
+          GoRoute(
+            path: 'promotions',
+            parentNavigatorKey: _rootNavigatorKey,
+            builder: (context, state) => const AdminPromotionScreen(),
           ),
         ],
       ),

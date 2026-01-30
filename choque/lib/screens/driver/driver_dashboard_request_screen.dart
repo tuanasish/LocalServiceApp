@@ -9,6 +9,7 @@ import '../../ui/widgets/notification_badge.dart';
 import '../../providers/app_providers.dart';
 import '../../data/models/order_model.dart';
 import '../../ui/widgets/route_path_painter.dart';
+import '../../ui/widgets/order_request_bottom_sheet.dart';
 
 /// Driver Dashboard & Request Screen
 /// Dashboard tài xế với danh sách đơn hàng đang chờ nhận / có thể nhận.
@@ -195,7 +196,6 @@ class _DriverDashboardRequestScreenState
           // Notification button
           NotificationBadge(
             onTap: () => context.push('/driver/notifications'),
-            color: AppColors.textPrimary,
           ),
         ],
       ),

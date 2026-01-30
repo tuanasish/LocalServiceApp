@@ -7,6 +7,9 @@ import '../../ui/widgets/stat_card.dart';
 import '../../ui/widgets/activity_timeline_item.dart';
 import '../../ui/widgets/health_status_item.dart';
 import '../../providers/admin_order_provider.dart';
+import '../../providers/admin_merchant_provider.dart';
+import '../../providers/admin_product_provider.dart';
+import '../../providers/admin_promotion_provider.dart';
 import 'admin_driver_list_screen.dart';
 import 'admin_driver_monitoring_screen.dart';
 
@@ -36,6 +39,14 @@ class AdminSystemOverviewScreen extends ConsumerWidget {
                       _buildOrderManagement(context, ref),
                       const SizedBox(height: 20),
                       _buildDriverManagement(context),
+                      const SizedBox(height: 20),
+                      _buildMerchantManagement(context, ref),
+                      const SizedBox(height: 20),
+                      _buildMenuManagement(context, ref),
+                      const SizedBox(height: 20),
+                      _buildSettingsManagement(context),
+                      const SizedBox(height: 20),
+                      _buildPromotionManagement(context, ref),
                       const SizedBox(height: 20),
                       _buildQuickStats(),
                       const SizedBox(height: 20),
@@ -251,7 +262,7 @@ class AdminSystemOverviewScreen extends ConsumerWidget {
                   badge: pendingCount.when(
                     data: (c) => c > 0 ? '$c' : null,
                     loading: () => null,
-                    error: (_, __) => null,
+                    error: (e, s) => null,
                   ),
                   onTap: () => context.push('/admin/orders'),
                 ),
@@ -266,7 +277,7 @@ class AdminSystemOverviewScreen extends ConsumerWidget {
                   badge: confirmedCount.when(
                     data: (c) => c > 0 ? '$c' : null,
                     loading: () => null,
-                    error: (_, __) => null,
+                    error: (e, s) => null,
                   ),
                   onTap: () => context.push('/admin/orders'),
                 ),
@@ -281,7 +292,7 @@ class AdminSystemOverviewScreen extends ConsumerWidget {
                   badge: activeCount.when(
                     data: (c) => c > 0 ? '$c' : null,
                     loading: () => null,
-                    error: (_, __) => null,
+                    error: (e, s) => null,
                   ),
                   onTap: () => context.push('/admin/orders'),
                 ),
@@ -344,7 +355,6 @@ class AdminSystemOverviewScreen extends ConsumerWidget {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
             Text(
               label,
               textAlign: TextAlign.center,
@@ -356,6 +366,300 @@ class AdminSystemOverviewScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildMerchantManagement(BuildContext context, WidgetRef ref) {
+    final pendingCount = ref.watch(pendingMerchantsCountProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Quản lý Cửa hàng', style: AppTextStyles.heading18),
+              TextButton(
+                onPressed: () => context.push('/admin/merchants'),
+                child: Text(
+                  'Xem tất cả',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.pending_actions_outlined,
+                  label: 'Chờ duyệt',
+                  color: const Color(0xFFF59E0B),
+                  badge: pendingCount.when(
+                    data: (c) => c > 0 ? '$c' : null,
+                    loading: () => null,
+                    error: (e, s) => null,
+                  ),
+                  onTap: () => context.push('/admin/merchants'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.store_outlined,
+                  label: 'Đang hoạt động',
+                  color: AppColors.success,
+                  onTap: () => context.push('/admin/merchants'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.list_alt_outlined,
+                  label: 'Tất cả',
+                  color: AppColors.primary,
+                  onTap: () => context.push('/admin/merchants'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuManagement(BuildContext context, WidgetRef ref) {
+    final totalProductsAsync = ref.watch(totalProductsCountProvider);
+    final activeProductsAsync = ref.watch(activeProductsCountProvider);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Quản lý Sản phẩm', style: AppTextStyles.heading18),
+              TextButton(
+                onPressed: () => context.push('/admin/menu'),
+                child: Text(
+                  'Xem tất cả',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.inventory_2_outlined,
+                  label: 'Tổng sản phẩm',
+                  color: AppColors.primary,
+                  badge: totalProductsAsync.when(
+                    data: (c) => c > 0 ? '$c' : null,
+                    loading: () => null,
+                    error: (e, s) => null,
+                  ),
+                  onTap: () => context.push('/admin/menu'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.check_circle_outline,
+                  label: 'Đang bán',
+                  color: AppColors.success,
+                  badge: activeProductsAsync.when(
+                    data: (c) => c > 0 ? '$c' : null,
+                    loading: () => null,
+                    error: (e, s) => null,
+                  ),
+                  onTap: () => context.push('/admin/menu'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.add_circle_outline,
+                  label: 'Thêm mới',
+                  color: const Color(0xFF8B5CF6),
+                  onTap: () => context.push('/admin/menu/new'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsManagement(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Cài đặt hệ thống', style: AppTextStyles.heading18),
+              TextButton(
+                onPressed: () => context.push('/admin/config'),
+                child: Text(
+                  'Cấu hình',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.tune_outlined,
+                  label: 'Feature Flags',
+                  color: const Color(0xFF8B5CF6),
+                  onTap: () => context.push('/admin/config'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.rule_outlined,
+                  label: 'Quy tắc',
+                  color: const Color(0xFF10B981),
+                  onTap: () => context.push('/admin/config'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.settings_outlined,
+                  label: 'Giới hạn',
+                  color: const Color(0xFFF59E0B),
+                  onTap: () => context.push('/admin/config'),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPromotionManagement(BuildContext context, WidgetRef ref) {
+    final activeCountAsync = ref.watch(activePromotionsCountProvider);
+    
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(AppRadius.large),
+        boxShadow: AppShadows.soft(0.04),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text('Khuyến mãi', style: AppTextStyles.heading18),
+              TextButton(
+                onPressed: () => context.push('/admin/promotions'),
+                child: Text(
+                  'Quản lý',
+                  style: GoogleFonts.inter(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.local_offer_outlined,
+                  label: activeCountAsync.when(
+                    data: (count) => '$count đang chạy',
+                    loading: () => 'Đang tải...',
+                    error: (e, s) => 'Lỗi',
+                  ),
+                  color: const Color(0xFF10B981),
+                  onTap: () => context.push('/admin/promotions'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.add_circle_outline,
+                  label: 'Tạo mới',
+                  color: const Color(0xFF8B5CF6),
+                  onTap: () => context.push('/admin/promotions'),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildDriverManagementCard(
+                  context: context,
+                  icon: Icons.bar_chart_outlined,
+                  label: 'Thống kê',
+                  color: const Color(0xFFF59E0B),
+                  onTap: () => context.push('/admin/promotions'),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }

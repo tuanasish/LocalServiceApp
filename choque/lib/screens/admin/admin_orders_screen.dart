@@ -116,7 +116,7 @@ class _AdminOrdersScreenState extends ConsumerState<AdminOrdersScreen>
               );
             },
             loading: () => const SizedBox.shrink(),
-            error: (_, __) => const SizedBox.shrink(),
+            error: (e, s) => const SizedBox.shrink(),
           ),
         ],
       ),

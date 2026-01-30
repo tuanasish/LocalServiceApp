@@ -7,7 +7,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'data/supabase_client.dart';
 import 'routing/app_router.dart';
 import 'config/constants.dart';
-import 'services/notification_service.dart';
 import 'services/fcm_service.dart';
 import 'services/notification_handler_service.dart';
 import 'providers/notification_provider.dart';

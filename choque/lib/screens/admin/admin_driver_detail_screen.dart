@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import '../../ui/design_system.dart';
 import '../../providers/driver_admin_provider.dart';
-import '../../ui/widgets/driver_status_badge.dart';
 import '../../data/models/order_model.dart';
 
 /// Admin Driver Detail Screen
@@ -126,10 +125,10 @@ class AdminDriverDetailScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 if (driver.driverApprovalStatus != null)
-                  DriverStatusBadge(status: driver.driverApprovalStatus!),
+                  _buildStatusBadge(driver.driverApprovalStatus!),
                 if (driver.driverStatus != null) ...[
                   const SizedBox(width: 8),
-                  DriverStatusBadge(status: driver.driverStatus!),
+                  _buildStatusBadge(driver.driverStatus!),
                 ],
               ],
             ),
@@ -452,7 +451,7 @@ class AdminDriverDetailScreen extends ConsumerWidget {
                 ],
               ),
             ),
-            DriverStatusBadge(status: order.status.toDbString(), compact: true),
+            _buildStatusBadge(order.status.toDbString(), compact: true),
           ],
         ),
       ),
@@ -480,5 +479,51 @@ class AdminDriverDetailScreen extends ConsumerWidget {
     final licenseClass = licenseInfo['class'] ?? 'A1';
     if (number != null) return '$licenseClass - $number';
     return licenseClass;
+  }
+  Widget _buildStatusBadge(String status, {bool compact = false}) {
+    Color color;
+    String label;
+
+    switch (status.toLowerCase()) {
+      case 'approved':
+      case 'active':
+      case 'completed':
+        color = AppColors.success;
+        label = status == 'approved' ? 'Đã duyệt' : (status == 'active' ? 'Hoạt động' : 'Hoàn thành');
+        break;
+      case 'pending':
+      case 'in_progress':
+        color = AppColors.warning;
+        label = status == 'pending' ? 'Chờ duyệt' : 'Đang xử lý';
+        break;
+      case 'rejected':
+      case 'cancelled':
+        color = AppColors.danger;
+        label = status == 'rejected' ? 'Từ chối' : 'Đã hủy';
+        break;
+      default:
+        color = AppColors.textSecondary;
+        label = status;
+    }
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: compact ? 8 : 12,
+        vertical: compact ? 4 : 6,
+      ),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppRadius.small),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        label,
+        style: GoogleFonts.inter(
+          fontSize: compact ? 11 : 12,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
+      ),
+    );
   }
 }
